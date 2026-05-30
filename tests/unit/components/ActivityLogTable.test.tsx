@@ -115,9 +115,7 @@ describe("ActivityLogTable", () => {
     render(<ActivityLogTable initialLogs={mockLogs} />);
     fireEvent.click(screen.getByRole("button", { name: /terapkan filter/i }));
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("/api/activity-logs"),
-      );
+      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/api/activity-logs"));
     });
   });
 

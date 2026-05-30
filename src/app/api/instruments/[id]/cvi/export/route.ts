@@ -48,8 +48,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams): Promi
   return new NextResponse(blob, {
     status: 200,
     headers: {
-      "Content-Type":
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       "Content-Disposition": contentDisposition,
     },
   });

@@ -26,12 +26,12 @@ const config = {
     "src/**/*.{ts,tsx}",
     // Kecualikan file-file yang tidak dapat di-unit-test di jsdom:
     "!src/**/*.d.ts",
-    "!src/app/**",          // Server Components, Next.js pages/layouts
-    "!src/middleware.ts",   // Next.js edge middleware
-    "!src/proxy.ts",        // Next.js server-side proxy utility
-    "!src/services/**",    // Thin API wrappers (no business logic)
-    "!src/lib/auth.ts",    // Server-side auth (getServerSession)
-    "!src/constants/**",   // Pure constants
+    "!src/app/**", // Server Components, Next.js pages/layouts
+    "!src/middleware.ts", // Next.js edge middleware
+    "!src/proxy.ts", // Next.js server-side proxy utility
+    "!src/services/**", // Thin API wrappers (no business logic)
+    "!src/lib/auth.ts", // Server-side auth (getServerSession)
+    "!src/constants/**", // Pure constants
     "!src/**/index.ts",
   ],
   coverageThreshold: {

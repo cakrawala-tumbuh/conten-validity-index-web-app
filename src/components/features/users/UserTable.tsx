@@ -107,7 +107,9 @@ export const UserTable = ({ initialUsers }: UserTableProps) => {
    * @param user - User yang akan dinonaktifkan.
    */
   const deactivateUser = async (user: UserResponse) => {
-    if (!confirm(`Nonaktifkan pengguna "${user.full_name}"? Pengguna tidak akan bisa login lagi.`)) {
+    if (
+      !confirm(`Nonaktifkan pengguna "${user.full_name}"? Pengguna tidak akan bisa login lagi.`)
+    ) {
       return;
     }
     setLoading(true);
@@ -118,9 +120,7 @@ export const UserTable = ({ initialUsers }: UserTableProps) => {
         const data = await resp.json().catch(() => ({}));
         throw new Error(data.detail ?? `Gagal menonaktifkan pengguna (${resp.status})`);
       }
-      setUsers((prev) =>
-        prev.map((u) => (u.id === user.id ? { ...u, is_active: false } : u)),
-      );
+      setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, is_active: false } : u)));
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal menonaktifkan pengguna.");

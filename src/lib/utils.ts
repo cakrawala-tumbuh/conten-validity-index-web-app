@@ -5,7 +5,11 @@
  */
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { CVI_FEW_EXPERTS_MAX, CVI_THRESHOLD_FEW_EXPERTS, CVI_THRESHOLD_MANY_EXPERTS } from "@/constants";
+import {
+  CVI_FEW_EXPERTS_MAX,
+  CVI_THRESHOLD_FEW_EXPERTS,
+  CVI_THRESHOLD_MANY_EXPERTS,
+} from "@/constants";
 
 /**
  * Menggabungkan Tailwind CSS class names dengan penanganan konflik yang benar.

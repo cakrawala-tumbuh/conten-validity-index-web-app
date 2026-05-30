@@ -197,7 +197,9 @@ export const ActivityLogTable = ({ initialLogs }: ActivityLogTableProps) => {
                       })}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">
-                      {log.user_id ? log.user_id.slice(0, 8) + "..." : (
+                      {log.user_id ? (
+                        log.user_id.slice(0, 8) + "..."
+                      ) : (
                         <span className="text-gray-400 italic">sistem</span>
                       )}
                     </td>
@@ -213,16 +215,12 @@ export const ActivityLogTable = ({ initialLogs }: ActivityLogTableProps) => {
                         <span>
                           {log.resource_type}
                           {log.resource_id && (
-                            <span className="ml-1 font-mono">
-                              #{log.resource_id.slice(0, 6)}
-                            </span>
+                            <span className="ml-1 font-mono">#{log.resource_id.slice(0, 6)}</span>
                           )}
                         </span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-xs text-gray-400 font-mono">
-                      {log.ip_address}
-                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-400 font-mono">{log.ip_address}</td>
                   </tr>
                 ))}
               </tbody>

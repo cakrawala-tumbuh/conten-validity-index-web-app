@@ -99,16 +99,17 @@ export const AssignmentManager = ({
   const removeAssignment = async (assignment: AssignmentResponse) => {
     const expert = availableExperts.find((u) => u.id === assignment.user_id);
     const label = expert?.full_name ?? assignment.user_id.slice(0, 8);
-    if (!confirm(`Hapus penugasan ${label}? Expert tidak akan lagi dapat mengakses instrumen ini.`)) {
+    if (
+      !confirm(`Hapus penugasan ${label}? Expert tidak akan lagi dapat mengakses instrumen ini.`)
+    ) {
       return;
     }
     setLoading(true);
     setError(null);
     try {
-      const resp = await fetch(
-        `/api/instruments/${instrumentId}/assignments/${assignment.id}`,
-        { method: "DELETE" },
-      );
+      const resp = await fetch(`/api/instruments/${instrumentId}/assignments/${assignment.id}`, {
+        method: "DELETE",
+      });
       if (!resp.ok) {
         const data = await resp.json().catch(() => ({}));
         throw new Error(data.detail ?? `Gagal menghapus assignment (${resp.status})`);
@@ -130,7 +131,10 @@ export const AssignmentManager = ({
         {!showForm && unassignedExperts.length > 0 && (
           <button
             type="button"
-            onClick={() => { setShowForm(true); setError(null); }}
+            onClick={() => {
+              setShowForm(true);
+              setError(null);
+            }}
             className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition"
           >
             <UserPlus className="h-3.5 w-3.5" /> Tugaskan Expert
@@ -159,7 +163,8 @@ export const AssignmentManager = ({
                 <option value="">— Pilih expert —</option>
                 {unassignedExperts.map((u) => (
                   <option key={u.id} value={u.id}>
-                    {u.full_name}{u.institution ? ` (${u.institution})` : ""}
+                    {u.full_name}
+                    {u.institution ? ` (${u.institution})` : ""}
                   </option>
                 ))}
               </select>
@@ -177,7 +182,12 @@ export const AssignmentManager = ({
           <div className="flex justify-end gap-2">
             <button
               type="button"
-              onClick={() => { setShowForm(false); setError(null); setSelectedUserId(""); setDeadline(""); }}
+              onClick={() => {
+                setShowForm(false);
+                setError(null);
+                setSelectedUserId("");
+                setDeadline("");
+              }}
               className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition"
             >
               Batal

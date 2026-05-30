@@ -92,38 +92,20 @@ describe("RatingForm", () => {
   });
 
   it("harus merender semua item dalam form", () => {
-    render(
-      <RatingForm
-        assignment={mockAssignment}
-        items={mockItems}
-        existingRatings={[]}
-      />,
-    );
+    render(<RatingForm assignment={mockAssignment} items={mockItems} existingRatings={[]} />);
     expect(screen.getByText("Item pertama untuk dinilai")).toBeInTheDocument();
     expect(screen.getByText("Item kedua untuk dinilai")).toBeInTheDocument();
   });
 
   it("harus menampilkan progress indicator", () => {
-    render(
-      <RatingForm
-        assignment={mockAssignment}
-        items={mockItems}
-        existingRatings={[]}
-      />,
-    );
+    render(<RatingForm assignment={mockAssignment} items={mockItems} existingRatings={[]} />);
     expect(screen.getByText(/progres/i)).toBeInTheDocument();
     // 0 dari 2 terisi
     expect(screen.getByText(/0 \/ 2/)).toBeInTheDocument();
   });
 
   it("harus menampilkan radio button untuk setiap skala (1-4)", () => {
-    render(
-      <RatingForm
-        assignment={mockAssignment}
-        items={[mockItems[0]]}
-        existingRatings={[]}
-      />,
-    );
+    render(<RatingForm assignment={mockAssignment} items={[mockItems[0]]} existingRatings={[]} />);
     // Labels render as "1 — Tidak Relevan" etc. in a single <span>
     expect(screen.getByText(/tidak relevan/i)).toBeInTheDocument();
     expect(screen.getByText(/kurang relevan/i)).toBeInTheDocument();
@@ -132,13 +114,7 @@ describe("RatingForm", () => {
   });
 
   it("harus tombol submit disabled jika belum semua item dinilai", () => {
-    render(
-      <RatingForm
-        assignment={mockAssignment}
-        items={mockItems}
-        existingRatings={[]}
-      />,
-    );
+    render(<RatingForm assignment={mockAssignment} items={mockItems} existingRatings={[]} />);
     const submitButton = screen.getByRole("button", { name: /simpan semua penilaian/i });
     expect(submitButton).toBeDisabled();
   });
@@ -168,13 +144,7 @@ describe("RatingForm", () => {
   });
 
   it("harus menampilkan error jika submit sebelum semua item dinilai", () => {
-    render(
-      <RatingForm
-        assignment={mockAssignment}
-        items={mockItems}
-        existingRatings={[]}
-      />,
-    );
+    render(<RatingForm assignment={mockAssignment} items={mockItems} existingRatings={[]} />);
     // Klik submit meski disabled — coba via form submit langsung
     const submitButton = screen.getByRole("button", { name: /simpan semua penilaian/i });
     // Button disabled, jadi tidak bisa diklik, tapi test tetap valid
@@ -182,26 +152,14 @@ describe("RatingForm", () => {
   });
 
   it("harus menampilkan konten item dan nomor urut", () => {
-    render(
-      <RatingForm
-        assignment={mockAssignment}
-        items={mockItems}
-        existingRatings={[]}
-      />,
-    );
+    render(<RatingForm assignment={mockAssignment} items={mockItems} existingRatings={[]} />);
     // sequence_number rendered as plain number, no trailing dot
     expect(screen.getByText("1")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
   });
 
   it("harus mengupdate progress saat radio button dipilih", () => {
-    render(
-      <RatingForm
-        assignment={mockAssignment}
-        items={mockItems}
-        existingRatings={[]}
-      />,
-    );
+    render(<RatingForm assignment={mockAssignment} items={mockItems} existingRatings={[]} />);
     // Pilih skor 3 untuk item pertama
     const radio3Options = screen.getAllByRole("radio", { name: /cukup relevan/i });
     fireEvent.click(radio3Options[0]);
@@ -212,11 +170,7 @@ describe("RatingForm", () => {
   it("harus berhasil submit penilaian lengkap dan menampilkan sukses", async () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
     render(
-      <RatingForm
-        assignment={mockAssignment}
-        items={mockItems}
-        existingRatings={mockAllRatings}
-      />,
+      <RatingForm assignment={mockAssignment} items={mockItems} existingRatings={mockAllRatings} />,
     );
     const form = screen.getByRole("button", { name: /simpan semua penilaian/i }).closest("form");
     if (form) fireEvent.submit(form);
@@ -231,11 +185,7 @@ describe("RatingForm", () => {
   it("harus menampilkan state sukses setelah submit berhasil", async () => {
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
     render(
-      <RatingForm
-        assignment={mockAssignment}
-        items={mockItems}
-        existingRatings={mockAllRatings}
-      />,
+      <RatingForm assignment={mockAssignment} items={mockItems} existingRatings={mockAllRatings} />,
     );
     const form = screen.getByRole("button", { name: /simpan semua penilaian/i }).closest("form");
     if (form) fireEvent.submit(form);
@@ -250,11 +200,7 @@ describe("RatingForm", () => {
       json: async () => ({ detail: "Server error" }),
     });
     render(
-      <RatingForm
-        assignment={mockAssignment}
-        items={mockItems}
-        existingRatings={mockAllRatings}
-      />,
+      <RatingForm assignment={mockAssignment} items={mockItems} existingRatings={mockAllRatings} />,
     );
     const form = screen.getByRole("button", { name: /simpan semua penilaian/i }).closest("form");
     if (form) fireEvent.submit(form);

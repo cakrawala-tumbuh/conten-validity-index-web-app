@@ -27,9 +27,17 @@ export default defineConfig({
    * Untuk Docker, direktori ini diatur via env PLAYWRIGHT_OUTPUT_DIR.
    */
   outputDir: process.env.PLAYWRIGHT_OUTPUT_DIR ?? "/tmp/cvi-playwright-results",
-  reporter: [["html", { outputFolder: process.env.PLAYWRIGHT_OUTPUT_DIR
-    ? `${process.env.PLAYWRIGHT_OUTPUT_DIR}/report`
-    : "/tmp/cvi-playwright-report" }], ["list"]],
+  reporter: [
+    [
+      "html",
+      {
+        outputFolder: process.env.PLAYWRIGHT_OUTPUT_DIR
+          ? `${process.env.PLAYWRIGHT_OUTPUT_DIR}/report`
+          : "/tmp/cvi-playwright-report",
+      },
+    ],
+    ["list"],
+  ],
 
   globalSetup: "./tests/e2e/global-setup.ts",
 

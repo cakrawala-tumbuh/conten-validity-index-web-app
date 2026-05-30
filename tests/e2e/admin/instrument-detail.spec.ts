@@ -26,9 +26,15 @@ let instrumentId: string;
 async function createTestInstrument(page: Page, name: string): Promise<string> {
   await page.goto("/instruments/new");
   await page.getByLabel(/nama instrumen/i).fill(name);
-  await page.getByPlaceholder(/konten.*pernyataan item/i).first().fill("Item pertama");
+  await page
+    .getByPlaceholder(/konten.*pernyataan item/i)
+    .first()
+    .fill("Item pertama");
   await page.getByRole("button", { name: /\+ tambah item/i }).click();
-  await page.getByPlaceholder(/konten.*pernyataan item/i).last().fill("Item kedua");
+  await page
+    .getByPlaceholder(/konten.*pernyataan item/i)
+    .last()
+    .fill("Item kedua");
   await page.getByRole("button", { name: /buat instrumen/i }).click();
   await page.waitForURL(/\/instruments$/, { timeout: 10_000 });
 
@@ -80,7 +86,10 @@ test.describe("Halaman Detail Instrumen (Admin)", () => {
     // Badge adalah <span class="rounded-full"> dengan label "Draf", "Aktif", atau "Ditutup"
     // Menggunakan locator spesifik agar tidak mencocokkan <option> tersembunyi di dropdown status
     await expect(
-      page.locator("span.rounded-full").filter({ hasText: /^(Draf|Aktif|Ditutup)$/ }).first(),
+      page
+        .locator("span.rounded-full")
+        .filter({ hasText: /^(Draf|Aktif|Ditutup)$/ })
+        .first(),
     ).toBeVisible();
   });
 
@@ -255,8 +264,8 @@ test.describe("Halaman Detail Instrumen (Admin)", () => {
     await page.getByRole("button", { name: /hasil cvi/i }).click();
     await page.getByRole("button", { name: /hitung cvi/i }).click();
     // Harus menampilkan error (karena belum ada rating) atau hasil
-    await expect(
-      page.getByText(/gagal|tidak ada|belum ada penilaian|cvi/i).first(),
-    ).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByText(/gagal|tidak ada|belum ada penilaian|cvi/i).first()).toBeVisible({
+      timeout: 10_000,
+    });
   });
 });

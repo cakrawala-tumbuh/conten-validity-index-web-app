@@ -57,8 +57,7 @@ function getAuthentikBase(issuerUrl: string): string {
 
 /** Base URL Authentik yang dapat dijangkau oleh browser pengguna. */
 const authentikExternalBase =
-  process.env.AUTHENTIK_EXTERNAL_URL ??
-  getAuthentikBase(process.env.AUTHENTIK_ISSUER_URL ?? "");
+  process.env.AUTHENTIK_EXTERNAL_URL ?? getAuthentikBase(process.env.AUTHENTIK_ISSUER_URL ?? "");
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -101,8 +100,7 @@ export const authOptions: NextAuthOptions = {
     async signIn({ account }) {
       if (account?.access_token) {
         try {
-          const baseUrl =
-            process.env.BACKEND_API_INTERNAL_URL ?? "http://backend:8000";
+          const baseUrl = process.env.BACKEND_API_INTERNAL_URL ?? "http://backend:8000";
           await fetch(`${baseUrl}/api/v1/auth/sync`, {
             method: "POST",
             headers: {

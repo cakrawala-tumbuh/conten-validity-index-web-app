@@ -75,10 +75,8 @@ export default async function RatingPage({ params }: RatingPageProps) {
 
   if (!instrument) notFound();
 
-  const instrumentStatusLabel =
-    INSTRUMENT_STATUS_LABELS[instrument.status] ?? instrument.status;
-  const assignmentStatusLabel =
-    ASSIGNMENT_STATUS_LABELS[assignment.status] ?? assignment.status;
+  const instrumentStatusLabel = INSTRUMENT_STATUS_LABELS[instrument.status] ?? instrument.status;
+  const assignmentStatusLabel = ASSIGNMENT_STATUS_LABELS[assignment.status] ?? assignment.status;
 
   const statusColor: Record<string, string> = {
     draft: "bg-gray-100 text-gray-700",
@@ -149,16 +147,10 @@ export default async function RatingPage({ params }: RatingPageProps) {
 
       {items.length === 0 ? (
         <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">
-          <p className="text-sm text-gray-500">
-            Instrumen ini belum memiliki item untuk dinilai.
-          </p>
+          <p className="text-sm text-gray-500">Instrumen ini belum memiliki item untuk dinilai.</p>
         </div>
       ) : (
-        <RatingForm
-          assignment={assignment}
-          items={items}
-          existingRatings={existingRatings}
-        />
+        <RatingForm assignment={assignment} items={items} existingRatings={existingRatings} />
       )}
     </div>
   );

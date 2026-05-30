@@ -169,7 +169,11 @@ const InfoTab = ({ instrument }: InfoTabProps) => {
    * Menghapus instrumen setelah konfirmasi dua kali.
    */
   const handleDelete = async () => {
-    if (!confirm(`Hapus instrumen "${instrument.name}"? Semua item dan assignment akan ikut terhapus.`)) {
+    if (
+      !confirm(
+        `Hapus instrumen "${instrument.name}"? Semua item dan assignment akan ikut terhapus.`,
+      )
+    ) {
       return;
     }
     if (!confirm("Konfirmasi sekali lagi: hapus permanen?")) return;

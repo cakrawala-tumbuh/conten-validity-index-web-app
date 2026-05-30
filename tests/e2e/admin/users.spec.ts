@@ -21,7 +21,10 @@ test.describe("Halaman Pengguna (Admin)", () => {
 
   test("harus menampilkan tabel atau pesan kosong", async ({ page }) => {
     await page.goto("/users");
-    const hasTable = await page.locator("table").isVisible().catch(() => false);
+    const hasTable = await page
+      .locator("table")
+      .isVisible()
+      .catch(() => false);
     const hasEmpty = await page
       .getByText(/belum ada pengguna/i)
       .isVisible()
@@ -40,7 +43,10 @@ test.describe("Halaman Pengguna (Admin)", () => {
 
   test("harus menampilkan kolom header tabel pengguna", async ({ page }) => {
     await page.goto("/users");
-    const hasTable = await page.locator("table").isVisible().catch(() => false);
+    const hasTable = await page
+      .locator("table")
+      .isVisible()
+      .catch(() => false);
     if (!hasTable) {
       test.skip();
       return;
@@ -54,7 +60,10 @@ test.describe("Halaman Pengguna (Admin)", () => {
 
   test("harus menampilkan tombol edit untuk setiap pengguna", async ({ page }) => {
     await page.goto("/users");
-    const hasTable = await page.locator("table").isVisible().catch(() => false);
+    const hasTable = await page
+      .locator("table")
+      .isVisible()
+      .catch(() => false);
     if (!hasTable) {
       test.skip();
       return;
@@ -64,7 +73,10 @@ test.describe("Halaman Pengguna (Admin)", () => {
 
   test("harus menampilkan form edit inline saat tombol edit diklik", async ({ page }) => {
     await page.goto("/users");
-    const hasTable = await page.locator("table").isVisible().catch(() => false);
+    const hasTable = await page
+      .locator("table")
+      .isVisible()
+      .catch(() => false);
     if (!hasTable) {
       test.skip();
       return;
@@ -72,13 +84,19 @@ test.describe("Halaman Pengguna (Admin)", () => {
     await page.getByTitle("Edit").first().click();
     // Form edit inline muncul dengan field institusi / area keahlian
     await expect(
-      page.getByPlaceholder(/institusi|institution/i).or(page.getByRole("textbox")).first(),
+      page
+        .getByPlaceholder(/institusi|institution/i)
+        .or(page.getByRole("textbox"))
+        .first(),
     ).toBeVisible();
   });
 
   test("harus dapat membatalkan edit dengan tombol batal", async ({ page }) => {
     await page.goto("/users");
-    const hasTable = await page.locator("table").isVisible().catch(() => false);
+    const hasTable = await page
+      .locator("table")
+      .isVisible()
+      .catch(() => false);
     if (!hasTable) {
       test.skip();
       return;
@@ -91,7 +109,10 @@ test.describe("Halaman Pengguna (Admin)", () => {
 
   test("harus dapat menyimpan perubahan institusi pengguna", async ({ page }) => {
     await page.goto("/users");
-    const hasTable = await page.locator("table").isVisible().catch(() => false);
+    const hasTable = await page
+      .locator("table")
+      .isVisible()
+      .catch(() => false);
     if (!hasTable) {
       test.skip();
       return;
@@ -101,16 +122,17 @@ test.describe("Halaman Pengguna (Admin)", () => {
     await institutionInput.fill("Universitas Test E2E");
     await page.getByTitle("Simpan").first().click();
     // Tidak ada error setelah simpan
-    await expect(
-      page.getByText(/gagal menyimpan/i),
-    ).not.toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText(/gagal menyimpan/i)).not.toBeVisible({ timeout: 5_000 });
   });
 
   // ─── Aksi Nonaktifkan ─────────────────────────────────────────────────────
 
   test("harus menampilkan tombol nonaktifkan untuk pengguna aktif", async ({ page }) => {
     await page.goto("/users");
-    const hasTable = await page.locator("table").isVisible().catch(() => false);
+    const hasTable = await page
+      .locator("table")
+      .isVisible()
+      .catch(() => false);
     if (!hasTable) {
       test.skip();
       return;

@@ -129,9 +129,7 @@ describe("UserTable", () => {
     render(<UserTable initialUsers={[mockUsers[0]]} />);
     const deactivateButton = screen.getByTitle("Nonaktifkan");
     fireEvent.click(deactivateButton);
-    expect(mockConfirm).toHaveBeenCalledWith(
-      expect.stringContaining("Admin Pertama"),
-    );
+    expect(mockConfirm).toHaveBeenCalledWith(expect.stringContaining("Admin Pertama"));
   });
 
   it("harus membatalkan nonaktifkan jika konfirmasi ditolak", () => {

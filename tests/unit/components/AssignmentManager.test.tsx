@@ -64,11 +64,7 @@ describe("AssignmentManager", () => {
 
   it("harus menampilkan pesan kosong jika tidak ada assignment", () => {
     render(
-      <AssignmentManager
-        instrumentId="inst-1"
-        initialAssignments={[]}
-        availableExperts={[]}
-      />,
+      <AssignmentManager instrumentId="inst-1" initialAssignments={[]} availableExperts={[]} />,
     );
     expect(screen.getByText(/belum ada expert yang ditugaskan/i)).toBeInTheDocument();
   });

@@ -26,7 +26,10 @@ test.describe("Halaman Instrumen (Admin)", () => {
 
   test("harus menampilkan tabel instrumen atau pesan kosong", async ({ page }) => {
     await page.goto("/instruments");
-    const hasTable = await page.locator("table").isVisible().catch(() => false);
+    const hasTable = await page
+      .locator("table")
+      .isVisible()
+      .catch(() => false);
     const hasEmpty = await page
       .getByText(/belum ada instrumen/i)
       .isVisible()
@@ -89,7 +92,10 @@ test.describe("Halaman Buat Instrumen Baru (Admin)", () => {
     const addButton = page.getByRole("button", { name: /\+ tambah item/i });
     await addButton.click();
     const rowsBefore = await page.getByPlaceholder(/konten.*pernyataan item/i).count();
-    await page.getByRole("button", { name: /hapus item/i }).last().click();
+    await page
+      .getByRole("button", { name: /hapus item/i })
+      .last()
+      .click();
     const rowsAfter = await page.getByPlaceholder(/konten.*pernyataan item/i).count();
     expect(rowsAfter).toBe(rowsBefore - 1);
   });
@@ -101,15 +107,16 @@ test.describe("Halaman Buat Instrumen Baru (Admin)", () => {
     await expect(submitBtn).toBeDisabled();
   });
 
-  test("harus berhasil membuat instrumen baru dan redirect ke /instruments", async ({
-    page,
-  }) => {
+  test("harus berhasil membuat instrumen baru dan redirect ke /instruments", async ({ page }) => {
     const ts = Date.now();
     await page.goto("/instruments/new");
 
     await page.getByLabel(/nama instrumen/i).fill(`Instrumen Test E2E ${ts}`);
     await page.getByLabel(/deskripsi/i).fill("Deskripsi instrumen test otomatis.");
-    await page.getByPlaceholder(/konten.*pernyataan item/i).first().fill("Item pertama test");
+    await page
+      .getByPlaceholder(/konten.*pernyataan item/i)
+      .first()
+      .fill("Item pertama test");
 
     await page.getByRole("button", { name: /buat instrumen/i }).click();
 

@@ -44,8 +44,7 @@ export default function NewInstrumentPage() {
    *
    * @param index - Indeks item yang akan dihapus.
    */
-  const removeItem = (index: number) =>
-    setItems((prev) => prev.filter((_, i) => i !== index));
+  const removeItem = (index: number) => setItems((prev) => prev.filter((_, i) => i !== index));
 
   /**
    * Memperbarui field `content` atau `domain` pada item di indeks tertentu.
@@ -55,9 +54,7 @@ export default function NewInstrumentPage() {
    * @param value - Nilai baru.
    */
   const updateItem = (index: number, field: keyof ItemDraft, value: string) =>
-    setItems((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
-    );
+    setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
 
   /**
    * Menangani pengiriman form pembuatan instrumen beserta item-itemnya.
@@ -77,7 +74,11 @@ export default function NewInstrumentPage() {
       const resp = await fetch("/api/instruments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name.trim(), description: description.trim() || null, version }),
+        body: JSON.stringify({
+          name: name.trim(),
+          description: description.trim() || null,
+          version,
+        }),
       });
 
       if (!resp.ok) {
@@ -105,7 +106,9 @@ export default function NewInstrumentPage() {
 
         if (!itemsResp.ok) {
           const data = await itemsResp.json().catch(() => ({}));
-          throw new Error(data.detail ?? `Instrumen dibuat, tetapi gagal menambahkan item (${itemsResp.status})`);
+          throw new Error(
+            data.detail ?? `Instrumen dibuat, tetapi gagal menambahkan item (${itemsResp.status})`,
+          );
         }
       }
 
@@ -121,10 +124,7 @@ export default function NewInstrumentPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Link
-          href="/instruments"
-          className="text-sm text-gray-500 hover:text-gray-700"
-        >
+        <Link href="/instruments" className="text-sm text-gray-500 hover:text-gray-700">
           ← Kembali
         </Link>
         <h1 className="text-xl font-semibold text-gray-900">Buat Instrumen Baru</h1>
@@ -184,9 +184,7 @@ export default function NewInstrumentPage() {
           {/* Bagian item instrumen */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-gray-700">
-                Item Instrumen
-              </label>
+              <label className="block text-sm font-medium text-gray-700">Item Instrumen</label>
               <button
                 type="button"
                 onClick={addItem}
@@ -197,7 +195,10 @@ export default function NewInstrumentPage() {
             </div>
             <div className="space-y-3">
               {items.map((item, index) => (
-                <div key={index} className="flex gap-2 items-start rounded-md border border-gray-200 p-3">
+                <div
+                  key={index}
+                  className="flex gap-2 items-start rounded-md border border-gray-200 p-3"
+                >
                   <span className="mt-2 text-xs font-medium text-gray-400 w-5 shrink-0">
                     {index + 1}.
                   </span>

@@ -230,14 +230,20 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={() => { setMode("add-single"); setError(null); }}
+              onClick={() => {
+                setMode("add-single");
+                setError(null);
+              }}
               className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition"
             >
               <Plus className="h-3.5 w-3.5" /> Tambah Item
             </button>
             <button
               type="button"
-              onClick={() => { setMode("add-bulk"); setError(null); }}
+              onClick={() => {
+                setMode("add-bulk");
+                setError(null);
+              }}
               className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-blue-700 transition"
             >
               <Upload className="h-3.5 w-3.5" /> Tambah Massal
@@ -247,7 +253,10 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
         {mode !== "idle" && (
           <button
             type="button"
-            onClick={() => { setMode("idle"); setError(null); }}
+            onClick={() => {
+              setMode("idle");
+              setError(null);
+            }}
             className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
           >
             <X className="h-3.5 w-3.5" /> Batal

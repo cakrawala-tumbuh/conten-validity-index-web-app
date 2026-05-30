@@ -47,9 +47,15 @@ describe("CVISection", () => {
         instrument_id: "inst-1",
         n_experts: 5,
         s_cvi_ave: 0.85,
-        s_cvi_ua: 0.80,
+        s_cvi_ua: 0.8,
         items: [
-          { item_id: "item-1", sequence_number: 1, content: "Item satu", i_cvi: 0.8, n_relevant: 4 },
+          {
+            item_id: "item-1",
+            sequence_number: 1,
+            content: "Item satu",
+            i_cvi: 0.8,
+            n_relevant: 4,
+          },
         ],
       }),
     });
@@ -87,7 +93,7 @@ describe("CVISection", () => {
         instrument_id: "inst-1",
         n_experts: 3,
         s_cvi_ave: 0.75,
-        s_cvi_ua: 0.70,
+        s_cvi_ua: 0.7,
         items: [],
       }),
     });
@@ -106,7 +112,7 @@ describe("CVISection", () => {
         instrument_id: "inst-1",
         n_experts: 3,
         s_cvi_ave: 0.75,
-        s_cvi_ua: 0.70,
+        s_cvi_ua: 0.7,
         items: [],
       }),
     });
@@ -136,7 +142,7 @@ describe("CVISection", () => {
         instrument_id: "inst-1",
         n_experts: 3,
         s_cvi_ave: 0.75,
-        s_cvi_ua: 0.70,
+        s_cvi_ua: 0.7,
         items: [],
       }),
     });

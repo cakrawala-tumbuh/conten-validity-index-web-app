@@ -182,8 +182,24 @@ describe("ItemsManager", () => {
 
   it("harus berhasil menambahkan items secara massal", async () => {
     const newItems = [
-      { id: "item-3", instrument_id: "inst-1", sequence_number: 3, content: "Item A", domain: null, created_at: "", updated_at: "" },
-      { id: "item-4", instrument_id: "inst-1", sequence_number: 4, content: "Item B", domain: null, created_at: "", updated_at: "" },
+      {
+        id: "item-3",
+        instrument_id: "inst-1",
+        sequence_number: 3,
+        content: "Item A",
+        domain: null,
+        created_at: "",
+        updated_at: "",
+      },
+      {
+        id: "item-4",
+        instrument_id: "inst-1",
+        sequence_number: 4,
+        content: "Item B",
+        domain: null,
+        created_at: "",
+        updated_at: "",
+      },
     ];
     mockFetch.mockResolvedValueOnce({
       ok: true,

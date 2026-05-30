@@ -8,7 +8,11 @@
 
 import { useState } from "react";
 import { BarChart3, Download, RefreshCw } from "lucide-react";
-import { CVI_THRESHOLD_MANY_EXPERTS, CVI_THRESHOLD_FEW_EXPERTS, CVI_FEW_EXPERTS_MAX } from "@/constants";
+import {
+  CVI_THRESHOLD_MANY_EXPERTS,
+  CVI_THRESHOLD_FEW_EXPERTS,
+  CVI_FEW_EXPERTS_MAX,
+} from "@/constants";
 import type { CVIResult } from "@/types/cvi";
 
 /**
@@ -28,9 +32,7 @@ interface CVISectionProps {
  */
 function isValid(icvi: number, nExperts: number): boolean {
   const threshold =
-    nExperts <= CVI_FEW_EXPERTS_MAX
-      ? CVI_THRESHOLD_FEW_EXPERTS
-      : CVI_THRESHOLD_MANY_EXPERTS;
+    nExperts <= CVI_FEW_EXPERTS_MAX ? CVI_THRESHOLD_FEW_EXPERTS : CVI_THRESHOLD_MANY_EXPERTS;
   return icvi >= threshold;
 }
 
@@ -97,9 +99,7 @@ export const CVISection = ({ instrumentId, instrumentName }: CVISectionProps) =>
     }
   };
 
-  const validItemsCount = result
-    ? result.items.filter((item) => item.is_valid).length
-    : 0;
+  const validItemsCount = result ? result.items.filter((item) => item.is_valid).length : 0;
 
   return (
     <div className="space-y-4">

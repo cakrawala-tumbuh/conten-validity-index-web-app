@@ -326,9 +326,7 @@ describe("InstrumentDetailTabs", () => {
 
   it("harus menghentikan hapus saat konfirmasi kedua ditolak", () => {
     // Konfirmasi pertama = true, kedua = false
-    mockConfirm
-      .mockReturnValueOnce(true)
-      .mockReturnValueOnce(false);
+    mockConfirm.mockReturnValueOnce(true).mockReturnValueOnce(false);
     render(
       <InstrumentDetailTabs
         instrument={mockInstrument}

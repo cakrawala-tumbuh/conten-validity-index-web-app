@@ -21,7 +21,10 @@ test.describe("Halaman Log Aktivitas (Admin)", () => {
 
   test("harus menampilkan tabel atau pesan kosong", async ({ page }) => {
     await page.goto("/activity-logs");
-    const hasTable = await page.locator("table").isVisible().catch(() => false);
+    const hasTable = await page
+      .locator("table")
+      .isVisible()
+      .catch(() => false);
     const hasEmpty = await page
       .getByText(/tidak ada log|belum ada/i)
       .isVisible()
@@ -71,7 +74,10 @@ test.describe("Halaman Log Aktivitas (Admin)", () => {
     await page.waitForTimeout(500);
     const rows = page.getByRole("row").filter({ hasText: /login/i });
     const emptyMsg = page.getByText(/tidak ada log|belum ada/i);
-    const hasRows = await rows.first().isVisible().catch(() => false);
+    const hasRows = await rows
+      .first()
+      .isVisible()
+      .catch(() => false);
     const hasEmpty = await emptyMsg.isVisible().catch(() => false);
     expect(hasRows || hasEmpty).toBeTruthy();
   });
@@ -103,7 +109,10 @@ test.describe("Halaman Log Aktivitas (Admin)", () => {
 
   test("harus menampilkan kolom header tabel log aktivitas jika ada data", async ({ page }) => {
     await page.goto("/activity-logs");
-    const hasTable = await page.locator("table").isVisible().catch(() => false);
+    const hasTable = await page
+      .locator("table")
+      .isVisible()
+      .catch(() => false);
     if (!hasTable) {
       test.skip();
       return;

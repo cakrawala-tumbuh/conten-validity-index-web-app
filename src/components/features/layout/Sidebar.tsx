@@ -8,13 +8,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  FileText,
-  Users,
-  ClipboardList,
-  Activity,
-  LayoutDashboard,
-} from "lucide-react";
+import { FileText, Users, ClipboardList, Activity, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types/user";
 import { APP_NAME } from "@/constants";

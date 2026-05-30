@@ -28,13 +28,13 @@ Tandai setiap poin secara mental. Jika ada yang belum terpenuhi, **selesaikan du
 - [ ] Sudah ada unit test untuk setiap komponen, hook, atau fungsi baru/diubah di `tests/unit/`.
 - [ ] Docker image sudah di-build ulang: `docker build -t cvi-web:test --target test .`
 - [ ] **Unit test** sudah dijalankan di dalam Docker dan **semua test lolos**:
-  `docker compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from test`
+      `docker compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from test`
 - [ ] Coverage kode di `src/` tidak turun di bawah **80%**.
 - [ ] Jika ada perubahan pada alur navigasi, auth, atau integrasi penuh: **E2E test Playwright**
-  sudah dijalankan di dalam Docker dan **semua test lolos**:
-  `docker compose -f docker-compose.e2e.yml up --abort-on-container-exit --exit-code-from playwright`
+      sudah dijalankan di dalam Docker dan **semua test lolos**:
+      `docker compose -f docker-compose.e2e.yml up --abort-on-container-exit --exit-code-from playwright`
 - [ ] **DILARANG** menjalankan `npx playwright test` langsung di luar Docker — semua Playwright test
-  **HARUS** dijalankan via `docker-compose.e2e.yml`.
+      **HARUS** dijalankan via `docker-compose.e2e.yml`.
 
 ### ✅ Checklist Git
 
@@ -66,23 +66,23 @@ Aplikasi ini berkomunikasi dengan backend FastAPI melalui REST API.
 
 ## Tech Stack
 
-| Komponen         | Teknologi                                    |
-| ---------------- | -------------------------------------------- |
-| Framework        | Next.js 15 (App Router)                      |
-| Bahasa           | TypeScript 5+                                |
-| Styling          | Tailwind CSS v4                              |
-| Komponen UI      | shadcn/ui                                    |
-| Validasi Form    | React Hook Form + Zod                        |
-| HTTP Client      | fetch API bawaan (dengan wrapper custom)     |
-| State Management | Zustand (global) + React Query (server state)|
-| Testing Unit     | Jest + React Testing Library                 |
-| Testing E2E      | Playwright                                   |
-| Linter           | ESLint (eslint-config-next)                  |
-| Formatter        | Prettier                                     |
-| Container        | Docker + Docker Compose                      |
-| CI/CD            | GitHub Actions                               |
-| Container Registry | GitHub Container Registry (GHCR)           |
-| CLI GitHub       | GitHub CLI (`gh`)                            |
+| Komponen           | Teknologi                                     |
+| ------------------ | --------------------------------------------- |
+| Framework          | Next.js 15 (App Router)                       |
+| Bahasa             | TypeScript 5+                                 |
+| Styling            | Tailwind CSS v4                               |
+| Komponen UI        | shadcn/ui                                     |
+| Validasi Form      | React Hook Form + Zod                         |
+| HTTP Client        | fetch API bawaan (dengan wrapper custom)      |
+| State Management   | Zustand (global) + React Query (server state) |
+| Testing Unit       | Jest + React Testing Library                  |
+| Testing E2E        | Playwright                                    |
+| Linter             | ESLint (eslint-config-next)                   |
+| Formatter          | Prettier                                      |
+| Container          | Docker + Docker Compose                       |
+| CI/CD              | GitHub Actions                                |
+| Container Registry | GitHub Container Registry (GHCR)              |
+| CLI GitHub         | GitHub CLI (`gh`)                             |
 
 ## Struktur Proyek
 
@@ -163,7 +163,7 @@ AI **DILARANG** melewatkan JSDoc dengan alasan apapun, termasuk kode yang tampak
 
 **Contoh untuk React Component:**
 
-```tsx
+````tsx
 /**
  * Menampilkan kartu ringkasan hasil CVI untuk satu instrumen.
  *
@@ -186,11 +186,11 @@ AI **DILARANG** melewatkan JSDoc dengan alasan apapun, termasuk kode yang tampak
 export function InstrumentCard({ instrument, onViewDetail }: InstrumentCardProps) {
   // ...
 }
-```
+````
 
 **Contoh untuk custom hook:**
 
-```ts
+````ts
 /**
  * Hook untuk mengambil dan mengelola daftar instrumen dari API.
  *
@@ -208,11 +208,11 @@ export function InstrumentCard({ instrument, onViewDetail }: InstrumentCardProps
 export function useInstruments(options?: UseInstrumentsOptions) {
   // ...
 }
-```
+````
 
 **Contoh untuk fungsi utilitas:**
 
-```ts
+````ts
 /**
  * Menginterpretasikan nilai CVI menjadi kategori verbal.
  *
@@ -234,7 +234,7 @@ export function useInstruments(options?: UseInstrumentsOptions) {
 export function interpretCVI(cvi: number, nExperts: number): "valid" | "tidak-valid" {
   // ...
 }
-```
+````
 
 ### Gaya Kode
 
@@ -396,16 +396,16 @@ Semua commit message **WAJIB** ditulis dalam **Bahasa Indonesia** dengan format:
 
 **Tipe commit yang valid:**
 
-| Tipe       | Kapan digunakan                                                          |
-| ---------- | ------------------------------------------------------------------------ |
-| `feat`     | Menambahkan fitur baru (halaman, komponen, hook baru)                    |
-| `fix`      | Memperbaiki bug                                                          |
-| `docs`     | Perubahan dokumentasi saja                                               |
-| `test`     | Menambah atau mengubah test                                              |
-| `refactor` | Refaktor kode tanpa menambah fitur atau memperbaiki bug                  |
-| `chore`    | Perubahan tooling, dependensi, konfigurasi CI                            |
-| `style`    | Perubahan format/style (tidak mengubah logika)                           |
-| `perf`     | Peningkatan performa (lazy loading, optimasi bundle, dll.)               |
+| Tipe       | Kapan digunakan                                            |
+| ---------- | ---------------------------------------------------------- |
+| `feat`     | Menambahkan fitur baru (halaman, komponen, hook baru)      |
+| `fix`      | Memperbaiki bug                                            |
+| `docs`     | Perubahan dokumentasi saja                                 |
+| `test`     | Menambah atau mengubah test                                |
+| `refactor` | Refaktor kode tanpa menambah fitur atau memperbaiki bug    |
+| `chore`    | Perubahan tooling, dependensi, konfigurasi CI              |
+| `style`    | Perubahan format/style (tidak mengubah logika)             |
+| `perf`     | Peningkatan performa (lazy loading, optimasi bundle, dll.) |
 
 **Contoh:**
 
@@ -427,12 +427,12 @@ Diperbaiki dengan menyimpan intended URL di session storage.
 
 ### Strategi Branch
 
-| Branch            | Deskripsi                               |
-| ----------------- | --------------------------------------- |
-| `master`          | Branch utama, selalu stabil dan siap rilis |
-| `feature/<nama>`  | Pengembangan fitur baru                 |
-| `fix/<nama>`      | Perbaikan bug                           |
-| `chore/<nama>`    | Perubahan non-fungsional                |
+| Branch           | Deskripsi                                  |
+| ---------------- | ------------------------------------------ |
+| `master`         | Branch utama, selalu stabil dan siap rilis |
+| `feature/<nama>` | Pengembangan fitur baru                    |
+| `fix/<nama>`     | Perbaikan bug                              |
+| `chore/<nama>`   | Perubahan non-fungsional                   |
 
 - **DILARANG push langsung ke `master`** kecuali diminta secara **eksplisit** oleh pengguna.
 - Apabila tidak ada instruksi eksplisit untuk push ke master: **WAJIB** buat branch baru, lalu **WAJIB** buat Pull Request ke `master`.
@@ -442,11 +442,11 @@ Diperbaiki dengan menyimpan intended URL di session storage.
 
 Format tag: `vMAJOR.MINOR.PATCH`
 
-| Komponen | Kondisi naik                                                                          |
-| -------- | ------------------------------------------------------------------------------------- |
-| `MAJOR`  | Perubahan breaking (redesain total UI, perubahan struktur URL yang tidak kompatibel)  |
-| `MINOR`  | Penambahan halaman/fitur baru yang backward-compatible                                |
-| `PATCH`  | Perbaikan bug, pembaruan dependensi minor, perubahan teks/styling minor               |
+| Komponen | Kondisi naik                                                                         |
+| -------- | ------------------------------------------------------------------------------------ |
+| `MAJOR`  | Perubahan breaking (redesain total UI, perubahan struktur URL yang tidak kompatibel) |
+| `MINOR`  | Penambahan halaman/fitur baru yang backward-compatible                               |
+| `PATCH`  | Perbaikan bug, pembaruan dependensi minor, perubahan teks/styling minor              |
 
 **Cara membuat tag:**
 
@@ -465,23 +465,23 @@ Tag **HARUS** selalu berada di commit di branch `master` — **DILARANG** membua
 
 ### Pemicu Workflow
 
-| Workflow             | Pemicu                       |
-| -------------------- | ---------------------------- |
+| Workflow             | Pemicu                           |
+| -------------------- | -------------------------------- |
 | `lint.yml`           | Push ke `master`, PR ke `master` |
 | `test.yml`           | Push ke `master`, PR ke `master` |
-| `docker-publish.yml` | Push tag `v*` di `master`    |
+| `docker-publish.yml` | Push tag `v*` di `master`        |
 
 ### Interaksi dengan GitHub
 
 **WAJIB** selalu gunakan **GitHub CLI (`gh`)** untuk semua interaksi dengan GitHub.
 **DILARANG** menggunakan cara lain.
 
-| Operasi          | Perintah yang WAJIB digunakan       |
-| ---------------- | ----------------------------------- |
-| Membuat PR       | `gh pr create`                      |
-| Membuat release  | `gh release create`                 |
-| Melihat status CI | `gh run list` / `gh run view`      |
-| Memeriksa PR     | `gh pr view` / `gh pr list`         |
+| Operasi           | Perintah yang WAJIB digunakan |
+| ----------------- | ----------------------------- |
+| Membuat PR        | `gh pr create`                |
+| Membuat release   | `gh release create`           |
+| Melihat status CI | `gh run list` / `gh run view` |
+| Memeriksa PR      | `gh pr view` / `gh pr list`   |
 
 ## Docker
 
@@ -508,28 +508,30 @@ Tag **HARUS** selalu berada di commit di branch `master` — **DILARANG** membua
 **DILARANG KERAS** commit file `.env.local` ke repository dalam kondisi apapun.
 
 Variabel yang **TIDAK BOLEH** menggunakan prefix `NEXT_PUBLIC_` (hanya boleh diakses server-side):
+
 - `NEXTAUTH_SECRET`
 - `NEXTAUTH_URL`
 - `BACKEND_API_INTERNAL_URL` (URL internal backend, bukan URL publik)
 
 Variabel yang **BOLEH** menggunakan prefix `NEXT_PUBLIC_` (diakses client-side):
+
 - `NEXT_PUBLIC_API_URL` (URL publik backend untuk client-side fetch)
 - `NEXT_PUBLIC_APP_NAME`
 
 ## Konvensi Penamaan
 
-| Elemen                | Konvensi                  | Contoh                                  |
-| --------------------- | ------------------------- | --------------------------------------- |
-| File komponen         | PascalCase                | `InstrumentCard.tsx`                    |
-| File non-komponen     | kebab-case                | `instrument-service.ts`, `use-cvi.ts`   |
-| Direktori             | kebab-case                | `features/instruments/`                 |
-| Komponen React        | PascalCase                | `InstrumentCard`, `CVIResultTable`      |
-| Fungsi/variabel       | camelCase                 | `calculateCVI`, `instrumentList`        |
-| Konstanta             | UPPER_SNAKE_CASE          | `MAX_EXPERTS`, `API_TIMEOUT_MS`         |
-| Interface/Type        | PascalCase                | `InstrumentResponse`, `CVICalculation`  |
-| Custom hooks          | camelCase dengan prefix `use` | `useInstruments`, `useCVIReport`    |
-| CSS class (Tailwind)  | Tailwind utility classes  | `className="flex items-center gap-4"`   |
-| URL/route             | kebab-case                | `/instruments`, `/cvi-report`           |
+| Elemen               | Konvensi                      | Contoh                                 |
+| -------------------- | ----------------------------- | -------------------------------------- |
+| File komponen        | PascalCase                    | `InstrumentCard.tsx`                   |
+| File non-komponen    | kebab-case                    | `instrument-service.ts`, `use-cvi.ts`  |
+| Direktori            | kebab-case                    | `features/instruments/`                |
+| Komponen React       | PascalCase                    | `InstrumentCard`, `CVIResultTable`     |
+| Fungsi/variabel      | camelCase                     | `calculateCVI`, `instrumentList`       |
+| Konstanta            | UPPER_SNAKE_CASE              | `MAX_EXPERTS`, `API_TIMEOUT_MS`        |
+| Interface/Type       | PascalCase                    | `InstrumentResponse`, `CVICalculation` |
+| Custom hooks         | camelCase dengan prefix `use` | `useInstruments`, `useCVIReport`       |
+| CSS class (Tailwind) | Tailwind utility classes      | `className="flex items-center gap-4"`  |
+| URL/route            | kebab-case                    | `/instruments`, `/cvi-report`          |
 
 ## Integrasi dengan Backend
 

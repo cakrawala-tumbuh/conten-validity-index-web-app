@@ -74,7 +74,10 @@ test.describe("Halaman Form Penilaian (Expert)", () => {
     await page.goto(url);
     // Badge adalah <span class="rounded-full"> dengan label "Draf", "Aktif", atau "Ditutup"
     await expect(
-      page.locator("span.rounded-full").filter({ hasText: /^(Draf|Aktif|Ditutup)$/ }).first(),
+      page
+        .locator("span.rounded-full")
+        .filter({ hasText: /^(Draf|Aktif|Ditutup)$/ })
+        .first(),
     ).toBeVisible();
   });
 
