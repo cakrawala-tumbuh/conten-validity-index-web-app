@@ -4,6 +4,7 @@
  * Menggunakan `nextJest` helper agar Next.js dapat memuat file konfigurasi
  * (next.config.ts, .env.local, dll.) secara otomatis saat menjalankan test.
  */
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const nextJest = require("next/jest");
 
 const createJestConfig = nextJest({ dir: "./" });
