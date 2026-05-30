@@ -59,6 +59,7 @@ export interface ActivityLogResponse {
 export interface ActivityLogFilter {
   user_id?: string;
   action?: ActivityAction;
+  resource_type?: ResourceType;
   start_date?: string;
   end_date?: string;
   skip?: number;

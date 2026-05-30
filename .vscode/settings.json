@@ -1,0 +1,8 @@
+{
+  "playwright.reuseBrowser": true,
+  "playwright.showBrowser": true,
+  "playwright.env": {
+    "PLAYWRIGHT_BASE_URL": "http://localhost:3000",
+    "AUTHENTIK_URL": "http://localhost:9000"
+  }
+}
