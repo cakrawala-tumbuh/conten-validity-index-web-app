@@ -10,7 +10,7 @@
 export interface ItemCreate {
   sequence_number: number;
   content: string;
-  domain?: string;
+  dimension_id?: string;
 }
 
 /**
@@ -26,7 +26,7 @@ export interface ItemBulkCreate {
 export interface ItemUpdate {
   sequence_number?: number;
   content?: string;
-  domain?: string;
+  dimension_id?: string;
 }
 
 /**
@@ -37,7 +37,8 @@ export interface ItemResponse {
   instrument_id: string;
   sequence_number: number;
   content: string;
-  domain: string | null;
+  dimension_id: string | null;
+  dimension_name: string | null;
   created_at: string;
   updated_at: string;
 }

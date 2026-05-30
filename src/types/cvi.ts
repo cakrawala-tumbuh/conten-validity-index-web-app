@@ -12,7 +12,7 @@ export interface ItemCVIResult {
   item_id: string;
   sequence_number: number;
   content: string;
-  domain: string | null;
+  dimension_name: string | null;
   /** Jumlah expert yang menilai item ini. */
   n_experts: number;
   /** Jumlah expert yang menilai item relevan (skor 3 atau 4). */

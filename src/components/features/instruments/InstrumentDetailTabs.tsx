@@ -17,6 +17,7 @@ import type { InstrumentResponse, InstrumentUpdate } from "@/types/instrument";
 import type { ItemResponse } from "@/types/item";
 import type { AssignmentResponse } from "@/types/expert-assignment";
 import type { UserResponse } from "@/types/user";
+import type { DimensionResponse } from "@/types/dimension";
 
 /**
  * Tab yang tersedia pada halaman detail instrumen.
@@ -31,6 +32,7 @@ interface InstrumentDetailTabsProps {
   items: ItemResponse[];
   assignments: AssignmentResponse[];
   experts: UserResponse[];
+  dimensions: DimensionResponse[];
 }
 
 /**
@@ -49,6 +51,7 @@ export const InstrumentDetailTabs = ({
   items,
   assignments,
   experts,
+  dimensions,
 }: InstrumentDetailTabsProps) => {
   const [activeTab, setActiveTab] = useState<Tab>("info");
 
@@ -86,7 +89,7 @@ export const InstrumentDetailTabs = ({
       <div className="rounded-b-lg bg-white border border-t-0 border-gray-200 p-6">
         {activeTab === "info" && <InfoTab instrument={instrument} />}
         {activeTab === "items" && (
-          <ItemsManager instrumentId={instrument.id} initialItems={items} />
+          <ItemsManager instrumentId={instrument.id} initialItems={items} dimensions={dimensions} />
         )}
         {activeTab === "experts" && (
           <AssignmentManager

@@ -3,6 +3,7 @@
  *
  * Menampilkan daftar item dalam tabel, dengan kemampuan menambah item baru
  * (satu per satu atau bulk), mengedit konten item, dan menghapus item.
+ * Domain/dimensi dipilih dari dropdown, bukan diketik manual.
  */
 "use client";
 
@@ -10,6 +11,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2, Plus, Upload, X, Check } from "lucide-react";
 import type { ItemResponse } from "@/types/item";
+import type { DimensionResponse } from "@/types/dimension";
 
 /**
  * Props untuk ItemsManager.
@@ -17,6 +19,7 @@ import type { ItemResponse } from "@/types/item";
 interface ItemsManagerProps {
   instrumentId: string;
   initialItems: ItemResponse[];
+  dimensions: DimensionResponse[];
 }
 
 /**
@@ -24,7 +27,7 @@ interface ItemsManagerProps {
  */
 interface ItemDraft {
   content: string;
-  domain: string;
+  dimensionId: string;
 }
 
 /**
@@ -35,20 +38,25 @@ interface ItemDraft {
  *
  * @param props.instrumentId - ID instrumen pemilik item.
  * @param props.initialItems - Daftar item awal dari server.
+ * @param props.dimensions - Daftar dimensi untuk dipilih.
  * @returns Komponen manajemen item interaktif.
  */
-export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) => {
+export const ItemsManager = ({
+  instrumentId,
+  initialItems,
+  dimensions,
+}: ItemsManagerProps) => {
   const router = useRouter();
   const [items, setItems] = useState<ItemResponse[]>(initialItems);
   const [mode, setMode] = useState<"idle" | "add-single" | "add-bulk">("idle");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
-  const [editDomain, setEditDomain] = useState("");
+  const [editDimensionId, setEditDimensionId] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   // State untuk tambah satu item
-  const [newItem, setNewItem] = useState<ItemDraft>({ content: "", domain: "" });
+  const [newItem, setNewItem] = useState<ItemDraft>({ content: "", dimensionId: "" });
 
   // State untuk bulk add
   const [bulkText, setBulkText] = useState("");
@@ -61,7 +69,7 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
   const startEdit = (item: ItemResponse) => {
     setEditingId(item.id);
     setEditContent(item.content);
-    setEditDomain(item.domain ?? "");
+    setEditDimensionId(item.dimension_id ?? "");
     setError(null);
   };
 
@@ -91,7 +99,7 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content: editContent.trim(),
-          domain: editDomain.trim() || null,
+          dimension_id: editDimensionId || null,
           sequence_number: item.sequence_number,
         }),
       });
@@ -157,7 +165,7 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
             {
               sequence_number: items.length + 1,
               content: newItem.content.trim(),
-              domain: newItem.domain.trim() || undefined,
+              dimension_id: newItem.dimensionId || undefined,
             },
           ],
         }),
@@ -168,7 +176,7 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
       }
       const created: ItemResponse[] = await resp.json();
       setItems((prev) => [...prev, ...created]);
-      setNewItem({ content: "", domain: "" });
+      setNewItem({ content: "", dimensionId: "" });
       setMode("idle");
       router.refresh();
     } catch (err) {
@@ -281,13 +289,24 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
             rows={3}
             className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
           />
-          <input
-            type="text"
-            value={newItem.domain}
-            onChange={(e) => setNewItem((p) => ({ ...p, domain: e.target.value }))}
-            placeholder="Domain (opsional)"
-            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
-          />
+          {dimensions.length > 0 ? (
+            <select
+              value={newItem.dimensionId}
+              onChange={(e) => setNewItem((p) => ({ ...p, dimensionId: e.target.value }))}
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+            >
+              <option value="">Tanpa Dimensi</option>
+              {dimensions.map((dim) => (
+                <option key={dim.id} value={dim.id}>
+                  {dim.name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p className="text-xs text-gray-400">
+              Belum ada dimensi. Tambahkan dimensi terlebih dahulu untuk mengelompokkan item.
+            </p>
+          )}
           <div className="flex justify-end">
             <button
               type="button"
@@ -346,8 +365,8 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                   Konten Item
                 </th>
-                <th className="w-40 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Domain
+                <th className="w-48 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  Dimensi
                 </th>
                 <th className="w-24 px-4 py-3" />
               </tr>
@@ -368,13 +387,22 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
                       />
                     </td>
                     <td className="px-4 py-3">
-                      <input
-                        type="text"
-                        value={editDomain}
-                        onChange={(e) => setEditDomain(e.target.value)}
-                        placeholder="Domain..."
-                        className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-gray-900 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                      />
+                      {dimensions.length > 0 ? (
+                        <select
+                          value={editDimensionId}
+                          onChange={(e) => setEditDimensionId(e.target.value)}
+                          className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-gray-900 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                        >
+                          <option value="">Tanpa Dimensi</option>
+                          {dimensions.map((dim) => (
+                            <option key={dim.id} value={dim.id}>
+                              {dim.name}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span className="text-sm text-gray-400">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1 justify-end">
@@ -404,7 +432,7 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
                       {item.sequence_number}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900">{item.content}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{item.domain ?? "—"}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500">{item.dimension_name ?? "—"}</td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1 justify-end">
                         <button

@@ -10,6 +10,7 @@ import type { InstrumentResponse } from "@/types/instrument";
 import type { ItemResponse } from "@/types/item";
 import type { AssignmentResponse } from "@/types/expert-assignment";
 import type { UserResponse } from "@/types/user";
+import type { DimensionResponse } from "@/types/dimension";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn(), refresh: jest.fn() }),
@@ -32,13 +33,25 @@ const mockInstrument: InstrumentResponse = {
   updated_at: "2024-01-01T00:00:00Z",
 };
 
+const mockDimensions: DimensionResponse[] = [
+  {
+    id: "dim-1",
+    instrument_id: "inst-1",
+    name: "Afektif",
+    description: null,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+];
+
 const mockItems: ItemResponse[] = [
   {
     id: "item-1",
     instrument_id: "inst-1",
     sequence_number: 1,
     content: "Konten item satu",
-    domain: "Afektif",
+    dimension_id: "dim-1",
+    dimension_name: "Afektif",
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
   },
@@ -83,6 +96,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     // Tab Informasi harus ada
@@ -96,6 +110,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     expect(screen.getByDisplayValue("Instrumen Uji Keperawatan")).toBeInTheDocument();
@@ -108,6 +123,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     expect(screen.getByText(`Item (${mockItems.length})`)).toBeInTheDocument();
@@ -120,6 +136,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     expect(screen.getByText(`Expert (${mockAssignments.length})`)).toBeInTheDocument();
@@ -132,6 +149,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     fireEvent.click(screen.getByText(`Item (${mockItems.length})`));
@@ -146,6 +164,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     fireEvent.click(screen.getByText(`Expert (${mockAssignments.length})`));
@@ -160,6 +179,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     fireEvent.click(screen.getByText("Hasil CVI"));
@@ -174,6 +194,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     expect(screen.getByRole("button", { name: /simpan perubahan/i })).toBeInTheDocument();
@@ -187,6 +208,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     const deleteButton = screen.getByRole("button", { name: /hapus instrumen/i });
@@ -202,6 +224,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     fireEvent.click(screen.getByRole("button", { name: /simpan perubahan/i }));
@@ -221,6 +244,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     fireEvent.click(screen.getByRole("button", { name: /simpan perubahan/i }));
@@ -240,6 +264,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     fireEvent.click(screen.getByRole("button", { name: /simpan perubahan/i }));
@@ -258,6 +283,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     fireEvent.click(screen.getByRole("button", { name: /hapus instrumen/i }));
@@ -276,6 +302,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     expect(screen.getByDisplayValue(mockInstrument.name)).toBeInTheDocument();
@@ -288,6 +315,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     const descTextarea = screen.getByDisplayValue("Deskripsi instrumen");
@@ -302,6 +330,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     const versionInput = screen.getByDisplayValue("1.0");
@@ -316,6 +345,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     // Status "draft" ditampilkan sebagai "Draf" di select
@@ -333,6 +363,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     fireEvent.click(screen.getByRole("button", { name: /hapus instrumen/i }));
@@ -351,6 +382,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     fireEvent.click(screen.getByRole("button", { name: /hapus instrumen/i }));
@@ -366,6 +398,7 @@ describe("InstrumentDetailTabs", () => {
         items={mockItems}
         assignments={mockAssignments}
         experts={mockExperts}
+        dimensions={mockDimensions}
       />,
     );
     const nameInput = screen.getByDisplayValue(mockInstrument.name);

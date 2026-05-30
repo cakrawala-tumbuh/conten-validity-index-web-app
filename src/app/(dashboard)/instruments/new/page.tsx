@@ -17,7 +17,6 @@ import Link from "next/link";
  */
 interface ItemDraft {
   content: string;
-  domain: string;
 }
 
 /**
@@ -30,14 +29,14 @@ export default function NewInstrumentPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [version, setVersion] = useState("1.0");
-  const [items, setItems] = useState<ItemDraft[]>([{ content: "", domain: "" }]);
+  const [items, setItems] = useState<ItemDraft[]>([{ content: "" }]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   /**
    * Menambahkan baris item baru ke daftar item draft.
    */
-  const addItem = () => setItems((prev) => [...prev, { content: "", domain: "" }]);
+  const addItem = () => setItems((prev) => [...prev, { content: "" }]);
 
   /**
    * Menghapus item pada indeks tertentu dari daftar item draft.
@@ -94,7 +93,7 @@ export default function NewInstrumentPage() {
         .map((it, idx) => ({
           sequence_number: idx + 1,
           content: it.content.trim(),
-          domain: it.domain.trim() || undefined,
+          dimension_id: undefined,
         }));
 
       if (validItems.length > 0) {
@@ -202,19 +201,12 @@ export default function NewInstrumentPage() {
                   <span className="mt-2 text-xs font-medium text-gray-400 w-5 shrink-0">
                     {index + 1}.
                   </span>
-                  <div className="flex-1 space-y-2">
+                  <div className="flex-1">
                     <input
                       type="text"
                       value={item.content}
                       onChange={(e) => updateItem(index, "content", e.target.value)}
                       placeholder="Konten / pernyataan item"
-                      className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
-                    <input
-                      type="text"
-                      value={item.domain}
-                      onChange={(e) => updateItem(index, "domain", e.target.value)}
-                      placeholder="Domain (opsional)"
                       className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
                   </div>
