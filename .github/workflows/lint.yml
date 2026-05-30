@@ -1,0 +1,34 @@
+name: Lint
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  lint:
+    name: ESLint & TypeScript
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependensi
+        run: npm ci
+
+      - name: Jalankan ESLint
+        run: npm run lint
+
+      - name: Periksa format Prettier
+        run: npm run format:check
+
+      - name: Periksa TypeScript
+        run: npm run type-check

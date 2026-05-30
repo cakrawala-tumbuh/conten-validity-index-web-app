@@ -1,0 +1,141 @@
+# docker-compose.yml — Development lokal
+#
+# Menjalankan semua service yang diperlukan untuk development:
+# - web: Next.js dev server
+# - backend: FastAPI server
+# - db: PostgreSQL
+# - authentik-server: Authentik server
+# - authentik-worker: Authentik worker
+# - authentik-db: Database khusus Authentik
+# - redis: Redis untuk Authentik
+
+services:
+  web:
+    build:
+      context: .
+      target: builder
+    command: npm run dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - AUTHENTIK_ISSUER_URL=${AUTHENTIK_ISSUER_URL:-http://authentik-server:9000/application/o/cvi/}
+      - AUTHENTIK_CLIENT_ID=${AUTHENTIK_CLIENT_ID}
+      - AUTHENTIK_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET}
+      - AUTHENTIK_ADMIN_GROUP=${AUTHENTIK_ADMIN_GROUP:-cvi-admin}
+      - AUTHENTIK_EXPERT_GROUP=${AUTHENTIK_EXPERT_GROUP:-cvi-expert}
+      - BACKEND_API_INTERNAL_URL=${BACKEND_API_INTERNAL_URL:-http://backend:8000}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      - NEXT_PUBLIC_APP_NAME=${NEXT_PUBLIC_APP_NAME:-CVI App}
+    depends_on:
+      - backend
+      - authentik-server
+    networks:
+      - cvi-network
+
+  backend:
+    image: ghcr.io/your-org/content-validity-index-backend:latest
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://cvi:cvi@db:5432/cvi
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - cvi-network
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: cvi
+      POSTGRES_PASSWORD: cvi
+      POSTGRES_DB: cvi
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cvi"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cvi-network
+
+  authentik-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: authentik
+      POSTGRES_PASSWORD: authentik
+      POSTGRES_DB: authentik
+    volumes:
+      - authentik-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U authentik"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - cvi-network
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - cvi-network
+
+  authentik-server:
+    image: ghcr.io/goauthentik/server:2024.6
+    command: server
+    environment:
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-db
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-changeme-use-real-secret-in-production}
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
+    ports:
+      - "9000:9000"
+    depends_on:
+      authentik-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - cvi-network
+
+  authentik-worker:
+    image: ghcr.io/goauthentik/server:2024.6
+    command: worker
+    environment:
+      AUTHENTIK_REDIS__HOST: redis
+      AUTHENTIK_POSTGRESQL__HOST: authentik-db
+      AUTHENTIK_POSTGRESQL__USER: authentik
+      AUTHENTIK_POSTGRESQL__PASSWORD: authentik
+      AUTHENTIK_POSTGRESQL__NAME: authentik
+      AUTHENTIK_SECRET_KEY: ${AUTHENTIK_SECRET_KEY:-changeme-use-real-secret-in-production}
+      AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
+    depends_on:
+      authentik-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - cvi-network
+
+volumes:
+  postgres-data:
+  authentik-postgres-data:
+
+networks:
+  cvi-network:
+    driver: bridge

@@ -1,0 +1,25 @@
+name: Test
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  unit-test:
+    name: Unit Test (Docker)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout kode
+        uses: actions/checkout@v4
+
+      - name: Build Docker image (stage test)
+        run: docker build -t cvi-web:test --target test .
+
+      - name: Jalankan unit test di Docker
+        run: |
+          docker compose -f docker-compose.test.yml up \
+            --abort-on-container-exit \
+            --exit-code-from test

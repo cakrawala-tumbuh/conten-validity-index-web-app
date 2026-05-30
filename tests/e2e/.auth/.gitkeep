@@ -1,0 +1,2 @@
+# .gitkeep — Direktori untuk menyimpan Playwright storage state
+# File JSON di direktori ini (admin.json, expert.json) diabaikan oleh Git

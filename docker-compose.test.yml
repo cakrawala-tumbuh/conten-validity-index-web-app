@@ -1,0 +1,23 @@
+# docker-compose.test.yml — Unit test di Docker
+#
+# Digunakan untuk menjalankan unit test (Jest) di dalam Docker.
+# Tidak memerlukan database atau Authentik.
+#
+# Cara menjalankan:
+#   docker build -t cvi-web:test --target test .
+#   docker compose -f docker-compose.test.yml up --abort-on-container-exit --exit-code-from test
+
+services:
+  test:
+    build:
+      context: .
+      target: test
+    environment:
+      - NODE_ENV=test
+      - NEXTAUTH_SECRET=test-secret
+      - NEXTAUTH_URL=http://localhost:3000
+      - AUTHENTIK_CLIENT_ID=test-client-id
+      - AUTHENTIK_CLIENT_SECRET=test-client-secret
+      - AUTHENTIK_ISSUER_URL=http://authentik-server:9000/application/o/cvi/
+      - BACKEND_API_INTERNAL_URL=http://backend:8000
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
