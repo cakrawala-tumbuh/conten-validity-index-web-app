@@ -1,0 +1,100 @@
+# Authentik Blueprint — CVI E2E Test Setup
+#
+# Blueprint ini dikonfigurasi otomatis saat Authentik pertama kali dijalankan.
+# Berisi konfigurasi OIDC Provider, Application, Groups, dan Test Users
+# yang diperlukan untuk menjalankan E2E test Playwright.
+#
+# Letakkan file ini di /blueprints/custom/ di dalam container Authentik
+# agar diterapkan secara otomatis.
+
+version: 1
+metadata:
+  name: cvi-e2e-setup
+  labels:
+    blueprints.goauthentik.io/instantiate: "true"
+
+entries:
+  # ─── Groups ──────────────────────────────────────────────────────────────────
+
+  - id: group-cvi-admin
+    model: authentik_core.group
+    state: present
+    identifiers:
+      name: cvi-admin
+    attrs:
+      name: cvi-admin
+
+  - id: group-cvi-expert
+    model: authentik_core.group
+    state: present
+    identifiers:
+      name: cvi-expert
+    attrs:
+      name: cvi-expert
+
+  # ─── Update default admin user (dibuat via AUTHENTIK_BOOTSTRAP_*) ────────────
+  # Username default Authentik adalah "akadmin"
+
+  - model: authentik_core.user
+    state: present
+    identifiers:
+      username: akadmin
+    attrs:
+      email: admin@cvi.test
+      password: AdminTest123!
+      groups:
+        - !KeyOf group-cvi-admin
+
+  # ─── Expert test user ─────────────────────────────────────────────────────────
+
+  - id: user-expert
+    model: authentik_core.user
+    state: present
+    identifiers:
+      username: expert
+    attrs:
+      username: expert
+      name: Expert CVI
+      email: expert@cvi.test
+      is_active: true
+      password: ExpertTest123!
+      groups:
+        - !KeyOf group-cvi-expert
+
+  # ─── OIDC / OAuth2 Provider ──────────────────────────────────────────────────
+
+  - id: cvi-oidc-provider
+    model: authentik_providers_oauth2.oauth2provider
+    state: present
+    identifiers:
+      name: cvi
+    attrs:
+      name: cvi
+      client_id: cvi-e2e-client
+      client_secret: cvi-e2e-secret
+      client_type: confidential
+      redirect_uris: |
+        http://web:3000/api/auth/callback/authentik
+        http://localhost:3000/api/auth/callback/authentik
+      sub_mode: hashed_user_id
+      include_claims_in_id_token: true
+      issuer_mode: per_provider
+      access_token_validity: "hours=1"
+      refresh_token_validity: "days=30"
+      signing_key: !Find [authentik_crypto.certificatekeypair, [name, "authentik Internal JWT Certificate"]]
+      authorization_flow: !Find [authentik_flows.flow, [slug, default-provider-authorization-implicit-consent]]
+      property_mappings:
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, openid]]
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, email]]
+        - !Find [authentik_providers_oauth2.scopemapping, [scope_name, profile]]
+
+  # ─── Application ─────────────────────────────────────────────────────────────
+
+  - model: authentik_core.application
+    state: present
+    identifiers:
+      slug: cvi
+    attrs:
+      name: CVI
+      slug: cvi
+      provider: !KeyOf cvi-oidc-provider

@@ -3,9 +3,15 @@ import { defineConfig, devices } from "@playwright/test";
 /**
  * Konfigurasi Playwright untuk E2E test CVI Web App.
  *
- * Playwright HARUS dijalankan di dalam Docker via `docker-compose.e2e.yml`.
- * baseURL menggunakan Docker internal network (`http://web:3000`) bukan localhost.
- * globalSetup mengotomatisasi proses login per role sebelum test dijalankan.
+ * Untuk VS Code internal browser (Playwright Extension):
+ *   baseURL default: http://localhost:3000 (pastikan app berjalan via docker-compose.yml)
+ *   AUTHENTIK_URL default: http://localhost:9000
+ *
+ * Untuk Docker (docker-compose.e2e.yml):
+ *   Set PLAYWRIGHT_BASE_URL=http://web:3000
+ *   Set AUTHENTIK_URL=http://authentik-server:9000
+ *
+ * globalSetup mengotomatisasi login per role sebelum test dijalankan.
  *
  * @see https://playwright.dev/docs/test-configuration
  */
@@ -16,16 +22,23 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: [["html", { outputFolder: "playwright-report" }], ["list"]],
+  /**
+   * outputDir ke /tmp agar tidak konflik dengan file milik root yang dibuat Docker.
+   * Untuk Docker, direktori ini diatur via env PLAYWRIGHT_OUTPUT_DIR.
+   */
+  outputDir: process.env.PLAYWRIGHT_OUTPUT_DIR ?? "/tmp/cvi-playwright-results",
+  reporter: [["html", { outputFolder: process.env.PLAYWRIGHT_OUTPUT_DIR
+    ? `${process.env.PLAYWRIGHT_OUTPUT_DIR}/report`
+    : "/tmp/cvi-playwright-report" }], ["list"]],
 
   globalSetup: "./tests/e2e/global-setup.ts",
 
   use: {
     /**
-     * Base URL menggunakan Docker internal network.
-     * Ketika dijalankan di luar Docker (lokal), gunakan PLAYWRIGHT_BASE_URL env var.
+     * Base URL default: http://localhost:3000 untuk VS Code / dev lokal.
+     * Saat menjalankan di Docker, gunakan PLAYWRIGHT_BASE_URL=http://web:3000.
      */
-    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://web:3000",
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3000",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
   },
@@ -42,13 +55,13 @@ export default defineConfig({
 
     /**
      * Test suite untuk role admin.
-     * Menggunakan storageState yang sudah dibuat oleh global-setup.
+     * storageState dibuat oleh global-setup atau tersedia dari run sebelumnya.
      */
     {
       name: "admin",
       use: {
         ...devices["Desktop Chrome"],
-        storageState: "tests/e2e/.auth/admin.json",
+        storageState: "/tmp/cvi-playwright-auth/admin.json",
       },
       testMatch: "**/admin/**/*.spec.ts",
       dependencies: ["setup"],
@@ -56,13 +69,13 @@ export default defineConfig({
 
     /**
      * Test suite untuk role expert.
-     * Menggunakan storageState yang sudah dibuat oleh global-setup.
+     * storageState dibuat oleh global-setup atau tersedia dari run sebelumnya.
      */
     {
       name: "expert",
       use: {
         ...devices["Desktop Chrome"],
-        storageState: "tests/e2e/.auth/expert.json",
+        storageState: "/tmp/cvi-playwright-auth/expert.json",
       },
       testMatch: "**/expert/**/*.spec.ts",
       dependencies: ["setup"],
