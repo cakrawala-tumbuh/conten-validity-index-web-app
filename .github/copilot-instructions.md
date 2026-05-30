@@ -42,9 +42,7 @@ Tandai setiap poin secara mental. Jika ada yang belum terpenuhi, **selesaikan du
 - [ ] Format commit mengikuti: `<tipe>(<scope>): <deskripsi singkat>`.
 - [ ] Tipe commit sesuai dengan perubahan yang dilakukan (feat/fix/docs/test/refactor/chore/style/perf).
 - [ ] Semua commit di lokal **WAJIB** dilakukan di branch `master`.
-- [ ] Push menyesuaikan instruksi:
-      - Jika diminta push ke master: `git push origin master`.
-      - Jika diminta buat PR: push master lokal ke branch baru di GitHub lalu `gh pr create`.
+- [ ] Push menyesuaikan instruksi: - Jika diminta push ke master: `git push origin master`. - Jika diminta buat PR: push master lokal ke branch baru di GitHub lalu `gh pr create`.
 
 ### ✅ Checklist Docker & Keamanan
 
@@ -429,8 +427,8 @@ Diperbaiki dengan menyimpan intended URL di session storage.
 
 ### Strategi Branch
 
-| Branch | Deskripsi |
-|---|---|
+| Branch   | Deskripsi                                  |
+| -------- | ------------------------------------------ |
 | `master` | Branch utama, selalu stabil dan siap rilis |
 
 - Semua commit di lokal **WAJIB** dilakukan di branch `master`.

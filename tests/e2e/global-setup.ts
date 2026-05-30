@@ -46,6 +46,7 @@ const TEST_USERS = {
  *
  * @param config - Konfigurasi Playwright.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function globalSetup(config: FullConfig): Promise<void> {
   // Buat direktori .auth jika belum ada
   if (!fs.existsSync(AUTH_DIR)) {
