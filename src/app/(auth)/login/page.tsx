@@ -29,9 +29,7 @@ export default async function LoginPage() {
       <div className="w-full max-w-md rounded-xl bg-white p-10 shadow-md">
         <div className="mb-8 text-center">
           <h1 className="text-2xl font-bold text-gray-900">{APP_NAME}</h1>
-          <p className="mt-2 text-sm text-gray-500">
-            Aplikasi pengelolaan Content Validity Index
-          </p>
+          <p className="mt-2 text-sm text-gray-500">Aplikasi pengelolaan Content Validity Index</p>
         </div>
 
         <LoginButton />

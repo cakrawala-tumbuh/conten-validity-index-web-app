@@ -6,17 +6,17 @@ CVI adalah metode statistik untuk mengukur validitas isi instrumen penelitian, d
 
 ## Tech Stack
 
-| Komponen | Teknologi |
-|---|---|
-| Framework | Next.js 15 (App Router) |
-| Bahasa | TypeScript 5+ (strict mode) |
-| Styling | Tailwind CSS v4 |
-| Autentikasi | NextAuth.js v4 + Authentik OIDC |
-| Validasi Form | React Hook Form + Zod |
-| Testing Unit | Jest + React Testing Library |
-| Testing E2E | Playwright (via Docker) |
-| Container | Docker (multi-stage) + Docker Compose |
-| CI/CD | GitHub Actions |
+| Komponen      | Teknologi                             |
+| ------------- | ------------------------------------- |
+| Framework     | Next.js 15 (App Router)               |
+| Bahasa        | TypeScript 5+ (strict mode)           |
+| Styling       | Tailwind CSS v4                       |
+| Autentikasi   | NextAuth.js v4 + Authentik OIDC       |
+| Validasi Form | React Hook Form + Zod                 |
+| Testing Unit  | Jest + React Testing Library          |
+| Testing E2E   | Playwright (via Docker)               |
+| Container     | Docker (multi-stage) + Docker Compose |
+| CI/CD         | GitHub Actions                        |
 
 ## Setup
 
@@ -69,8 +69,8 @@ docker compose -f docker-compose.e2e.yml up --abort-on-container-exit --exit-cod
 
 ## CI/CD
 
-| Workflow | Pemicu |
-|---|---|
-| `lint.yml` | Push/PR ke `master` |
-| `test.yml` | Push/PR ke `master` |
+| Workflow             | Pemicu                    |
+| -------------------- | ------------------------- |
+| `lint.yml`           | Push/PR ke `master`       |
+| `test.yml`           | Push/PR ke `master`       |
 | `docker-publish.yml` | Push tag `v*` ke `master` |

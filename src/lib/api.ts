@@ -97,7 +97,10 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
     });
   } catch (err) {
     if (err instanceof DOMException && err.name === "AbortError") {
-      throw new ApiError(408, "Request timeout: server tidak merespons dalam waktu yang ditentukan.");
+      throw new ApiError(
+        408,
+        "Request timeout: server tidak merespons dalam waktu yang ditentukan.",
+      );
     }
     throw new ApiError(0, "Gagal terhubung ke server. Periksa koneksi internet Anda.");
   } finally {

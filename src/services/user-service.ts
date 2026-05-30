@@ -79,10 +79,7 @@ export async function updateUser(
  * @returns Pesan konfirmasi.
  * @throws {ApiError} Jika user tidak ditemukan (404) atau bukan admin (403).
  */
-export async function deactivateUser(
-  token: string,
-  userId: string,
-): Promise<{ message: string }> {
+export async function deactivateUser(token: string, userId: string): Promise<{ message: string }> {
   return apiRequest<{ message: string }>(`/api/v1/users/${userId}`, {
     method: "DELETE",
     token,

@@ -58,6 +58,10 @@ services:
       AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
       AUTHENTIK_BOOTSTRAP_EMAIL: admin@cvi.test
       AUTHENTIK_BOOTSTRAP_PASSWORD: ${AUTHENTIK_BOOTSTRAP_PASSWORD:-AdminTest123!}
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./blueprints:/blueprints/custom
     healthcheck:
       test: ["CMD", "ak", "healthcheck"]
       interval: 10s
@@ -82,6 +86,8 @@ services:
       AUTHENTIK_POSTGRESQL__NAME: authentik
       AUTHENTIK_SECRET_KEY: e2e-test-secret-key-must-be-at-least-50-chars-long
       AUTHENTIK_ERROR_REPORTING__ENABLED: "false"
+    volumes:
+      - ./blueprints:/blueprints/custom
     depends_on:
       authentik-db:
         condition: service_healthy
@@ -91,14 +97,23 @@ services:
       - e2e-network
 
   backend:
-    image: ghcr.io/your-org/content-validity-index-backend:latest
+    image: cvi-backend:local
+    ports:
+      - "8000:8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://cvi:cvi_test@db:5432/cvi_test
+      - AUTHENTIK_ISSUER_URL=http://authentik-server:9000/application/o/cvi/
     depends_on:
       db:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')",
+        ]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -106,23 +121,24 @@ services:
       - e2e-network
 
   web:
-    build:
-      context: .
-      target: runner
+    image: cvi-web:e2e
+    ports:
+      - "3000:3000"
     environment:
       - NODE_ENV=production
-      - NEXTAUTH_URL=http://web:3000
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://web:3000}
       - NEXTAUTH_SECRET=e2e-nextauth-secret
       - AUTHENTIK_ISSUER_URL=http://authentik-server:9000/application/o/cvi/
+      - AUTHENTIK_EXTERNAL_URL=${AUTHENTIK_EXTERNAL_URL:-}
       - AUTHENTIK_CLIENT_ID=${AUTHENTIK_CLIENT_ID:-cvi-e2e-client}
       - AUTHENTIK_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET:-cvi-e2e-secret}
       - AUTHENTIK_ADMIN_GROUP=cvi-admin
       - AUTHENTIK_EXPERT_GROUP=cvi-expert
       - BACKEND_API_INTERNAL_URL=http://backend:8000
-      - NEXT_PUBLIC_API_URL=http://backend:8000
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
       - NEXT_PUBLIC_APP_NAME=CVI App
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:3000/api/auth/providers"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/api/auth/providers"]
       interval: 10s
       timeout: 5s
       retries: 15
@@ -135,11 +151,12 @@ services:
       - e2e-network
 
   playwright:
-    image: mcr.microsoft.com/playwright:v1.44.0-jammy
+    image: mcr.microsoft.com/playwright:v1.60.0-jammy
     working_dir: /app
     volumes:
       - .:/app
-    command: npx playwright test
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    command: npx playwright test --headed
     environment:
       - PLAYWRIGHT_BASE_URL=http://web:3000
       - AUTHENTIK_URL=http://authentik-server:9000
@@ -147,11 +164,12 @@ services:
       - TEST_ADMIN_PASSWORD=${TEST_ADMIN_PASSWORD:-AdminTest123!}
       - TEST_EXPERT_EMAIL=expert@cvi.test
       - TEST_EXPERT_PASSWORD=${TEST_EXPERT_PASSWORD:-ExpertTest123!}
+      - DISPLAY=${DISPLAY}
+    networks:
+      - e2e-network
     depends_on:
       web:
         condition: service_healthy
-    networks:
-      - e2e-network
 
 networks:
   e2e-network:

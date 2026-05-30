@@ -19,10 +19,9 @@ export async function listAssignments(
   token: string,
   instrumentId: string,
 ): Promise<AssignmentResponse[]> {
-  return apiRequest<AssignmentResponse[]>(
-    `/api/v1/instruments/${instrumentId}/assignments`,
-    { token },
-  );
+  return apiRequest<AssignmentResponse[]>(`/api/v1/instruments/${instrumentId}/assignments`, {
+    token,
+  });
 }
 
 /**

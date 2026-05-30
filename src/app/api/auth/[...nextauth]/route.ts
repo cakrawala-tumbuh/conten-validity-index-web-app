@@ -43,6 +43,22 @@ function extractRole(groups: string[]): UserRole {
  * Diekspor agar dapat digunakan oleh helper `getServerSession(authOptions)`
  * di server components dan API routes.
  */
+/**
+ * Mengekstrak base URL Authentik dari issuer URL.
+ *
+ * Misal: `http://authentik-server:9000/application/o/cvi/` → `http://authentik-server:9000`
+ *
+ * @param issuerUrl - URL issuer Authentik.
+ * @returns Base URL Authentik (tanpa path).
+ */
+function getAuthentikBase(issuerUrl: string): string {
+  return issuerUrl.replace(/\/application\/o\/[^/]+\/?$/, "");
+}
+
+/** Base URL Authentik yang dapat dijangkau oleh browser pengguna. */
+const authentikExternalBase =
+  process.env.AUTHENTIK_EXTERNAL_URL ?? getAuthentikBase(process.env.AUTHENTIK_ISSUER_URL ?? "");
+
 export const authOptions: NextAuthOptions = {
   providers: [
     {
@@ -53,6 +69,7 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.AUTHENTIK_CLIENT_ID,
       clientSecret: process.env.AUTHENTIK_CLIENT_SECRET,
       authorization: {
+        url: `${authentikExternalBase}/application/o/authorize/`,
         params: {
           scope: "openid email profile groups",
         },
@@ -83,8 +100,7 @@ export const authOptions: NextAuthOptions = {
     async signIn({ account }) {
       if (account?.access_token) {
         try {
-          const baseUrl =
-            process.env.BACKEND_API_INTERNAL_URL ?? "http://backend:8000";
+          const baseUrl = process.env.BACKEND_API_INTERNAL_URL ?? "http://backend:8000";
           await fetch(`${baseUrl}/api/v1/auth/sync`, {
             method: "POST",
             headers: {
