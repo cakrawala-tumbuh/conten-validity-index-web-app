@@ -20,6 +20,7 @@ const mockLogs: ActivityLogResponse[] = [
     resource_id: "inst-12345678",
     ip_address: "127.0.0.1",
     user_agent: "Mozilla/5.0",
+    metadata_: null,
     created_at: "2024-06-01T10:30:00Z",
   },
   {
@@ -30,6 +31,7 @@ const mockLogs: ActivityLogResponse[] = [
     resource_id: null,
     ip_address: "192.168.1.1",
     user_agent: null,
+    metadata_: null,
     created_at: "2024-06-01T09:00:00Z",
   },
 ];
@@ -105,6 +107,7 @@ describe("ActivityLogTable", () => {
         resource_id: "inst-999",
         ip_address: "10.0.0.1",
         user_agent: null,
+        metadata_: null,
         created_at: "2024-07-01T00:00:00Z",
       },
     ];
@@ -140,6 +143,7 @@ describe("ActivityLogTable", () => {
       resource_id: "inst-1",
       ip_address: "10.0.0.1",
       user_agent: null,
+      metadata_: null,
       created_at: "2024-07-01T00:00:00Z",
     };
     render(<ActivityLogTable initialLogs={[deleteLog]} />);
@@ -157,6 +161,7 @@ describe("ActivityLogTable", () => {
       resource_id: "inst-1",
       ip_address: "10.0.0.2",
       user_agent: null,
+      metadata_: null,
       created_at: "2024-07-01T00:00:00Z",
     };
     render(<ActivityLogTable initialLogs={[submitLog]} />);
