@@ -63,8 +63,23 @@ docker compose -f docker-compose.test.yml up --abort-on-container-exit --exit-co
 
 > **Penting:** Playwright HARUS dijalankan via Docker. Jangan gunakan `npx playwright test` langsung.
 
+#### Test otomatis (Playwright)
+
 ```bash
-docker compose -f docker-compose.e2e.yml up --abort-on-container-exit --exit-code-from playwright
+# Build image lokal terlebih dahulu (jika belum)
+docker build -t cvi-web:e2e --target e2e .
+docker build -t cvi-backend:local ../content-validity-index-backend
+
+# Jalankan test
+docker compose -f docker-compose.playwright.yml up \
+  --abort-on-container-exit --exit-code-from playwright
+```
+
+#### Stack manual (pengujian via browser)
+
+```bash
+docker compose -f docker-compose.e2e.yml up
+# Akses: http://localhost:3000
 ```
 
 ## CI/CD

@@ -1,19 +1,15 @@
-# docker-compose.e2e.yml — Stack E2E untuk pengujian manual
+# docker-compose.playwright.yml — E2E test Playwright otomatis di Docker
 #
-# Menjalankan seluruh stack (backend, web, Authentik) TANPA Playwright.
-# Gunakan untuk pengujian manual melalui browser.
+# Menjalankan seluruh stack (backend, web, Authentik) beserta container Playwright.
+# Login otomatis via Authentik UI, storageState disimpan per role.
 #
 # PERHATIAN: Build image lokal sebelum menjalankan:
 #   docker build -t cvi-web:e2e --target e2e .   (dari folder content-validity-index-web-app)
 #   docker build -t cvi-backend:local .           (dari folder content-validity-index-backend)
 #
 # Cara menjalankan:
-#   docker compose -f docker-compose.e2e.yml up
-#
-# Akses:
-#   Web App  : http://localhost:3000
-#   Backend  : http://localhost:8000
-#   Authentik: http://localhost:9000
+#   docker compose -f docker-compose.playwright.yml up \
+#     --abort-on-container-exit --exit-code-from playwright
 
 services:
   db:
@@ -87,6 +83,8 @@ services:
   authentik-worker:
     image: ghcr.io/goauthentik/server:2024.6
     command: worker
+    # restart: unless-stopped mencegah exit kode 0 dari Celery worker
+    # men-trigger --abort-on-container-exit secara prematur
     restart: unless-stopped
     environment:
       AUTHENTIK_REDIS__HOST: redis
@@ -159,6 +157,29 @@ services:
         condition: service_healthy
     networks:
       - e2e-network
+
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.60.0-jammy
+    # network_mode: host agar dapat mengakses localhost:3000, :8000, :9000
+    # yang di-publish oleh service-service di atas
+    network_mode: host
+    working_dir: /app
+    environment:
+      - CI=true
+      - PLAYWRIGHT_BASE_URL=http://localhost:3000
+      - AUTHENTIK_URL=http://localhost:9000
+      - TEST_ADMIN_EMAIL=admin@cvi.test
+      - TEST_ADMIN_PASSWORD=${TEST_ADMIN_PASSWORD:-AdminTest123!}
+      - TEST_EXPERT_EMAIL=expert@cvi.test
+      - TEST_EXPERT_PASSWORD=${TEST_EXPERT_PASSWORD:-ExpertTest123!}
+    volumes:
+      - .:/app
+    # Playwright menggunakan headless mode by default saat CI=true.
+    # Tidak perlu xvfb-run atau DISPLAY.
+    command: npx playwright test
+    depends_on:
+      web:
+        condition: service_healthy
 
 networks:
   e2e-network:
