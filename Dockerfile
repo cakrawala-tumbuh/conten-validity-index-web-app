@@ -41,7 +41,33 @@ ENV NEXT_TELEMETRY_DISABLED=1
 CMD ["npm", "run", "test:coverage"]
 
 # ============================================================
-# Stage 4: runner — Image final yang ringan untuk production
+# Stage 4: e2e — Production build untuk E2E testing
+# ============================================================
+FROM node:20-alpine AS e2e
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]
+
+# ============================================================
+# Stage 5: runner — Image final yang ringan untuk production
 # ============================================================
 FROM node:20-alpine AS runner
 

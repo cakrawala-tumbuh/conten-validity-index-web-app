@@ -32,9 +32,9 @@ Tandai setiap poin secara mental. Jika ada yang belum terpenuhi, **selesaikan du
 - [ ] Coverage kode di `src/` tidak turun di bawah **80%**.
 - [ ] Jika ada perubahan pada alur navigasi, auth, atau integrasi penuh: **E2E test Playwright**
       sudah dijalankan di dalam Docker dan **semua test lolos**:
-      `docker compose -f docker-compose.e2e.yml up --abort-on-container-exit --exit-code-from playwright`
+      `docker compose -f docker-compose.playwright.yml up --abort-on-container-exit --exit-code-from playwright`
 - [ ] **DILARANG** menjalankan `npx playwright test` langsung di luar Docker — semua Playwright test
-      **HARUS** dijalankan via `docker-compose.e2e.yml`.
+      **HARUS** dijalankan via `docker-compose.playwright.yml`.
 
 ### ✅ Checklist Git
 
@@ -337,11 +337,14 @@ Jika ada perubahan pada alur navigasi, auth, atau integrasi penuh, **WAJIB** jug
 
 ```bash
 # 3. WAJIB (untuk perubahan integrasi): Jalankan Playwright E2E di dalam Docker
-docker compose -f docker-compose.e2e.yml up --abort-on-container-exit --exit-code-from playwright
+docker compose -f docker-compose.playwright.yml up --abort-on-container-exit --exit-code-from playwright
 ```
 
+> **CATATAN:** Semua perintah `docker compose` **TIDAK BOLEH** menggunakan `sudo`.
+> Gunakan `docker compose` langsung (bukan `sudo docker compose`).
+
 > **ATURAN KETAT:** `npx playwright test` **DILARANG** dijalankan langsung di luar Docker.
-> Playwright **HARUS** selalu berjalan di dalam container via `docker-compose.e2e.yml`.
+> Playwright **HARUS** selalu berjalan di dalam container via `docker-compose.playwright.yml`.
 
 Jika ada test yang gagal, AI **HARUS** memperbaiki kode terlebih dahulu sebelum melanjutkan.
 AI **DILARANG** melewati langkah ini dengan alasan apapun.
@@ -352,10 +355,12 @@ AI **DILARANG** melewati langkah ini dengan alasan apapun.
   - Setiap komponen **WAJIB** diuji: render, interaksi dasar, dan edge case.
   - **WAJIB** mock semua panggilan API menggunakan `jest.mock` atau `msw` (Mock Service Worker).
 - `tests/e2e/` — E2E test alur kritikal menggunakan **Playwright** yang berjalan di dalam Docker.
-  - Playwright menggunakan image `mcr.microsoft.com/playwright` sebagai container.
-  - Playwright mengakses app via Docker internal network (`http://web:3000`).
-  - Login flow via Authentik UI di Docker internal network (`http://authentik-server:9000`).
+  - Playwright menggunakan image `mcr.microsoft.com/playwright` sebagai container dengan `network_mode: host`.
+  - Playwright mengakses app dan Authentik via `localhost` (sama seperti browser pengguna manual).
+  - Login flow via Authentik UI di `http://localhost:9000`.
   - `global-setup.ts` mengotomatisasi login dan menyimpan `storageState` per role.
+  - **Gunakan `docker-compose.playwright.yml`** untuk menjalankan test otomatis.
+  - **Gunakan `docker-compose.e2e.yml`** untuk menjalankan stack saja (pengujian manual via browser).
 - Coverage minimum: **80%** untuk kode di `src/` — **TIDAK BOLEH** dikurangi.
 
 ### Penulisan Test
