@@ -20,7 +20,7 @@ import { APP_NAME } from "@/constants";
 export default async function LoginPage() {
   const session = await getServerSession(authOptions);
 
-  if (session) {
+  if (session && !session.error) {
     redirect("/");
   }
 
