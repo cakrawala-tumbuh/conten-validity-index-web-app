@@ -36,6 +36,16 @@ const TEST_USERS = {
     password: process.env.TEST_EXPERT_PASSWORD ?? "ExpertTest123!",
     stateFile: path.join(AUTH_DIR, "expert.json"),
   },
+  expert2: {
+    email: process.env.TEST_EXPERT2_EMAIL ?? "expert2@cvi.test",
+    password: process.env.TEST_EXPERT2_PASSWORD ?? "ExpertTest123!",
+    stateFile: path.join(AUTH_DIR, "expert2.json"),
+  },
+  expert3: {
+    email: process.env.TEST_EXPERT3_EMAIL ?? "expert3@cvi.test",
+    password: process.env.TEST_EXPERT3_PASSWORD ?? "ExpertTest123!",
+    stateFile: path.join(AUTH_DIR, "expert3.json"),
+  },
 };
 
 /**

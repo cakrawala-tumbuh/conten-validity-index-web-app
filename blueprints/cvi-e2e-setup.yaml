@@ -45,7 +45,7 @@ entries:
       groups:
         - !KeyOf group-cvi-admin
 
-  # ─── Expert test user ─────────────────────────────────────────────────────────
+  # ─── Expert test users ───────────────────────────────────────────────────────
 
   - id: user-expert
     model: authentik_core.user
@@ -56,6 +56,34 @@ entries:
       username: expert
       name: Expert CVI
       email: expert@cvi.test
+      is_active: true
+      password: ExpertTest123!
+      groups:
+        - !KeyOf group-cvi-expert
+
+  - id: user-expert2
+    model: authentik_core.user
+    state: present
+    identifiers:
+      username: expert2
+    attrs:
+      username: expert2
+      name: Expert CVI 2
+      email: expert2@cvi.test
+      is_active: true
+      password: ExpertTest123!
+      groups:
+        - !KeyOf group-cvi-expert
+
+  - id: user-expert3
+    model: authentik_core.user
+    state: present
+    identifiers:
+      username: expert3
+    attrs:
+      username: expert3
+      name: Expert CVI 3
+      email: expert3@cvi.test
       is_active: true
       password: ExpertTest123!
       groups:
