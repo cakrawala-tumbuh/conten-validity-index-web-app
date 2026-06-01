@@ -18,7 +18,7 @@ import type { UserResponse } from "@/types/user";
  * @throws {ApiError} Jika sync gagal (misal: token invalid).
  */
 export async function syncUser(token: string): Promise<UserResponse> {
-  return apiRequest<UserResponse>("/api/v1/auth/sync", {
+  return apiRequest<UserResponse>("/api/v1/auth/sync/", {
     method: "POST",
     token,
   });

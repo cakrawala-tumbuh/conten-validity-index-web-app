@@ -16,7 +16,7 @@ import type { RatingBulkCreate, RatingUpdate, RatingResponse } from "@/types/rat
  * @throws {ApiError} Jika assignment tidak ditemukan (404).
  */
 export async function getRatings(token: string, assignmentId: string): Promise<RatingResponse[]> {
-  return apiRequest<RatingResponse[]>(`/api/v1/assignments/${assignmentId}/ratings`, { token });
+  return apiRequest<RatingResponse[]>(`/api/v1/assignments/${assignmentId}/ratings/`, { token });
 }
 
 /**
@@ -35,7 +35,7 @@ export async function bulkSubmitRatings(
   assignmentId: string,
   data: RatingBulkCreate,
 ): Promise<RatingResponse[]> {
-  return apiRequest<RatingResponse[]>(`/api/v1/assignments/${assignmentId}/ratings/bulk`, {
+  return apiRequest<RatingResponse[]>(`/api/v1/assignments/${assignmentId}/ratings/bulk/`, {
     method: "POST",
     body: JSON.stringify(data),
     token,

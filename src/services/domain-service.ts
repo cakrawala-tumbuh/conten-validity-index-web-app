@@ -15,7 +15,7 @@ import type { DomainCreate, DomainUpdate, DomainResponse } from "@/types/domain"
  * @throws {ApiError} Jika instrumen tidak ditemukan (404).
  */
 export async function listDomains(token: string, instrumentId: string): Promise<DomainResponse[]> {
-  return apiRequest<DomainResponse[]>(`/api/v1/instruments/${instrumentId}/domains`, { token });
+  return apiRequest<DomainResponse[]>(`/api/v1/instruments/${instrumentId}/domains/`, { token });
 }
 
 /**
@@ -32,7 +32,7 @@ export async function createDomain(
   instrumentId: string,
   data: DomainCreate,
 ): Promise<DomainResponse> {
-  return apiRequest<DomainResponse>(`/api/v1/instruments/${instrumentId}/domains`, {
+  return apiRequest<DomainResponse>(`/api/v1/instruments/${instrumentId}/domains/`, {
     method: "POST",
     body: JSON.stringify(data),
     token,

@@ -16,7 +16,7 @@ import type { ItemCreate, ItemBulkCreate, ItemUpdate, ItemResponse } from "@/typ
  * @throws {ApiError} Jika instrumen tidak ditemukan (404).
  */
 export async function listItems(token: string, instrumentId: string): Promise<ItemResponse[]> {
-  return apiRequest<ItemResponse[]>(`/api/v1/instruments/${instrumentId}/items`, { token });
+  return apiRequest<ItemResponse[]>(`/api/v1/instruments/${instrumentId}/items/`, { token });
 }
 
 /**
@@ -33,7 +33,7 @@ export async function createItem(
   instrumentId: string,
   data: ItemCreate,
 ): Promise<ItemResponse> {
-  return apiRequest<ItemResponse>(`/api/v1/instruments/${instrumentId}/items`, {
+  return apiRequest<ItemResponse>(`/api/v1/instruments/${instrumentId}/items/`, {
     method: "POST",
     body: JSON.stringify(data),
     token,
@@ -54,7 +54,7 @@ export async function bulkCreateItems(
   instrumentId: string,
   data: ItemBulkCreate,
 ): Promise<ItemResponse[]> {
-  return apiRequest<ItemResponse[]>(`/api/v1/instruments/${instrumentId}/items/bulk`, {
+  return apiRequest<ItemResponse[]>(`/api/v1/instruments/${instrumentId}/items/bulk/`, {
     method: "POST",
     body: JSON.stringify(data),
     token,

@@ -19,7 +19,7 @@ export async function listAssignments(
   token: string,
   instrumentId: string,
 ): Promise<AssignmentResponse[]> {
-  return apiRequest<AssignmentResponse[]>(`/api/v1/instruments/${instrumentId}/assignments`, {
+  return apiRequest<AssignmentResponse[]>(`/api/v1/instruments/${instrumentId}/assignments/`, {
     token,
   });
 }
@@ -38,7 +38,7 @@ export async function createAssignment(
   instrumentId: string,
   data: AssignmentCreate,
 ): Promise<AssignmentResponse> {
-  return apiRequest<AssignmentResponse>(`/api/v1/instruments/${instrumentId}/assignments`, {
+  return apiRequest<AssignmentResponse>(`/api/v1/instruments/${instrumentId}/assignments/`, {
     method: "POST",
     body: JSON.stringify(data),
     token,
@@ -73,5 +73,5 @@ export async function deleteAssignment(
  * @throws {ApiError} Jika token tidak valid.
  */
 export async function getMyAssignments(token: string): Promise<AssignmentResponse[]> {
-  return apiRequest<AssignmentResponse[]>("/api/v1/my-assignments", { token });
+  return apiRequest<AssignmentResponse[]>("/api/v1/my-assignments/", { token });
 }

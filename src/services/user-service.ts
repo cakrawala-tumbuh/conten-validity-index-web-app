@@ -16,7 +16,7 @@ import type { PaginationParams } from "@/types/common";
  * @throws {ApiError} Jika token tidak valid atau expired.
  */
 export async function getMe(token: string): Promise<UserResponse> {
-  return apiRequest<UserResponse>("/api/v1/users/me", { token });
+  return apiRequest<UserResponse>("/api/v1/users/me/", { token });
 }
 
 /**
@@ -35,7 +35,7 @@ export async function listUsers(
   if (params.skip !== undefined) query.set("skip", String(params.skip));
   if (params.limit !== undefined) query.set("limit", String(params.limit));
   const qs = query.toString() ? `?${query.toString()}` : "";
-  return apiRequest<UserResponse[]>(`/api/v1/users${qs}`, { token });
+  return apiRequest<UserResponse[]>(`/api/v1/users/${qs}`, { token });
 }
 
 /**

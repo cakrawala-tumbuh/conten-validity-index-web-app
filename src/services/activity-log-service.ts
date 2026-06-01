@@ -31,5 +31,5 @@ export async function listActivityLogs(
   if (filter.skip !== undefined) query.set("skip", String(filter.skip));
   if (filter.limit !== undefined) query.set("limit", String(filter.limit));
   const qs = query.toString() ? `?${query.toString()}` : "";
-  return apiRequest<ActivityLogResponse[]>(`/api/v1/activity-logs${qs}`, { token });
+  return apiRequest<ActivityLogResponse[]>(`/api/v1/activity-logs/${qs}`, { token });
 }

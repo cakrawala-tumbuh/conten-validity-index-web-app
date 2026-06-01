@@ -28,7 +28,7 @@ export async function listInstruments(
   if (params.skip !== undefined) query.set("skip", String(params.skip));
   if (params.limit !== undefined) query.set("limit", String(params.limit));
   const qs = query.toString() ? `?${query.toString()}` : "";
-  return apiRequest<InstrumentResponse[]>(`/api/v1/instruments${qs}`, { token });
+  return apiRequest<InstrumentResponse[]>(`/api/v1/instruments/${qs}`, { token });
 }
 
 /**
@@ -43,7 +43,7 @@ export async function createInstrument(
   token: string,
   data: InstrumentCreate,
 ): Promise<InstrumentResponse> {
-  return apiRequest<InstrumentResponse>("/api/v1/instruments", {
+  return apiRequest<InstrumentResponse>("/api/v1/instruments/", {
     method: "POST",
     body: JSON.stringify(data),
     token,
