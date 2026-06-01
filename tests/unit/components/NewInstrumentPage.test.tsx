@@ -60,9 +60,7 @@ describe("NewInstrumentPage", () => {
   });
 
   it("harus berhasil membuat instrumen tanpa domain dan item", async () => {
-    mockFetch.mockResolvedValueOnce(
-      makeFetchResponse({ id: "instr-1", name: "Instrumen #1" }),
-    );
+    mockFetch.mockResolvedValueOnce(makeFetchResponse({ id: "instr-1", name: "Instrumen #1" }));
 
     render(<NewInstrumentPage />);
 
@@ -190,9 +188,7 @@ describe("NewInstrumentPage", () => {
       makeFetchResponse({ id: "instr-1", name: "Instrumen #1" }, true, 201),
     );
     // Domain gagal — tidak ada detail, komponen menggunakan pesan fallback
-    mockFetch.mockResolvedValueOnce(
-      makeFetchResponse({}, false, 500),
-    );
+    mockFetch.mockResolvedValueOnce(makeFetchResponse({}, false, 500));
 
     render(<NewInstrumentPage />);
 
@@ -220,9 +216,7 @@ describe("NewInstrumentPage", () => {
       makeFetchResponse({ id: "instr-1", name: "Instrumen #1" }, true, 201),
     );
     // Items gagal — tidak ada detail, komponen menggunakan pesan fallback
-    mockFetch.mockResolvedValueOnce(
-      makeFetchResponse({}, false, 422),
-    );
+    mockFetch.mockResolvedValueOnce(makeFetchResponse({}, false, 422));
 
     render(<NewInstrumentPage />);
 
@@ -251,9 +245,7 @@ describe("NewInstrumentPage", () => {
       makeFetchResponse({ id: "instr-1", name: "Instrumen #1" }, true, 201),
     );
     // Items berhasil
-    mockFetch.mockResolvedValueOnce(
-      makeFetchResponse([{ id: "item-1" }], true, 201),
-    );
+    mockFetch.mockResolvedValueOnce(makeFetchResponse([{ id: "item-1" }], true, 201));
 
     render(<NewInstrumentPage />);
 

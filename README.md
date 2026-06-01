@@ -104,17 +104,17 @@ docker compose -f docker-compose.e2e.yml up
 
 **Langkah 3 — Akses service:**
 
-| Service  | URL                              |
-| -------- | -------------------------------- |
-| Web App  | <http://localhost:3000>          |
-| Backend  | <http://localhost:8000/docs>     |
-| Authentik Admin | <http://localhost:9000>  |
+| Service         | URL                          |
+| --------------- | ---------------------------- |
+| Web App         | <http://localhost:3000>      |
+| Backend         | <http://localhost:8000/docs> |
+| Authentik Admin | <http://localhost:9000>      |
 
 **Kredensial bawaan:**
 
-| Role   | Username  | Password        |
-| ------ | --------- | --------------- |
-| Admin  | `akadmin` | `AdminTest123!` |
+| Role   | Username  | Password         |
+| ------ | --------- | ---------------- |
+| Admin  | `akadmin` | `AdminTest123!`  |
 | Expert | `expert`  | `ExpertTest123!` |
 
 **Langkah 4 — Bersihkan setelah selesai:**

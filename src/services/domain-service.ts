@@ -55,14 +55,11 @@ export async function updateDomain(
   domainId: string,
   data: DomainUpdate,
 ): Promise<DomainResponse> {
-  return apiRequest<DomainResponse>(
-    `/api/v1/instruments/${instrumentId}/domains/${domainId}`,
-    {
-      method: "PATCH",
-      body: JSON.stringify(data),
-      token,
-    },
-  );
+  return apiRequest<DomainResponse>(`/api/v1/instruments/${instrumentId}/domains/${domainId}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+    token,
+  });
 }
 
 /**

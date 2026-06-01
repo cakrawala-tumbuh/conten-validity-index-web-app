@@ -4,10 +4,11 @@
  * Alur autentikasi:
  * 1. Pengguna klik tombol "Login" → redirect ke Authentik authorization endpoint.
  * 2. Authentik mengautentikasi pengguna dan redirect kembali dengan auth code.
- * 3. NextAuth menukar code dengan tokens (access_token, id_token).
+ * 3. NextAuth menukar code dengan tokens (access_token, id_token, refresh_token).
  * 4. Callback `signIn` memanggil backend untuk sync user ke database.
- * 5. Callback `jwt` menyimpan access_token dan role ke JWT.
- * 6. Callback `session` mengekspos data yang diperlukan ke client.
+ * 5. Callback `jwt` menyimpan access_token, refresh_token, dan role ke JWT.
+ * 6. Saat access token mendekati expiry, callback `jwt` otomatis me-refresh token.
+ * 7. Callback `session` mengekspos data yang diperlukan ke client.
  *
  * Role dipetakan dari Authentik group membership:
  * - Group `cvi-admin` → role "admin"
@@ -15,6 +16,7 @@
  */
 import NextAuth, { type NextAuthOptions } from "next-auth";
 import type { UserRole } from "@/types/user";
+import { refreshAccessToken, isTokenExpired } from "@/lib/auth-token";
 
 /** Nama Authentik group yang dipetakan ke role admin. */
 const ADMIN_GROUP = process.env.AUTHENTIK_ADMIN_GROUP ?? "cvi-admin";
@@ -55,6 +57,16 @@ function getAuthentikBase(issuerUrl: string): string {
   return issuerUrl.replace(/\/application\/o\/[^/]+\/?$/, "");
 }
 
+/**
+ * Mendapatkan token endpoint Authentik dari issuer URL.
+ *
+ * @param issuerUrl - URL issuer Authentik (misal: `https://auth.example.com/application/o/app/`).
+ * @returns URL token endpoint.
+ */
+function getTokenEndpoint(issuerUrl: string): string {
+  return `${getAuthentikBase(issuerUrl)}/application/o/token/`;
+}
+
 /** Base URL Authentik yang dapat dijangkau oleh browser pengguna. */
 const authentikExternalBase =
   process.env.AUTHENTIK_EXTERNAL_URL ?? getAuthentikBase(process.env.AUTHENTIK_ISSUER_URL ?? "");
@@ -71,7 +83,7 @@ export const authOptions: NextAuthOptions = {
       authorization: {
         url: `${authentikExternalBase}/application/o/authorize/`,
         params: {
-          scope: "openid email profile groups",
+          scope: "openid email profile groups offline_access",
         },
       },
       idToken: true,
@@ -119,7 +131,8 @@ export const authOptions: NextAuthOptions = {
      * Callback untuk mengisi JWT dengan data tambahan dari Authentik.
      *
      * Dipanggil saat token dibuat (login) dan setiap kali session diakses.
-     * Menyimpan access_token dan role ke dalam JWT.
+     * Menyimpan access_token, refresh_token, dan role ke dalam JWT.
+     * Jika access token mendekati expiry, otomatis me-refresh menggunakan refresh token.
      *
      * @param params.token - JWT yang sedang diproses.
      * @param params.account - Data account (hanya ada saat login pertama).
@@ -127,13 +140,48 @@ export const authOptions: NextAuthOptions = {
      * @returns JWT yang sudah diperbarui.
      */
     async jwt({ token, account, profile }) {
+      // Login pertama: simpan semua token dari Authentik
       if (account && profile) {
+        const nowSeconds = Math.floor(Date.now() / 1000);
         token.accessToken = account.access_token as string;
+        token.refreshToken = (account.refresh_token ?? "") as string;
+        token.accessTokenExpiry =
+          account.expires_at ?? nowSeconds + ((account.expires_in as number) ?? 3600);
         token.userId = profile.sub as string;
         const groups = (profile as Record<string, unknown>).groups;
         token.role = extractRole(Array.isArray(groups) ? (groups as string[]) : []);
+        return token;
       }
-      return token;
+
+      // Token masih valid: kembalikan tanpa refresh
+      if (!isTokenExpired(token.accessTokenExpiry)) {
+        return token;
+      }
+
+      // Access token expired: coba refresh
+      if (!token.refreshToken) {
+        return { ...token, error: "RefreshAccessTokenError" };
+      }
+
+      const issuerUrl = process.env.AUTHENTIK_ISSUER_URL ?? "";
+      const result = await refreshAccessToken({
+        tokenEndpoint: getTokenEndpoint(issuerUrl),
+        clientId: process.env.AUTHENTIK_CLIENT_ID ?? "",
+        clientSecret: process.env.AUTHENTIK_CLIENT_SECRET ?? "",
+        refreshToken: token.refreshToken,
+      });
+
+      if (!result.ok) {
+        return { ...token, error: "RefreshAccessTokenError" };
+      }
+
+      return {
+        ...token,
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken,
+        accessTokenExpiry: result.accessTokenExpiry,
+        error: undefined,
+      };
     },
 
     /**

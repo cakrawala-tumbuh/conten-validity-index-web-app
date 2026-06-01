@@ -68,48 +68,24 @@ describe("ItemsManager", () => {
   });
 
   it("harus merender tabel dengan semua item", () => {
-    render(
-      <ItemsManager
-        instrumentId="inst-1"
-        initialItems={mockItems}
-        domains={mockDomains}
-      />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     expect(screen.getByText("Konten item pertama")).toBeInTheDocument();
     expect(screen.getByText("Konten item kedua")).toBeInTheDocument();
   });
 
   it("harus menampilkan nama domain item jika ada", () => {
-    render(
-      <ItemsManager
-        instrumentId="inst-1"
-        initialItems={mockItems}
-        domains={mockDomains}
-      />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     // domain_id "dom-1" harus ditampilkan sebagai "Kognitif"
     expect(screen.getByText("Kognitif")).toBeInTheDocument();
   });
 
   it("harus menampilkan tanda hubung jika item tidak memiliki domain", () => {
-    render(
-      <ItemsManager
-        instrumentId="inst-1"
-        initialItems={mockItems}
-        domains={mockDomains}
-      />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     expect(screen.getByText("—")).toBeInTheDocument();
   });
 
   it("harus menampilkan nomor urut setiap item", () => {
-    render(
-      <ItemsManager
-        instrumentId="inst-1"
-        initialItems={mockItems}
-        domains={mockDomains}
-      />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     expect(screen.getByText("1")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
   });
@@ -134,13 +110,7 @@ describe("ItemsManager", () => {
   });
 
   it("harus masuk mode edit saat tombol edit item diklik", () => {
-    render(
-      <ItemsManager
-        instrumentId="inst-1"
-        initialItems={mockItems}
-        domains={mockDomains}
-      />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     const editButtons = screen.getAllByTitle("Edit");
     fireEvent.click(editButtons[0]);
     // Setelah klik edit, textarea konten muncul
@@ -148,13 +118,7 @@ describe("ItemsManager", () => {
   });
 
   it("harus keluar mode edit saat tombol Batal diklik", () => {
-    render(
-      <ItemsManager
-        instrumentId="inst-1"
-        initialItems={mockItems}
-        domains={mockDomains}
-      />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     const editButtons = screen.getAllByTitle("Edit");
     fireEvent.click(editButtons[0]);
     expect(screen.getByTitle("Batal")).toBeInTheDocument();
@@ -164,13 +128,7 @@ describe("ItemsManager", () => {
 
   it("harus meminta konfirmasi sebelum menghapus item", () => {
     mockConfirm.mockReturnValue(false);
-    render(
-      <ItemsManager
-        instrumentId="inst-1"
-        initialItems={mockItems}
-        domains={mockDomains}
-      />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     const deleteButtons = screen.getAllByTitle("Hapus");
     fireEvent.click(deleteButtons[0]);
     expect(mockConfirm).toHaveBeenCalledWith(expect.stringContaining("item"));
@@ -187,13 +145,7 @@ describe("ItemsManager", () => {
       ok: true,
       json: async () => updatedItem,
     });
-    render(
-      <ItemsManager
-        instrumentId="inst-1"
-        initialItems={mockItems}
-        domains={mockDomains}
-      />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     fireEvent.click(screen.getAllByTitle("Edit")[0]);
     const contentInput = screen.getByDisplayValue("Konten item pertama");
     fireEvent.change(contentInput, { target: { value: "Konten diperbarui" } });
@@ -211,13 +163,7 @@ describe("ItemsManager", () => {
       ok: false,
       json: async () => ({ detail: "Item tidak ditemukan" }),
     });
-    render(
-      <ItemsManager
-        instrumentId="inst-1"
-        initialItems={mockItems}
-        domains={mockDomains}
-      />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     fireEvent.click(screen.getAllByTitle("Edit")[0]);
     fireEvent.click(screen.getByTitle("Simpan"));
     await waitFor(() => {
@@ -226,13 +172,7 @@ describe("ItemsManager", () => {
   });
 
   it("harus menampilkan error jika konten edit kosong", () => {
-    render(
-      <ItemsManager
-        instrumentId="inst-1"
-        initialItems={mockItems}
-        domains={mockDomains}
-      />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     fireEvent.click(screen.getAllByTitle("Edit")[0]);
     const contentInput = screen.getByDisplayValue("Konten item pertama");
     fireEvent.change(contentInput, { target: { value: "" } });
@@ -254,13 +194,7 @@ describe("ItemsManager", () => {
       ok: true,
       json: async () => [newItemResp],
     });
-    render(
-      <ItemsManager
-        instrumentId="inst-1"
-        initialItems={mockItems}
-        domains={mockDomains}
-      />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     fireEvent.click(screen.getByRole("button", { name: /tambah item/i }));
     const contentInput = screen.getByPlaceholderText(/konten item/i);
     fireEvent.change(contentInput, { target: { value: "Item baru" } });
@@ -327,13 +261,7 @@ describe("ItemsManager", () => {
   it("harus berhasil menghapus item setelah konfirmasi", async () => {
     mockConfirm.mockReturnValue(true);
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
-    render(
-      <ItemsManager
-        instrumentId="inst-1"
-        initialItems={mockItems}
-        domains={mockDomains}
-      />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     fireEvent.click(screen.getAllByTitle("Hapus")[0]);
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
@@ -349,13 +277,7 @@ describe("ItemsManager", () => {
       ok: false,
       json: async () => ({ detail: "Item tidak dapat dihapus" }),
     });
-    render(
-      <ItemsManager
-        instrumentId="inst-1"
-        initialItems={mockItems}
-        domains={mockDomains}
-      />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     fireEvent.click(screen.getAllByTitle("Hapus")[0]);
     await waitFor(() => {
       expect(screen.getByText("Item tidak dapat dihapus")).toBeInTheDocument();
@@ -425,7 +347,7 @@ describe("ItemsManager", () => {
       ok: false,
       json: async () => ({ detail: "Gagal tambah massal" }),
     });
-    render(<ItemsManager instrumentId="inst-1" initialItems={[]} />);
+    render(<ItemsManager instrumentId="inst-1" initialItems={[]} domains={mockDomains} />);
     fireEvent.click(screen.getByRole("button", { name: /tambah massal/i }));
     const textareas = screen.getAllByRole("textbox");
     fireEvent.change(textareas[0], { target: { value: "Item A\nItem B" } });
@@ -465,9 +387,7 @@ describe("ItemsManager", () => {
   });
 
   it("harus memperbarui domain edit saat dropdown domain di baris edit diubah", () => {
-    render(
-      <ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />,
-    );
+    render(<ItemsManager instrumentId="inst-1" initialItems={mockItems} domains={mockDomains} />);
     fireEvent.click(screen.getAllByTitle("Edit")[0]);
     // Di baris edit, ada select domain tanpa label — ambil semua combobox
     const selects = screen.getAllByRole("combobox");

@@ -76,14 +76,11 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
     setLoading(true);
     setError(null);
     try {
-      const resp = await fetch(
-        `/api/instruments/${instrumentId}/domains/${domain.id}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: editName.trim() }),
-        },
-      );
+      const resp = await fetch(`/api/instruments/${instrumentId}/domains/${domain.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: editName.trim() }),
+      });
       if (!resp.ok) {
         const data = await resp.json().catch(() => ({}));
         throw new Error(data.detail ?? `Gagal menyimpan domain (${resp.status})`);
@@ -117,10 +114,9 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
     setLoading(true);
     setError(null);
     try {
-      const resp = await fetch(
-        `/api/instruments/${instrumentId}/domains/${domain.id}`,
-        { method: "DELETE" },
-      );
+      const resp = await fetch(`/api/instruments/${instrumentId}/domains/${domain.id}`, {
+        method: "DELETE",
+      });
       if (!resp.ok) {
         const data = await resp.json().catch(() => ({}));
         throw new Error(data.detail ?? `Gagal menghapus domain (${resp.status})`);
@@ -261,9 +257,7 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
               {domains.map((domain, idx) =>
                 editingId === domain.id ? (
                   <tr key={domain.id} className="bg-yellow-50">
-                    <td className="px-4 py-3 text-sm text-gray-500 text-center">
-                      {idx + 1}
-                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-500 text-center">{idx + 1}</td>
                     <td className="px-4 py-3">
                       <input
                         type="text"
@@ -301,9 +295,7 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
                   </tr>
                 ) : (
                   <tr key={domain.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-gray-500 text-center">
-                      {idx + 1}
-                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-500 text-center">{idx + 1}</td>
                     <td className="px-4 py-3 text-sm text-gray-900">{domain.name}</td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1 justify-end">

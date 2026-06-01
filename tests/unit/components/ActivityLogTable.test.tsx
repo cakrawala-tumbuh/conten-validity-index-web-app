@@ -201,9 +201,7 @@ describe("ActivityLogTable", () => {
     fireEvent.change(dateInputs[1] as HTMLInputElement, { target: { value: "2024-12-31" } });
     fireEvent.click(screen.getByRole("button", { name: /terapkan filter/i }));
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining("start_date=2024-01-01"),
-      );
+      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("start_date=2024-01-01"));
     });
     expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("end_date=2024-12-31"));
   });

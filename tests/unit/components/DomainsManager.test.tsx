@@ -197,9 +197,7 @@ describe("DomainsManager", () => {
     render(<DomainsManager instrumentId="inst-1" initialDomains={mockDomains} />);
     const deleteButtons = screen.getAllByTitle("Hapus");
     fireEvent.click(deleteButtons[0]);
-    expect(mockConfirm).toHaveBeenCalledWith(
-      expect.stringContaining("Kognitif"),
-    );
+    expect(mockConfirm).toHaveBeenCalledWith(expect.stringContaining("Kognitif"));
   });
 
   it("harus berhasil menghapus domain setelah konfirmasi", async () => {

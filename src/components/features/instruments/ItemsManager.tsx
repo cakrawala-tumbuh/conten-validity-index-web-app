@@ -44,11 +44,7 @@ interface ItemDraft {
  * @param props.domains - Daftar domain yang tersedia untuk dropdown.
  * @returns Komponen manajemen item interaktif.
  */
-export const ItemsManager = ({
-  instrumentId,
-  initialItems,
-  domains,
-}: ItemsManagerProps) => {
+export const ItemsManager = ({ instrumentId, initialItems, domains }: ItemsManagerProps) => {
   const router = useRouter();
   const [items, setItems] = useState<ItemResponse[]>(initialItems);
   const [mode, setMode] = useState<"idle" | "add-single" | "add-bulk">("idle");
@@ -302,9 +298,7 @@ export const ItemsManager = ({
             <select
               id="item-domain-select"
               value={newItem.domain_id}
-              onChange={(e) =>
-                setNewItem((p) => ({ ...p, domain_id: e.target.value }))
-              }
+              onChange={(e) => setNewItem((p) => ({ ...p, domain_id: e.target.value }))}
               className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
             >
               <option value="">-- Tanpa domain --</option>

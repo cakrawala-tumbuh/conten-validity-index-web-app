@@ -209,8 +209,20 @@ describe("CVISection", () => {
         s_cvi_ave: 0.9,
         s_cvi_ua: 0.5,
         items: [
-          { item_id: "item-1", sequence_number: 1, content: "Item tidak valid", i_cvi: 0.5, n_relevant: 3 },
-          { item_id: "item-2", sequence_number: 2, content: "Item valid", i_cvi: 0.83, n_relevant: 5 },
+          {
+            item_id: "item-1",
+            sequence_number: 1,
+            content: "Item tidak valid",
+            i_cvi: 0.5,
+            n_relevant: 3,
+          },
+          {
+            item_id: "item-2",
+            sequence_number: 2,
+            content: "Item valid",
+            i_cvi: 0.83,
+            n_relevant: 5,
+          },
         ],
       }),
     });
