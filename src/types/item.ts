@@ -10,7 +10,8 @@
 export interface ItemCreate {
   sequence_number: number;
   content: string;
-  domain?: string;
+  /** ID domain/dimensi pengelompokan item. */
+  domain_id?: string;
 }
 
 /**
@@ -26,7 +27,8 @@ export interface ItemBulkCreate {
 export interface ItemUpdate {
   sequence_number?: number;
   content?: string;
-  domain?: string;
+  /** ID domain/dimensi baru, null untuk menghapus referensi. */
+  domain_id?: string;
 }
 
 /**
@@ -37,7 +39,8 @@ export interface ItemResponse {
   instrument_id: string;
   sequence_number: number;
   content: string;
-  domain: string | null;
+  /** ID domain/dimensi tempat item ini dikelompokkan. */
+  domain_id: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -259,4 +259,63 @@ describe("UserTable", () => {
       );
     });
   });
+
+  it("harus menampilkan error fallback saat simpan edit gagal tanpa detail", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({}),
+    });
+    render(<UserTable initialUsers={[mockUsers[0]]} />);
+    fireEvent.click(screen.getByTitle("Edit"));
+    fireEvent.click(screen.getByTitle("Simpan"));
+    await waitFor(() => {
+      expect(screen.getByText(/gagal menyimpan perubahan/i)).toBeInTheDocument();
+    });
+  });
+
+  it("harus menampilkan error fallback saat nonaktifkan gagal tanpa detail", async () => {
+    mockConfirm.mockReturnValue(true);
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({}),
+    });
+    render(<UserTable initialUsers={[mockUsers[0]]} />);
+    fireEvent.click(screen.getByTitle("Nonaktifkan"));
+    await waitFor(() => {
+      expect(screen.getByText(/gagal menonaktifkan pengguna/i)).toBeInTheDocument();
+    });
+  });
+
+  it("harus menutup mode edit dan memperbarui data setelah simpan berhasil", async () => {
+    // Render dengan beberapa user agar ternary map mencakup kedua branch (match & no-match)
+    const updatedUser = { ...mockUsers[0], full_name: "Admin Diperbarui" };
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => updatedUser });
+    render(<UserTable initialUsers={mockUsers} />);
+    const editButtons = screen.getAllByTitle("Edit");
+    fireEvent.click(editButtons[0]);
+    expect(screen.getByTitle("Simpan")).toBeInTheDocument();
+    const nameInput = screen.getByPlaceholderText("Nama lengkap");
+    fireEvent.change(nameInput, { target: { value: "Admin Diperbarui" } });
+    fireEvent.click(screen.getByTitle("Simpan"));
+    await waitFor(() => {
+      expect(screen.queryByTitle("Simpan")).not.toBeInTheDocument();
+    });
+    expect(screen.getByText("Admin Diperbarui")).toBeInTheDocument();
+  });
+
+  it("harus menampilkan badge Nonaktif setelah deaktivasi berhasil", async () => {
+    mockConfirm.mockReturnValue(true);
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+    // Render dengan beberapa user agar ternary map mencakup kedua branch
+    render(<UserTable initialUsers={mockUsers} />);
+    const aktifBadges = screen.getAllByText("Aktif");
+    expect(aktifBadges.length).toBeGreaterThan(0);
+    const deactivateButtons = screen.getAllByTitle("Nonaktifkan");
+    fireEvent.click(deactivateButtons[0]);
+    await waitFor(() => {
+      // Setelah deaktivasi, badge Nonaktif bertambah satu
+      const nonaktifBadges = screen.getAllByText("Nonaktif");
+      expect(nonaktifBadges.length).toBeGreaterThan(1);
+    });
+  });
 });

@@ -1,27 +1,29 @@
 /**
  * Komponen tab-based detail instrumen untuk admin.
  *
- * Menggabungkan empat tab: Informasi (edit instrumen + delete), Item (CRUD item),
- * Expert (manajemen assignment), dan Hasil CVI (kalkulasi + export).
+ * Menggabungkan lima tab: Informasi (edit instrumen + delete), Item (CRUD item),
+ * Dimensi (CRUD domain), Expert (manajemen assignment), dan Hasil CVI (kalkulasi + export).
  */
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Info, List, Users, BarChart3 } from "lucide-react";
+import { Info, List, Users, BarChart3, Layers } from "lucide-react";
 import { ItemsManager } from "@/components/features/instruments/ItemsManager";
+import { DomainsManager } from "@/components/features/instruments/DomainsManager";
 import { AssignmentManager } from "@/components/features/instruments/AssignmentManager";
 import { CVISection } from "@/components/features/instruments/CVISection";
 import { INSTRUMENT_STATUS_LABELS } from "@/constants";
 import type { InstrumentResponse, InstrumentUpdate } from "@/types/instrument";
 import type { ItemResponse } from "@/types/item";
+import type { DomainResponse } from "@/types/domain";
 import type { AssignmentResponse } from "@/types/expert-assignment";
 import type { UserResponse } from "@/types/user";
 
 /**
  * Tab yang tersedia pada halaman detail instrumen.
  */
-type Tab = "info" | "items" | "experts" | "cvi";
+type Tab = "info" | "items" | "domains" | "experts" | "cvi";
 
 /**
  * Props untuk InstrumentDetailTabs.
@@ -29,6 +31,7 @@ type Tab = "info" | "items" | "experts" | "cvi";
 interface InstrumentDetailTabsProps {
   instrument: InstrumentResponse;
   items: ItemResponse[];
+  domains: DomainResponse[];
   assignments: AssignmentResponse[];
   experts: UserResponse[];
 }
@@ -40,6 +43,7 @@ interface InstrumentDetailTabsProps {
  *
  * @param props.instrument - Data instrumen dari server.
  * @param props.items - Daftar item instrumen dari server.
+ * @param props.domains - Daftar domain/dimensi instrumen dari server.
  * @param props.assignments - Daftar assignment expert dari server.
  * @param props.experts - Daftar semua user expert aktif.
  * @returns Layout tabs lengkap halaman detail instrumen.
@@ -47,6 +51,7 @@ interface InstrumentDetailTabsProps {
 export const InstrumentDetailTabs = ({
   instrument,
   items,
+  domains,
   assignments,
   experts,
 }: InstrumentDetailTabsProps) => {
@@ -55,6 +60,7 @@ export const InstrumentDetailTabs = ({
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
     { id: "info", label: "Informasi", icon: <Info className="h-4 w-4" /> },
     { id: "items", label: `Item (${items.length})`, icon: <List className="h-4 w-4" /> },
+    { id: "domains", label: `Dimensi (${domains.length})`, icon: <Layers className="h-4 w-4" /> },
     { id: "experts", label: `Expert (${assignments.length})`, icon: <Users className="h-4 w-4" /> },
     { id: "cvi", label: "Hasil CVI", icon: <BarChart3 className="h-4 w-4" /> },
   ];
@@ -86,7 +92,10 @@ export const InstrumentDetailTabs = ({
       <div className="rounded-b-lg bg-white border border-t-0 border-gray-200 p-6">
         {activeTab === "info" && <InfoTab instrument={instrument} />}
         {activeTab === "items" && (
-          <ItemsManager instrumentId={instrument.id} initialItems={items} />
+          <ItemsManager instrumentId={instrument.id} initialItems={items} domains={domains} />
+        )}
+        {activeTab === "domains" && (
+          <DomainsManager instrumentId={instrument.id} initialDomains={domains} />
         )}
         {activeTab === "experts" && (
           <AssignmentManager

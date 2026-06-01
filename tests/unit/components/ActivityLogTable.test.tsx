@@ -176,4 +176,47 @@ describe("ActivityLogTable", () => {
     fireEvent.change(select, { target: { value: "create_instrument" } });
     expect((select as HTMLSelectElement).value).toBe("create_instrument");
   });
+
+  it("harus memperbarui tanggal mulai saat input dari-tanggal diubah", () => {
+    const { container } = render(<ActivityLogTable initialLogs={[]} />);
+    const dateInputs = container.querySelectorAll("input[type='date']");
+    const startDateInput = dateInputs[0] as HTMLInputElement;
+    fireEvent.change(startDateInput, { target: { value: "2024-01-01" } });
+    expect(startDateInput.value).toBe("2024-01-01");
+  });
+
+  it("harus memperbarui tanggal akhir saat input sampai-tanggal diubah", () => {
+    const { container } = render(<ActivityLogTable initialLogs={[]} />);
+    const dateInputs = container.querySelectorAll("input[type='date']");
+    const endDateInput = dateInputs[1] as HTMLInputElement;
+    fireEvent.change(endDateInput, { target: { value: "2024-12-31" } });
+    expect(endDateInput.value).toBe("2024-12-31");
+  });
+
+  it("harus menyertakan parameter tanggal dalam URL saat filter dengan tanggal diterapkan", async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => [] });
+    const { container } = render(<ActivityLogTable initialLogs={[]} />);
+    const dateInputs = container.querySelectorAll("input[type='date']");
+    fireEvent.change(dateInputs[0] as HTMLInputElement, { target: { value: "2024-01-01" } });
+    fireEvent.change(dateInputs[1] as HTMLInputElement, { target: { value: "2024-12-31" } });
+    fireEvent.click(screen.getByRole("button", { name: /terapkan filter/i }));
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("start_date=2024-01-01"),
+      );
+    });
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("end_date=2024-12-31"));
+  });
+
+  it("harus menampilkan error fallback saat fetch gagal tanpa detail", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({}),
+    });
+    render(<ActivityLogTable initialLogs={[]} />);
+    fireEvent.click(screen.getByRole("button", { name: /terapkan filter/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/gagal memuat log/i)).toBeInTheDocument();
+    });
+  });
 });

@@ -34,7 +34,7 @@ const mockItems: ItemResponse[] = [
     instrument_id: "inst-1",
     sequence_number: 1,
     content: "Item pertama untuk dinilai",
-    domain: "Kognitif",
+    domain_id: "Kognitif",
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
   },
@@ -43,7 +43,7 @@ const mockItems: ItemResponse[] = [
     instrument_id: "inst-1",
     sequence_number: 2,
     content: "Item kedua untuk dinilai",
-    domain: null,
+    domain_id: null,
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
   },
@@ -207,5 +207,42 @@ describe("RatingForm", () => {
     await waitFor(() => {
       expect(screen.getByText("Server error")).toBeInTheDocument();
     });
+  });
+
+  it("harus menampilkan error saat form disubmit sebelum semua item dinilai", () => {
+    render(<RatingForm assignment={mockAssignment} items={mockItems} existingRatings={[]} />);
+    const form = screen.getByRole("button", { name: /simpan semua penilaian/i }).closest("form");
+    // Submit form secara langsung (bypass disabled button) untuk memicu validasi
+    if (form) fireEvent.submit(form);
+    expect(screen.getByText("Semua item harus dinilai sebelum submit.")).toBeInTheDocument();
+  });
+
+  it("harus menampilkan tombol Kembali dan dapat diklik setelah submit berhasil", async () => {
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+    render(
+      <RatingForm assignment={mockAssignment} items={mockItems} existingRatings={mockAllRatings} />,
+    );
+    const form = screen.getByRole("button", { name: /simpan semua penilaian/i }).closest("form");
+    if (form) fireEvent.submit(form);
+    await waitFor(() => {
+      expect(screen.getByText(/penilaian berhasil disimpan/i)).toBeInTheDocument();
+    });
+    const kembaliButton = screen.getByRole("button", { name: /kembali ke daftar penilaian/i });
+    expect(kembaliButton).toBeInTheDocument();
+    // Klik tombol — mengeksekusi router.push tanpa error
+    fireEvent.click(kembaliButton);
+  });
+
+  it("harus memperbarui catatan saat textarea catatan diubah", () => {
+    render(
+      <RatingForm
+        assignment={mockAssignment}
+        items={mockItems}
+        existingRatings={mockExistingRatings}
+      />,
+    );
+    const notesTextarea = screen.getByDisplayValue("Catatan item 1");
+    fireEvent.change(notesTextarea, { target: { value: "Catatan diperbarui" } });
+    expect(screen.getByDisplayValue("Catatan diperbarui")).toBeInTheDocument();
   });
 });

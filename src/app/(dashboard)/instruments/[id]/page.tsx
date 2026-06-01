@@ -11,6 +11,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getInstrument } from "@/services/instrument-service";
 import { listItems } from "@/services/item-service";
+import { listDomains } from "@/services/domain-service";
 import { listAssignments } from "@/services/assignment-service";
 import { listUsers } from "@/services/user-service";
 import { InstrumentDetailTabs } from "@/components/features/instruments/InstrumentDetailTabs";
@@ -54,9 +55,10 @@ export default async function InstrumentDetailPage({ params }: InstrumentDetailP
 
   const { id } = await params;
 
-  const [instrument, items, assignments, allUsers] = await Promise.all([
+  const [instrument, items, domains, assignments, allUsers] = await Promise.all([
     getInstrument(session.accessToken, id).catch(() => null),
     listItems(session.accessToken, id).catch(() => []),
+    listDomains(session.accessToken, id).catch(() => []),
     listAssignments(session.accessToken, id).catch(() => []),
     listUsers(session.accessToken, { limit: 200 }).catch(() => []),
   ]);
@@ -92,6 +94,7 @@ export default async function InstrumentDetailPage({ params }: InstrumentDetailP
       <InstrumentDetailTabs
         instrument={instrument}
         items={items}
+        domains={domains}
         assignments={assignments}
         experts={experts}
       />

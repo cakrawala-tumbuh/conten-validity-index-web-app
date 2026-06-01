@@ -3,6 +3,7 @@
  *
  * Menampilkan daftar item dalam tabel, dengan kemampuan menambah item baru
  * (satu per satu atau bulk), mengedit konten item, dan menghapus item.
+ * Domain dipilih dari dropdown berdasarkan daftar domain yang sudah ada.
  */
 "use client";
 
@@ -10,6 +11,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2, Plus, Upload, X, Check } from "lucide-react";
 import type { ItemResponse } from "@/types/item";
+import type { DomainResponse } from "@/types/domain";
 
 /**
  * Props untuk ItemsManager.
@@ -17,6 +19,8 @@ import type { ItemResponse } from "@/types/item";
 interface ItemsManagerProps {
   instrumentId: string;
   initialItems: ItemResponse[];
+  /** Daftar domain yang tersedia untuk dropdown. */
+  domains: DomainResponse[];
 }
 
 /**
@@ -24,7 +28,8 @@ interface ItemsManagerProps {
  */
 interface ItemDraft {
   content: string;
-  domain: string;
+  /** ID domain yang dipilih dari dropdown. */
+  domain_id: string;
 }
 
 /**
@@ -32,12 +37,18 @@ interface ItemDraft {
  *
  * Menampilkan tabel item yang dapat diedit inline, dengan dialog untuk
  * menambah item baru (single atau bulk via textarea).
+ * Domain dipilih dari dropdown yang berisi daftar domain yang sudah ada.
  *
  * @param props.instrumentId - ID instrumen pemilik item.
  * @param props.initialItems - Daftar item awal dari server.
+ * @param props.domains - Daftar domain yang tersedia untuk dropdown.
  * @returns Komponen manajemen item interaktif.
  */
-export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) => {
+export const ItemsManager = ({
+  instrumentId,
+  initialItems,
+  domains,
+}: ItemsManagerProps) => {
   const router = useRouter();
   const [items, setItems] = useState<ItemResponse[]>(initialItems);
   const [mode, setMode] = useState<"idle" | "add-single" | "add-bulk">("idle");
@@ -48,7 +59,7 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
   const [loading, setLoading] = useState(false);
 
   // State untuk tambah satu item
-  const [newItem, setNewItem] = useState<ItemDraft>({ content: "", domain: "" });
+  const [newItem, setNewItem] = useState<ItemDraft>({ content: "", domain_id: "" });
 
   // State untuk bulk add
   const [bulkText, setBulkText] = useState("");
@@ -61,7 +72,7 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
   const startEdit = (item: ItemResponse) => {
     setEditingId(item.id);
     setEditContent(item.content);
-    setEditDomain(item.domain ?? "");
+    setEditDomain(item.domain_id ?? "");
     setError(null);
   };
 
@@ -91,7 +102,7 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           content: editContent.trim(),
-          domain: editDomain.trim() || null,
+          domain_id: editDomain.trim() || null,
           sequence_number: item.sequence_number,
         }),
       });
@@ -157,7 +168,7 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
             {
               sequence_number: items.length + 1,
               content: newItem.content.trim(),
-              domain: newItem.domain.trim() || undefined,
+              domain_id: newItem.domain_id || undefined,
             },
           ],
         }),
@@ -168,7 +179,7 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
       }
       const created: ItemResponse[] = await resp.json();
       setItems((prev) => [...prev, ...created]);
-      setNewItem({ content: "", domain: "" });
+      setNewItem({ content: "", domain_id: "" });
       setMode("idle");
       router.refresh();
     } catch (err) {
@@ -281,13 +292,34 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
             rows={3}
             className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
           />
-          <input
-            type="text"
-            value={newItem.domain}
-            onChange={(e) => setNewItem((p) => ({ ...p, domain: e.target.value }))}
-            placeholder="Domain (opsional)"
-            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
-          />
+          <div>
+            <label
+              htmlFor="item-domain-select"
+              className="block text-xs font-medium text-gray-600 mb-1"
+            >
+              Domain / Dimensi (opsional)
+            </label>
+            <select
+              id="item-domain-select"
+              value={newItem.domain_id}
+              onChange={(e) =>
+                setNewItem((p) => ({ ...p, domain_id: e.target.value }))
+              }
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+            >
+              <option value="">-- Tanpa domain --</option>
+              {domains.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </select>
+            {domains.length === 0 && (
+              <p className="mt-1 text-xs text-gray-400">
+                Belum ada domain. Tambahkan di tab &ldquo;Dimensi&rdquo;.
+              </p>
+            )}
+          </div>
           <div className="flex justify-end">
             <button
               type="button"
@@ -368,13 +400,20 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
                       />
                     </td>
                     <td className="px-4 py-3">
-                      <input
-                        type="text"
-                        value={editDomain}
-                        onChange={(e) => setEditDomain(e.target.value)}
-                        placeholder="Domain..."
-                        className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-gray-900 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                      />
+                      <div>
+                        <select
+                          value={editDomain}
+                          onChange={(e) => setEditDomain(e.target.value)}
+                          className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-gray-900 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                        >
+                          <option value="">-- Tanpa domain --</option>
+                          {domains.map((d) => (
+                            <option key={d.id} value={d.id}>
+                              {d.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1 justify-end">
@@ -404,7 +443,11 @@ export const ItemsManager = ({ instrumentId, initialItems }: ItemsManagerProps) 
                       {item.sequence_number}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900">{item.content}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{item.domain ?? "—"}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500">
+                      {item.domain_id
+                        ? (domains.find((d) => d.id === item.domain_id)?.name ?? item.domain_id)
+                        : "—"}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1 justify-end">
                         <button

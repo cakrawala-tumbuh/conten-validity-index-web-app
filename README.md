@@ -77,9 +77,50 @@ docker compose -f docker-compose.playwright.yml up \
 
 #### Stack manual (pengujian via browser)
 
+Menjalankan seluruh stack (backend, web, Authentik) tanpa Playwright sehingga
+pengujian dilakukan langsung melalui browser.
+
+**Langkah 1 — Build image lokal** (jalankan dari masing-masing folder):
+
 ```bash
+# Dari folder content-validity-index-web-app
+docker build -t cvi-web:e2e --target e2e .
+
+# Dari folder content-validity-index-backend
+docker build -t cvi-backend:local .
+```
+
+**Langkah 2 — Jalankan stack:**
+
+```bash
+# Dari folder content-validity-index-web-app
 docker compose -f docker-compose.e2e.yml up
-# Akses: http://localhost:3000
+```
+
+> **Catatan:** Tunggu hingga semua service selesai start-up (±60–90 detik).
+> Authentik memerlukan waktu lebih lama untuk menerapkan blueprint otomatis
+> (konfigurasi OIDC, user, dan group). Cek log `authentik-worker` untuk memastikan
+> blueprint sudah diterapkan sebelum mencoba login.
+
+**Langkah 3 — Akses service:**
+
+| Service  | URL                              |
+| -------- | -------------------------------- |
+| Web App  | <http://localhost:3000>          |
+| Backend  | <http://localhost:8000/docs>     |
+| Authentik Admin | <http://localhost:9000>  |
+
+**Kredensial bawaan:**
+
+| Role   | Username  | Password        |
+| ------ | --------- | --------------- |
+| Admin  | `akadmin` | `AdminTest123!` |
+| Expert | `expert`  | `ExpertTest123!` |
+
+**Langkah 4 — Bersihkan setelah selesai:**
+
+```bash
+docker compose -f docker-compose.e2e.yml down --volumes
 ```
 
 ## CI/CD

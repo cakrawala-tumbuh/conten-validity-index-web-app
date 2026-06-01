@@ -2,8 +2,9 @@
  * Halaman form pembuatan instrumen baru.
  *
  * Menampilkan form dengan field nama, deskripsi, versi instrumen,
- * dan daftar item yang dapat ditambah secara inline.
- * Setelah berhasil dibuat beserta item-itemnya, pengguna diarahkan
+ * daftar dimensi/domain, dan daftar item yang dapat ditambah secara inline.
+ * Dimensi didefinisikan terlebih dahulu, kemudian item mereferensikan
+ * dimensi melalui dropdown. Setelah berhasil dibuat, pengguna diarahkan
  * kembali ke daftar instrumen.
  */
 "use client";
@@ -11,33 +12,87 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import type { DomainResponse } from "@/types/domain";
+
+/**
+ * Representasi satu domain/dimensi yang diisi di form sebelum disimpan.
+ */
+interface DomainDraft {
+  name: string;
+}
 
 /**
  * Representasi satu item yang diisi di form sebelum disimpan.
+ * `domainIndex` adalah indeks ke array `domains` (-1 = tanpa domain).
  */
 interface ItemDraft {
   content: string;
-  domain: string;
+  domainIndex: number;
 }
 
 /**
  * Halaman buat instrumen baru — Client Component.
  *
- * @returns Halaman form pembuatan instrumen dengan input item inline.
+ * Alur submit:
+ * 1. Buat instrumen (nama, deskripsi, versi).
+ * 2. Buat tiap domain → kumpulkan `DomainResponse[]` dengan ID asli.
+ * 3. Buat item dengan `domain_id` yang dipetakan dari hasil langkah 2.
+ *
+ * @returns Halaman form pembuatan instrumen lengkap.
  */
 export default function NewInstrumentPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [version, setVersion] = useState("1.0");
-  const [items, setItems] = useState<ItemDraft[]>([{ content: "", domain: "" }]);
+  const [domains, setDomains] = useState<DomainDraft[]>([]);
+  const [items, setItems] = useState<ItemDraft[]>([{ content: "", domainIndex: -1 }]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // ─── Domain helpers ────────────────────────────────────────────────────────
+
+  /**
+   * Menambahkan baris domain baru ke daftar domain draft.
+   */
+  const addDomain = () => setDomains((prev) => [...prev, { name: "" }]);
+
+  /**
+   * Menghapus domain pada indeks tertentu dan reset item yang mereferensikannya.
+   *
+   * @param index - Indeks domain yang akan dihapus.
+   */
+  const removeDomain = (index: number) => {
+    setDomains((prev) => prev.filter((_, i) => i !== index));
+    // Reset domainIndex item yang merujuk domain ini atau yang lebih besar
+    setItems((prev) =>
+      prev.map((it) => ({
+        ...it,
+        domainIndex:
+          it.domainIndex === index
+            ? -1
+            : it.domainIndex > index
+              ? it.domainIndex - 1
+              : it.domainIndex,
+      })),
+    );
+  };
+
+  /**
+   * Memperbarui nama domain pada indeks tertentu.
+   *
+   * @param index - Indeks domain yang diperbarui.
+   * @param value - Nama baru.
+   */
+  const updateDomainName = (index: number, value: string) =>
+    setDomains((prev) => prev.map((d, i) => (i === index ? { name: value } : d)));
+
+  // ─── Item helpers ──────────────────────────────────────────────────────────
 
   /**
    * Menambahkan baris item baru ke daftar item draft.
    */
-  const addItem = () => setItems((prev) => [...prev, { content: "", domain: "" }]);
+  const addItem = () => setItems((prev) => [...prev, { content: "", domainIndex: -1 }]);
 
   /**
    * Menghapus item pada indeks tertentu dari daftar item draft.
@@ -47,21 +102,19 @@ export default function NewInstrumentPage() {
   const removeItem = (index: number) => setItems((prev) => prev.filter((_, i) => i !== index));
 
   /**
-   * Memperbarui field `content` atau `domain` pada item di indeks tertentu.
+   * Memperbarui field pada item di indeks tertentu.
    *
    * @param index - Indeks item yang diperbarui.
-   * @param field - Field yang diperbarui (`content` atau `domain`).
+   * @param field - Field yang diperbarui.
    * @param value - Nilai baru.
    */
-  const updateItem = (index: number, field: keyof ItemDraft, value: string) =>
+  const updateItem = (index: number, field: keyof ItemDraft, value: string | number) =>
     setItems((prev) => prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)));
 
+  // ─── Submit ────────────────────────────────────────────────────────────────
+
   /**
-   * Menangani pengiriman form pembuatan instrumen beserta item-itemnya.
-   *
-   * Membuat instrumen terlebih dahulu, kemudian melakukan bulk create
-   * item yang sudah diisi. Jika tidak ada item yang diisi kontennya,
-   * langkah bulk create dilewati.
+   * Menangani pengiriman form pembuatan instrumen beserta domain dan item-nya.
    *
    * @param e - Event form submission.
    */
@@ -71,7 +124,8 @@ export default function NewInstrumentPage() {
     setIsSubmitting(true);
 
     try {
-      const resp = await fetch("/api/instruments", {
+      // 1. Buat instrumen
+      const instrResp = await fetch("/api/instruments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -81,21 +135,47 @@ export default function NewInstrumentPage() {
         }),
       });
 
-      if (!resp.ok) {
-        const data = await resp.json().catch(() => ({}));
-        throw new Error(data.detail ?? `Gagal membuat instrumen (${resp.status})`);
+      if (!instrResp.ok) {
+        const data = await instrResp.json().catch(() => ({}));
+        throw new Error(data.detail ?? `Gagal membuat instrumen (${instrResp.status})`);
       }
 
-      const instrument = await resp.json();
+      const instrument = await instrResp.json();
 
-      // Bulk create item jika ada yang diisi
+      // 2. Buat domain satu per satu, kumpulkan ID hasil API
+      const validDomains = domains.filter((d) => d.name.trim() !== "");
+      const createdDomains: DomainResponse[] = [];
+
+      for (const domain of validDomains) {
+        const domResp = await fetch(`/api/instruments/${instrument.id}/domains`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: domain.name.trim() }),
+        });
+        if (!domResp.ok) {
+          const data = await domResp.json().catch(() => ({}));
+          throw new Error(
+            data.detail ??
+              `Instrumen dibuat, tetapi gagal menambahkan domain "${domain.name}" (${domResp.status})`,
+          );
+        }
+        createdDomains.push(await domResp.json());
+      }
+
+      // 3. Bulk create item dengan domain_id yang dipetakan dari hasil langkah 2
       const validItems = items
         .filter((it) => it.content.trim() !== "")
-        .map((it, idx) => ({
-          sequence_number: idx + 1,
-          content: it.content.trim(),
-          domain: it.domain.trim() || undefined,
-        }));
+        .map((it, idx) => {
+          const domainId =
+            it.domainIndex >= 0 && it.domainIndex < createdDomains.length
+              ? createdDomains[it.domainIndex].id
+              : undefined;
+          return {
+            sequence_number: idx + 1,
+            content: it.content.trim(),
+            domain_id: domainId,
+          };
+        });
 
       if (validItems.length > 0) {
         const itemsResp = await fetch(`/api/instruments/${instrument.id}/items`, {
@@ -121,6 +201,11 @@ export default function NewInstrumentPage() {
     }
   };
 
+  // ─── Render ────────────────────────────────────────────────────────────────
+
+  /** Domain yang sudah diberi nama (dipakai sebagai opsi dropdown item). */
+  const namedDomains = domains.filter((d) => d.name.trim() !== "");
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
@@ -138,6 +223,7 @@ export default function NewInstrumentPage() {
             </div>
           )}
 
+          {/* Nama instrumen */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
               Nama Instrumen <span className="text-red-500">*</span>
@@ -153,6 +239,7 @@ export default function NewInstrumentPage() {
             />
           </div>
 
+          {/* Deskripsi */}
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
               Deskripsi
@@ -167,6 +254,7 @@ export default function NewInstrumentPage() {
             />
           </div>
 
+          {/* Versi */}
           <div>
             <label htmlFor="version" className="block text-sm font-medium text-gray-700 mb-1">
               Versi
@@ -181,7 +269,55 @@ export default function NewInstrumentPage() {
             />
           </div>
 
-          {/* Bagian item instrumen */}
+          {/* ── Dimensi / Domain ── */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Dimensi / Domain{" "}
+                <span className="text-xs font-normal text-gray-400">(opsional)</span>
+              </label>
+              <button
+                type="button"
+                onClick={addDomain}
+                className="text-xs text-blue-600 hover:text-blue-800 font-medium"
+              >
+                + Tambah Dimensi
+              </button>
+            </div>
+
+            {domains.length === 0 ? (
+              <p className="text-xs text-gray-400 py-2">
+                Belum ada dimensi. Klik &ldquo;+ Tambah Dimensi&rdquo; untuk mengelompokkan item.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {domains.map((domain, index) => (
+                  <div key={index} className="flex gap-2 items-center">
+                    <span className="text-xs font-medium text-gray-400 w-5 shrink-0 text-right">
+                      {index + 1}.
+                    </span>
+                    <input
+                      type="text"
+                      value={domain.name}
+                      onChange={(e) => updateDomainName(index, e.target.value)}
+                      placeholder="Nama dimensi (contoh: Kognitif, Afektif)"
+                      className="flex-1 rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeDomain(index)}
+                      className="text-xs text-red-400 hover:text-red-600"
+                      aria-label={`Hapus dimensi ${index + 1}`}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ── Item Instrumen ── */}
           <div>
             <div className="flex items-center justify-between mb-2">
               <label className="block text-sm font-medium text-gray-700">Item Instrumen</label>
@@ -210,13 +346,27 @@ export default function NewInstrumentPage() {
                       placeholder="Konten / pernyataan item"
                       className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     />
-                    <input
-                      type="text"
-                      value={item.domain}
-                      onChange={(e) => updateItem(index, "domain", e.target.value)}
-                      placeholder="Domain (opsional)"
-                      className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                    />
+                    <select
+                      value={item.domainIndex}
+                      onChange={(e) =>
+                        updateItem(index, "domainIndex", parseInt(e.target.value, 10))
+                      }
+                      disabled={namedDomains.length === 0}
+                      className="w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-400"
+                    >
+                      <option value={-1}>
+                        {namedDomains.length === 0
+                          ? "Tambahkan dimensi di atas untuk memilih"
+                          : "— Tanpa dimensi —"}
+                      </option>
+                      {domains.map((domain, dIdx) =>
+                        domain.name.trim() !== "" ? (
+                          <option key={dIdx} value={dIdx}>
+                            {domain.name.trim()}
+                          </option>
+                        ) : null,
+                      )}
+                    </select>
                   </div>
                   {items.length > 1 && (
                     <button

@@ -205,8 +205,8 @@ export const RatingForm = ({ assignment, items, existingRatings }: RatingFormPro
                   </td>
                   <td className="px-4 py-4 align-top">
                     <p className="text-sm text-gray-900">{item.content}</p>
-                    {item.domain && (
-                      <p className="mt-1 text-xs text-gray-400">Domain: {item.domain}</p>
+                    {item.domain_id && (
+                      <p className="mt-1 text-xs text-gray-400">Domain: {item.domain_id}</p>
                     )}
                   </td>
                   <td className="px-4 py-4 align-top">

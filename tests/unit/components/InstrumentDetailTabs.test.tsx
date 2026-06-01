@@ -8,6 +8,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { InstrumentDetailTabs } from "@/components/features/instruments/InstrumentDetailTabs";
 import type { InstrumentResponse } from "@/types/instrument";
 import type { ItemResponse } from "@/types/item";
+import type { DomainResponse } from "@/types/domain";
 import type { AssignmentResponse } from "@/types/expert-assignment";
 import type { UserResponse } from "@/types/user";
 
@@ -38,7 +39,24 @@ const mockItems: ItemResponse[] = [
     instrument_id: "inst-1",
     sequence_number: 1,
     content: "Konten item satu",
-    domain: "Afektif",
+    domain_id: "dom-1",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+];
+
+const mockDomains: DomainResponse[] = [
+  {
+    id: "dom-1",
+    instrument_id: "inst-1",
+    name: "Kognitif",
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "dom-2",
+    instrument_id: "inst-1",
+    name: "Afektif",
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
   },
@@ -81,6 +99,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -94,6 +113,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -106,6 +126,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -118,6 +139,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -130,6 +152,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -144,6 +167,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -158,6 +182,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -172,6 +197,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -185,6 +211,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -200,6 +227,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -219,6 +247,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -238,6 +267,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -256,6 +286,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -274,6 +305,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -286,6 +318,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -300,6 +333,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -314,6 +348,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -331,6 +366,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -349,6 +385,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -364,6 +401,7 @@ describe("InstrumentDetailTabs", () => {
       <InstrumentDetailTabs
         instrument={mockInstrument}
         items={mockItems}
+        domains={mockDomains}
         assignments={mockAssignments}
         experts={mockExperts}
       />,
@@ -374,5 +412,34 @@ describe("InstrumentDetailTabs", () => {
     await waitFor(() => {
       expect(screen.getByText(/nama instrumen tidak boleh kosong/i)).toBeInTheDocument();
     });
+  });
+
+  it("harus menampilkan tab Dimensi dengan jumlah domain", () => {
+    render(
+      <InstrumentDetailTabs
+        instrument={mockInstrument}
+        items={mockItems}
+        domains={mockDomains}
+        assignments={mockAssignments}
+        experts={mockExperts}
+      />,
+    );
+    expect(screen.getByText(`Dimensi (${mockDomains.length})`)).toBeInTheDocument();
+  });
+
+  it("harus berpindah ke tab Dimensi saat diklik", () => {
+    render(
+      <InstrumentDetailTabs
+        instrument={mockInstrument}
+        items={mockItems}
+        domains={mockDomains}
+        assignments={mockAssignments}
+        experts={mockExperts}
+      />,
+    );
+    fireEvent.click(screen.getByText(`Dimensi (${mockDomains.length})`));
+    // DomainsManager merender domain
+    expect(screen.getByText("Kognitif")).toBeInTheDocument();
+    expect(screen.getByText("Afektif")).toBeInTheDocument();
   });
 });
