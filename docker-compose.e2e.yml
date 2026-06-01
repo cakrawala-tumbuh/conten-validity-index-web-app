@@ -113,6 +113,8 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://cvi:cvi_test@db:5432/cvi_test
       - AUTHENTIK_ISSUER_URL=http://authentik-server:9000/application/o/cvi/
+      - AUTHENTIK_CLIENT_ID=${AUTHENTIK_CLIENT_ID:-cvi-e2e-client}
+      - AUTHENTIK_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET:-cvi-e2e-secret}
       - AUTHENTIK_ADMIN_GROUP=cvi-admin
       - AUTHENTIK_EXPERT_GROUP=cvi-expert
       - CORS_ORIGINS=["http://localhost:3000"]
