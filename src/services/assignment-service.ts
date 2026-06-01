@@ -73,5 +73,5 @@ export async function deleteAssignment(
  * @throws {ApiError} Jika token tidak valid.
  */
 export async function getMyAssignments(token: string): Promise<AssignmentResponse[]> {
-  return apiRequest<AssignmentResponse[]>("/api/v1/assignments/me", { token });
+  return apiRequest<AssignmentResponse[]>("/api/v1/my-assignments", { token });
 }
