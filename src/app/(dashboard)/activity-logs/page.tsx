@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { listActivityLogs } from "@/services/activity-log-service";
+import type { ActivityLogResponse } from "@/types/activity-log";
 import { ActivityLogTable } from "@/components/features/activity-logs/ActivityLogTable";
 import type { Metadata } from "next";
 
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
  * Hanya dapat diakses oleh admin. Mengambil 50 log terbaru dari API
  * dan meneruskannya ke komponen tabel interaktif.
  *
- * @returns Halaman daftar log aktivitas dengan filter.
+ * @returns Halaman daftar log aktivitas dengan filter, atau pesan error.
  */
 export default async function ActivityLogsPage() {
   const session = await getServerSession(authOptions);
@@ -29,7 +30,15 @@ export default async function ActivityLogsPage() {
   if (!session) redirect("/login");
   if (session.user.role !== "admin") redirect("/my-assignments");
 
-  const logs = await listActivityLogs(session.accessToken, { limit: 50 }).catch(() => []);
+  let logs: ActivityLogResponse[] = [];
+  let fetchError: string | null = null;
+
+  try {
+    logs = await listActivityLogs(session.accessToken, { limit: 50 });
+  } catch (err) {
+    fetchError =
+      err instanceof Error ? err.message : "Gagal mengambil data log aktivitas dari server.";
+  }
 
   return (
     <div className="space-y-6">
@@ -41,7 +50,13 @@ export default async function ActivityLogsPage() {
         </p>
       </div>
 
-      <ActivityLogTable initialLogs={logs} />
+      {fetchError ? (
+        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <strong>Gagal memuat log aktivitas:</strong> {fetchError}
+        </div>
+      ) : (
+        <ActivityLogTable initialLogs={logs} />
+      )}
     </div>
   );
 }

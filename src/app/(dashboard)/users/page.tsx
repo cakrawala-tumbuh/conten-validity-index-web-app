@@ -8,6 +8,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { listUsers } from "@/services/user-service";
+import type { UserResponse } from "@/types/user";
 import { UserTable } from "@/components/features/users/UserTable";
 import type { Metadata } from "next";
 
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
  * Hanya dapat diakses oleh admin. Mengambil daftar semua pengguna
  * dari API dan meneruskannya ke komponen tabel interaktif.
  *
- * @returns Halaman daftar pengguna dengan aksi edit dan nonaktifkan.
+ * @returns Halaman daftar pengguna dengan aksi edit dan nonaktifkan, atau pesan error.
  */
 export default async function UsersPage() {
   const session = await getServerSession(authOptions);
@@ -29,7 +30,14 @@ export default async function UsersPage() {
   if (!session) redirect("/login");
   if (session.user.role !== "admin") redirect("/my-assignments");
 
-  const users = await listUsers(session.accessToken, { limit: 200 }).catch(() => []);
+  let users: UserResponse[] = [];
+  let fetchError: string | null = null;
+
+  try {
+    users = await listUsers(session.accessToken, { limit: 200 });
+  } catch (err) {
+    fetchError = err instanceof Error ? err.message : "Gagal mengambil data pengguna dari server.";
+  }
 
   return (
     <div className="space-y-6">
@@ -40,12 +48,20 @@ export default async function UsersPage() {
             Kelola data pengguna sistem. Pengguna baru ditambahkan otomatis saat login pertama.
           </p>
         </div>
-        <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">
-          {users.length} pengguna
-        </span>
+        {!fetchError && (
+          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-600">
+            {users.length} pengguna
+          </span>
+        )}
       </div>
 
-      <UserTable initialUsers={users} />
+      {fetchError ? (
+        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <strong>Gagal memuat pengguna:</strong> {fetchError}
+        </div>
+      ) : (
+        <UserTable initialUsers={users} />
+      )}
     </div>
   );
 }
