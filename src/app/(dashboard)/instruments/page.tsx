@@ -26,6 +26,7 @@ export default async function InstrumentsPage() {
   const session = await getServerSession(authOptions);
 
   if (!session) redirect("/login");
+  if (session.error) redirect("/login");
   if (session.user.role !== "admin") redirect("/my-assignments");
 
   let instruments: InstrumentResponse[] = [];
