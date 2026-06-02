@@ -66,6 +66,7 @@ const mockAssignments: AssignmentResponse[] = [
   {
     id: "asgn-1",
     instrument_id: "inst-1",
+    instrument_name: "Skala Motivasi Belajar",
     user_id: "expert-1",
     assigned_by: "admin-1",
     deadline: null,

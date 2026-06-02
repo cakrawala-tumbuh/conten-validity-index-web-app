@@ -48,7 +48,7 @@ export const AssignmentList = ({ assignments }: AssignmentListProps) => {
         >
           <div>
             <p className="text-sm font-medium text-gray-900">
-              Instrumen #{assignment.instrument_id.slice(0, 8)}
+              {assignment.instrument_name ?? `Instrumen #${assignment.instrument_id.slice(0, 8)}`}
             </p>
             <span className="mt-1 inline-flex rounded-full px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-600">
               {ASSIGNMENT_STATUS_LABELS[assignment.status]}

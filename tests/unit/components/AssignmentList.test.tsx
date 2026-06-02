@@ -21,6 +21,7 @@ const mockAssignments: AssignmentResponse[] = [
   {
     id: "asgn-1",
     instrument_id: "inst-abcdefgh",
+    instrument_name: "Skala Motivasi Belajar",
     user_id: "user-1",
     assigned_by: "admin-1",
     deadline: null,
@@ -31,6 +32,7 @@ const mockAssignments: AssignmentResponse[] = [
   {
     id: "asgn-2",
     instrument_id: "inst-12345678",
+    instrument_name: null,
     user_id: "user-1",
     assigned_by: "admin-1",
     deadline: null,
@@ -46,10 +48,15 @@ describe("AssignmentList", () => {
     expect(screen.getByText(/belum ada instrumen yang ditugaskan/i)).toBeInTheDocument();
   });
 
-  it("harus merender daftar assignment dengan benar", () => {
-    render(<AssignmentList assignments={mockAssignments} />);
-    // instrument_id.slice(0, 8): "inst-abcdefgh" → "inst-abc"
-    expect(screen.getByText(/Instrumen #inst-abc/)).toBeInTheDocument();
+  it("harus menampilkan nama instrumen jika tersedia", () => {
+    render(<AssignmentList assignments={[mockAssignments[0]]} />);
+    expect(screen.getByText("Skala Motivasi Belajar")).toBeInTheDocument();
+  });
+
+  it("harus fallback ke ID instrumen jika nama tidak tersedia", () => {
+    render(<AssignmentList assignments={[mockAssignments[1]]} />);
+    // instrument_name null → fallback "Instrumen #" + instrument_id.slice(0, 8)
+    expect(screen.getByText(/Instrumen #inst-123/)).toBeInTheDocument();
   });
 
   it("harus menampilkan tombol 'Mulai' untuk assignment pending", () => {

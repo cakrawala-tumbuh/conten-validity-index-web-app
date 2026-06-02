@@ -23,6 +23,7 @@ export interface AssignmentCreate {
 export interface AssignmentResponse {
   id: string;
   instrument_id: string;
+  instrument_name: string | null;
   user_id: string;
   assigned_by: string;
   deadline: string | null;
