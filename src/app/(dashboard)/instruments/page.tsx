@@ -9,6 +9,7 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { listInstruments } from "@/services/instrument-service";
+import type { InstrumentResponse } from "@/types/instrument";
 import { InstrumentTable } from "@/components/features/instruments/InstrumentTable";
 import type { Metadata } from "next";
 
@@ -27,13 +28,12 @@ export default async function InstrumentsPage() {
   if (!session) redirect("/login");
   if (session.user.role !== "admin") redirect("/my-assignments");
 
-  let instruments;
+  let instruments: InstrumentResponse[] = [];
   let fetchError: string | null = null;
 
   try {
     instruments = await listInstruments(session.accessToken);
   } catch (err) {
-    instruments = [];
     fetchError = err instanceof Error ? err.message : "Gagal mengambil data instrumen dari server.";
   }
 
