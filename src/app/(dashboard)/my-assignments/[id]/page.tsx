@@ -13,7 +13,9 @@ import { getMyAssignments } from "@/services/assignment-service";
 import { getInstrument } from "@/services/instrument-service";
 import { listItems } from "@/services/item-service";
 import { getRatings } from "@/services/rating-service";
+import { listDomains } from "@/services/domain-service";
 import { RatingForm } from "@/components/features/ratings/RatingForm";
+import { KisiKisiKonstruk } from "@/components/features/ratings/KisiKisiKonstruk";
 import { ASSIGNMENT_STATUS_LABELS, INSTRUMENT_STATUS_LABELS } from "@/constants";
 import type { Metadata } from "next";
 
@@ -67,10 +69,11 @@ export default async function RatingPage({ params }: RatingPageProps) {
 
   if (!assignment) notFound();
 
-  const [instrument, items, existingRatings] = await Promise.all([
+  const [instrument, items, existingRatings, domains] = await Promise.all([
     getInstrument(session.accessToken, assignment.instrument_id).catch(() => null),
     listItems(session.accessToken, assignment.instrument_id).catch(() => []),
     getRatings(session.accessToken, id).catch(() => []),
+    listDomains(session.accessToken, assignment.instrument_id).catch(() => []),
   ]);
 
   if (!instrument) notFound();
@@ -144,6 +147,9 @@ export default async function RatingPage({ params }: RatingPageProps) {
           <li>Kolom catatan bersifat opsional.</li>
         </ul>
       </div>
+
+      {/* Kisi-kisi konstruk sebagai acuan expert, ditempatkan di atas tabel penilaian */}
+      <KisiKisiKonstruk domains={domains} />
 
       {items.length === 0 ? (
         <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">

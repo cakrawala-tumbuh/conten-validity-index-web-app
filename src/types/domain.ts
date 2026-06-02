@@ -11,6 +11,12 @@
 export interface DomainCreate {
   /** Nama domain/dimensi. */
   name: string;
+  /** Definisi konstruk dari kisi-kisi (kolom D). */
+  construct_definition?: string | null;
+  /** Contoh indikator perilaku dari kisi-kisi (kolom E). */
+  behavioral_indicator_example?: string | null;
+  /** Referensi teori dari kisi-kisi (kolom F). */
+  theory_reference?: string | null;
 }
 
 /**
@@ -19,6 +25,12 @@ export interface DomainCreate {
 export interface DomainUpdate {
   /** Nama domain baru. */
   name?: string;
+  /** Definisi konstruk dari kisi-kisi (kolom D). */
+  construct_definition?: string | null;
+  /** Contoh indikator perilaku dari kisi-kisi (kolom E). */
+  behavioral_indicator_example?: string | null;
+  /** Referensi teori dari kisi-kisi (kolom F). */
+  theory_reference?: string | null;
 }
 
 /**
@@ -28,6 +40,12 @@ export interface DomainResponse {
   id: string;
   instrument_id: string;
   name: string;
+  /** Definisi konstruk dari kisi-kisi (kolom D). */
+  construct_definition: string | null;
+  /** Contoh indikator perilaku dari kisi-kisi (kolom E). */
+  behavioral_indicator_example: string | null;
+  /** Referensi teori dari kisi-kisi (kolom F). */
+  theory_reference: string | null;
   created_at: string;
   updated_at: string;
 }

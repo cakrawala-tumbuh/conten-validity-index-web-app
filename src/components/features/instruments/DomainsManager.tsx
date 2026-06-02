@@ -2,14 +2,16 @@
  * Komponen manajemen domain/dimensi instrumen (CRUD) untuk admin.
  *
  * Menampilkan daftar domain dalam tabel, dengan kemampuan menambah domain baru,
- * mengedit nama domain, dan menghapus domain. Item yang terkait dengan domain
- * yang dihapus akan kehilangan referensi domain-nya (domain_id menjadi null).
+ * mengedit domain, dan menghapus domain. Selain nama, setiap domain dapat
+ * menyimpan kisi-kisi konstruk: definisi konstruk (kolom D), contoh indikator
+ * perilaku (kolom E), dan referensi teori (kolom F). Item yang terkait dengan
+ * domain yang dihapus akan kehilangan referensi domain-nya (domain_id menjadi null).
  */
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2, Plus, X, Check, Layers } from "lucide-react";
+import { Pencil, Trash2, Plus, X, Layers } from "lucide-react";
 import type { DomainResponse } from "@/types/domain";
 
 /**
@@ -21,10 +23,41 @@ interface DomainsManagerProps {
 }
 
 /**
+ * State form domain untuk operasi tambah/edit.
+ */
+interface DomainFormState {
+  name: string;
+  construct_definition: string;
+  behavioral_indicator_example: string;
+  theory_reference: string;
+}
+
+/**
+ * State form kosong sebagai nilai awal.
+ */
+const EMPTY_FORM: DomainFormState = {
+  name: "",
+  construct_definition: "",
+  behavioral_indicator_example: "",
+  theory_reference: "",
+};
+
+/**
+ * Mengubah string menjadi nilai trim atau null bila kosong.
+ *
+ * @param value - Nilai mentah dari input form.
+ * @returns String hasil trim, atau null bila string kosong.
+ */
+const toNullable = (value: string): string | null => {
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+};
+
+/**
  * Komponen manajemen domain/dimensi instrumen.
  *
- * Menampilkan tabel domain yang dapat diedit inline, dengan dialog untuk
- * menambah domain baru. Setiap domain dapat diedit atau dihapus.
+ * Menampilkan tabel domain dengan dialog untuk menambah maupun mengedit domain
+ * beserta kisi-kisi konstruknya (definisi, contoh indikator, dan referensi teori).
  *
  * @param props.instrumentId - ID instrumen pemilik domain.
  * @param props.initialDomains - Daftar domain awal dari server.
@@ -33,61 +66,99 @@ interface DomainsManagerProps {
 export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerProps) => {
   const router = useRouter();
   const [domains, setDomains] = useState<DomainResponse[]>(initialDomains);
-  const [mode, setMode] = useState<"idle" | "add">("idle");
+  const [mode, setMode] = useState<"idle" | "add" | "edit">("idle");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editName, setEditName] = useState("");
-  const [newName, setNewName] = useState("");
+  const [form, setForm] = useState<DomainFormState>(EMPTY_FORM);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   /**
-   * Memulai mode edit untuk domain tertentu.
+   * Memperbarui satu field pada state form.
+   *
+   * @param field - Nama field form yang diperbarui.
+   * @param value - Nilai baru untuk field tersebut.
+   */
+  const updateField = (field: keyof DomainFormState, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  /**
+   * Membuka panel tambah domain baru.
+   */
+  const startAdd = () => {
+    setMode("add");
+    setEditingId(null);
+    setForm(EMPTY_FORM);
+    setError(null);
+  };
+
+  /**
+   * Membuka panel edit untuk domain tertentu.
    *
    * @param domain - Domain yang akan diedit.
    */
   const startEdit = (domain: DomainResponse) => {
+    setMode("edit");
     setEditingId(domain.id);
-    setEditName(domain.name);
+    setForm({
+      name: domain.name,
+      construct_definition: domain.construct_definition ?? "",
+      behavioral_indicator_example: domain.behavioral_indicator_example ?? "",
+      theory_reference: domain.theory_reference ?? "",
+    });
     setError(null);
   };
 
   /**
-   * Membatalkan mode edit.
+   * Menutup panel form dan mengembalikan ke mode idle.
    */
-  const cancelEdit = () => {
+  const closeForm = () => {
+    setMode("idle");
     setEditingId(null);
+    setForm(EMPTY_FORM);
     setError(null);
   };
 
   /**
-   * Menyimpan perubahan nama domain yang sedang diedit.
+   * Menyimpan domain baru atau perubahan domain yang sedang diedit.
    *
-   * @param domain - Domain yang akan diperbarui.
+   * Memvalidasi nama tidak kosong, lalu mengirim request ke API sesuai mode
+   * (POST untuk tambah, PATCH untuk edit).
    */
-  const saveEdit = async (domain: DomainResponse) => {
-    if (!editName.trim()) {
+  const saveForm = async () => {
+    if (!form.name.trim()) {
       setError("Nama domain tidak boleh kosong.");
-      return;
-    }
-    if (editName.trim() === domain.name) {
-      setEditingId(null);
       return;
     }
     setLoading(true);
     setError(null);
+
+    const payload = {
+      name: form.name.trim(),
+      construct_definition: toNullable(form.construct_definition),
+      behavioral_indicator_example: toNullable(form.behavioral_indicator_example),
+      theory_reference: toNullable(form.theory_reference),
+    };
+
     try {
-      const resp = await fetch(`/api/instruments/${instrumentId}/domains/${domain.id}`, {
-        method: "PATCH",
+      const isEdit = mode === "edit" && editingId !== null;
+      const url = isEdit
+        ? `/api/instruments/${instrumentId}/domains/${editingId}`
+        : `/api/instruments/${instrumentId}/domains`;
+      const resp = await fetch(url, {
+        method: isEdit ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: editName.trim() }),
+        body: JSON.stringify(payload),
       });
       if (!resp.ok) {
         const data = await resp.json().catch(() => ({}));
         throw new Error(data.detail ?? `Gagal menyimpan domain (${resp.status})`);
       }
-      const updated: DomainResponse = await resp.json();
-      setDomains((prev) => prev.map((d) => (d.id === updated.id ? updated : d)));
-      setEditingId(null);
+      const saved: DomainResponse = await resp.json();
+      setDomains((prev) =>
+        isEdit ? prev.map((d) => (d.id === saved.id ? saved : d)) : [...prev, saved],
+      );
+      closeForm();
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal menyimpan domain.");
@@ -122,41 +193,10 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
         throw new Error(data.detail ?? `Gagal menghapus domain (${resp.status})`);
       }
       setDomains((prev) => prev.filter((d) => d.id !== domain.id));
+      if (editingId === domain.id) closeForm();
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal menghapus domain.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /**
-   * Menambah domain baru ke instrumen.
-   */
-  const addDomain = async () => {
-    if (!newName.trim()) {
-      setError("Nama domain tidak boleh kosong.");
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const resp = await fetch(`/api/instruments/${instrumentId}/domains`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: newName.trim() }),
-      });
-      if (!resp.ok) {
-        const data = await resp.json().catch(() => ({}));
-        throw new Error(data.detail ?? `Gagal menambah domain (${resp.status})`);
-      }
-      const created: DomainResponse = await resp.json();
-      setDomains((prev) => [...prev, created]);
-      setNewName("");
-      setMode("idle");
-      router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Gagal menambah domain.");
     } finally {
       setLoading(false);
     }
@@ -167,26 +207,18 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
       {/* Action bar */}
       <div className="flex items-center justify-between">
         <span className="text-sm text-gray-500">{domains.length} domain</span>
-        {mode === "idle" && (
+        {mode === "idle" ? (
           <button
             type="button"
-            onClick={() => {
-              setMode("add");
-              setError(null);
-            }}
+            onClick={startAdd}
             className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 transition"
           >
             <Plus className="h-3.5 w-3.5" /> Tambah Domain
           </button>
-        )}
-        {mode === "add" && (
+        ) : (
           <button
             type="button"
-            onClick={() => {
-              setMode("idle");
-              setNewName("");
-              setError(null);
-            }}
+            onClick={closeForm}
             className="flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700"
           >
             <X className="h-3.5 w-3.5" /> Batal
@@ -200,25 +232,63 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
         </div>
       )}
 
-      {/* Form tambah domain */}
-      {mode === "add" && (
+      {/* Form tambah / edit domain */}
+      {mode !== "idle" && (
         <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 space-y-3">
-          <p className="text-xs font-medium text-blue-800">Tambah Domain / Dimensi Baru</p>
-          <input
-            type="text"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") addDomain();
-            }}
-            placeholder="Nama domain (contoh: Kognitif, Afektif, Psikomotor)"
-            className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
-            autoFocus
-          />
+          <p className="text-xs font-medium text-blue-800">
+            {mode === "edit" ? "Edit Domain / Dimensi" : "Tambah Domain / Dimensi Baru"}
+          </p>
+          <div className="space-y-1">
+            <label className="block text-xs font-medium text-gray-700">Nama Domain</label>
+            <input
+              type="text"
+              value={form.name}
+              onChange={(e) => updateField("name", e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") saveForm();
+                if (e.key === "Escape") closeForm();
+              }}
+              placeholder="Nama domain (contoh: Stability of Change)"
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+              autoFocus
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="block text-xs font-medium text-gray-700">Definisi Konstruk</label>
+            <textarea
+              value={form.construct_definition}
+              onChange={(e) => updateField("construct_definition", e.target.value)}
+              placeholder="Definisi konstruk yang diukur oleh dimensi ini..."
+              rows={3}
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 resize-y"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="block text-xs font-medium text-gray-700">
+              Contoh Indikator Perilaku
+            </label>
+            <textarea
+              value={form.behavioral_indicator_example}
+              onChange={(e) => updateField("behavioral_indicator_example", e.target.value)}
+              placeholder="Contoh indikator perilaku yang mencerminkan konstruk..."
+              rows={3}
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 resize-y"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="block text-xs font-medium text-gray-700">Referensi Teori</label>
+            <textarea
+              value={form.theory_reference}
+              onChange={(e) => updateField("theory_reference", e.target.value)}
+              placeholder="Referensi teori pendukung (contoh: Rafferty & Griffin, 2006)..."
+              rows={2}
+              className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 resize-y"
+            />
+          </div>
           <div className="flex justify-end">
             <button
               type="button"
-              onClick={addDomain}
+              onClick={saveForm}
               disabled={loading}
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition disabled:opacity-50"
             >
@@ -250,77 +320,54 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                   Nama Domain
                 </th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  Definisi Konstruk
+                </th>
                 <th className="w-24 px-4 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {domains.map((domain, idx) =>
-                editingId === domain.id ? (
-                  <tr key={domain.id} className="bg-yellow-50">
-                    <td className="px-4 py-3 text-sm text-gray-500 text-center">{idx + 1}</td>
-                    <td className="px-4 py-3">
-                      <input
-                        type="text"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") saveEdit(domain);
-                          if (e.key === "Escape") cancelEdit();
-                        }}
-                        className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-gray-900 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                        autoFocus
-                      />
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-1 justify-end">
-                        <button
-                          type="button"
-                          onClick={() => saveEdit(domain)}
-                          disabled={loading}
-                          className="rounded-md p-1.5 text-green-600 hover:bg-green-50 transition disabled:opacity-50"
-                          title="Simpan"
-                        >
-                          <Check className="h-4 w-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={cancelEdit}
-                          className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 transition"
-                          title="Batal"
-                        >
-                          <X className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ) : (
-                  <tr key={domain.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-gray-500 text-center">{idx + 1}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{domain.name}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-1 justify-end">
-                        <button
-                          type="button"
-                          onClick={() => startEdit(domain)}
-                          className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-blue-600 transition"
-                          title="Edit"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => deleteDomain(domain)}
-                          disabled={loading}
-                          className="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition disabled:opacity-50"
-                          title="Hapus"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ),
-              )}
+              {domains.map((domain, idx) => (
+                <tr
+                  key={domain.id}
+                  className={editingId === domain.id ? "bg-yellow-50" : "hover:bg-gray-50"}
+                >
+                  <td className="px-4 py-3 text-sm text-gray-500 text-center align-top">
+                    {idx + 1}
+                  </td>
+                  <td className="px-4 py-3 text-sm font-medium text-gray-900 align-top">
+                    {domain.name}
+                  </td>
+                  <td className="px-4 py-3 text-xs text-gray-500 align-top">
+                    {domain.construct_definition ? (
+                      <span className="line-clamp-2">{domain.construct_definition}</span>
+                    ) : (
+                      <span className="italic text-gray-300">Belum diisi</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 align-top">
+                    <div className="flex gap-1 justify-end">
+                      <button
+                        type="button"
+                        onClick={() => startEdit(domain)}
+                        className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-blue-600 transition"
+                        title="Edit"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteDomain(domain)}
+                        disabled={loading}
+                        className="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition disabled:opacity-50"
+                        title="Hapus"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
