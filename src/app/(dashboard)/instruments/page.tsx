@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 /**
  * Halaman daftar instrumen — Server Component.
  *
- * @returns Halaman dengan tabel daftar instrumen.
+ * @returns Halaman dengan tabel daftar instrumen, atau pesan error jika API gagal.
  */
 export default async function InstrumentsPage() {
   const session = await getServerSession(authOptions);
@@ -27,7 +27,16 @@ export default async function InstrumentsPage() {
   if (!session) redirect("/login");
   if (session.user.role !== "admin") redirect("/my-assignments");
 
-  const instruments = await listInstruments(session.accessToken).catch(() => []);
+  let instruments;
+  let fetchError: string | null = null;
+
+  try {
+    instruments = await listInstruments(session.accessToken);
+  } catch (err) {
+    instruments = [];
+    fetchError =
+      err instanceof Error ? err.message : "Gagal mengambil data instrumen dari server.";
+  }
 
   return (
     <div className="space-y-6">
@@ -40,7 +49,13 @@ export default async function InstrumentsPage() {
           + Buat Instrumen
         </Link>
       </div>
-      <InstrumentTable instruments={instruments} />
+      {fetchError ? (
+        <div className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          <strong>Gagal memuat instrumen:</strong> {fetchError}
+        </div>
+      ) : (
+        <InstrumentTable instruments={instruments} />
+      )}
     </div>
   );
 }
