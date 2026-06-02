@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Generated coverage reports:
     "coverage/**",
+    // Service worker statis (memakai global service worker, di-load apa adanya):
+    "public/sw.js",
   ]),
 ]);
 

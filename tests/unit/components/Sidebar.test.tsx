@@ -2,9 +2,9 @@
  * Unit test untuk komponen Sidebar.
  *
  * Menguji rendering navigasi berdasarkan role pengguna (admin/expert),
- * highlighting link aktif, dan tampilan nama pengguna.
+ * highlighting link aktif, dan perilaku drawer responsif (mobile).
  */
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { Sidebar } from "@/components/features/layout/Sidebar";
 
 // Mock next/link
@@ -12,13 +12,15 @@ jest.mock("next/link", () => {
   const MockLink = ({
     href,
     children,
+    onClick,
     className,
   }: {
     href: string;
     children: React.ReactNode;
+    onClick?: () => void;
     className?: string;
   }) => (
-    <a href={href} className={className}>
+    <a href={href} onClick={onClick} className={className}>
       {children}
     </a>
   );
@@ -79,6 +81,39 @@ describe("Sidebar", () => {
       render(<Sidebar role="expert" />);
       const link = screen.getByRole("link", { name: /penilaian saya/i });
       expect(link).toHaveAttribute("href", "/my-assignments");
+    });
+  });
+
+  describe("perilaku drawer responsif (mobile)", () => {
+    it("tidak menampilkan overlay saat tertutup (default)", () => {
+      render(<Sidebar role="admin" />);
+      expect(screen.queryByTestId("sidebar-overlay")).not.toBeInTheDocument();
+    });
+
+    it("menampilkan overlay saat isOpen bernilai true", () => {
+      render(<Sidebar role="admin" isOpen />);
+      expect(screen.getByTestId("sidebar-overlay")).toBeInTheDocument();
+    });
+
+    it("memanggil onClose saat overlay diklik", () => {
+      const onClose = jest.fn();
+      render(<Sidebar role="admin" isOpen onClose={onClose} />);
+      fireEvent.click(screen.getByTestId("sidebar-overlay"));
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("memanggil onClose saat tombol tutup diklik", () => {
+      const onClose = jest.fn();
+      render(<Sidebar role="admin" isOpen onClose={onClose} />);
+      fireEvent.click(screen.getByRole("button", { name: /tutup menu navigasi/i }));
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+
+    it("memanggil onClose saat item navigasi dipilih", () => {
+      const onClose = jest.fn();
+      render(<Sidebar role="admin" isOpen onClose={onClose} />);
+      fireEvent.click(screen.getByRole("link", { name: /instrumen/i }));
+      expect(onClose).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -7,7 +7,7 @@
 "use client";
 
 import { signOut } from "next-auth/react";
-import { LogOut, User } from "lucide-react";
+import { LogOut, Menu, User } from "lucide-react";
 import { USER_ROLE_LABELS } from "@/constants";
 import type { UserRole } from "@/types/user";
 
@@ -25,6 +25,11 @@ interface HeaderUser {
  */
 interface HeaderProps {
   user: HeaderUser;
+  /**
+   * Callback saat tombol menu (hamburger) diklik pada mode mobile.
+   * Digunakan untuk membuka sidebar drawer. Tombol hanya tampil di layar kecil.
+   */
+  onMenuClick?: () => void;
 }
 
 /**
@@ -33,10 +38,14 @@ interface HeaderProps {
  * Menampilkan nama, email, dan role pengguna yang sedang login,
  * serta tombol untuk melakukan logout.
  *
+ * Pada layar kecil, menampilkan tombol menu (hamburger) di kiri untuk
+ * membuka sidebar drawer melalui callback `onMenuClick`.
+ *
  * @param props.user - Data pengguna yang ditampilkan di header.
+ * @param props.onMenuClick - Callback untuk membuka sidebar pada mode mobile.
  * @returns Header dengan info user dan tombol logout.
  */
-export const Header = ({ user }: HeaderProps) => {
+export const Header = ({ user, onMenuClick }: HeaderProps) => {
   /**
    * Menangani logout pengguna.
    *
@@ -47,7 +56,17 @@ export const Header = ({ user }: HeaderProps) => {
   };
 
   return (
-    <header className="flex h-16 items-center justify-end border-b border-gray-200 bg-white px-6">
+    <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 sm:px-6 md:justify-end">
+      {/* Tombol menu (hamburger) — hanya tampil di mobile */}
+      <button
+        type="button"
+        onClick={onMenuClick}
+        aria-label="Buka menu navigasi"
+        className="rounded-lg p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900 md:hidden"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
       <div className="flex items-center gap-4">
         {/* User info */}
         <div className="flex items-center gap-2">

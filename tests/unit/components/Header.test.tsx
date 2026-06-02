@@ -55,4 +55,16 @@ describe("Header", () => {
     fireEvent.click(logoutButton);
     expect(mockSignOut).toHaveBeenCalledWith({ callbackUrl: "/login" });
   });
+
+  it("harus menampilkan tombol menu (hamburger) untuk mobile", () => {
+    render(<Header user={mockUser} />);
+    expect(screen.getByRole("button", { name: /buka menu navigasi/i })).toBeInTheDocument();
+  });
+
+  it("harus memanggil onMenuClick saat tombol menu diklik", () => {
+    const onMenuClick = jest.fn();
+    render(<Header user={mockUser} onMenuClick={onMenuClick} />);
+    fireEvent.click(screen.getByRole("button", { name: /buka menu navigasi/i }));
+    expect(onMenuClick).toHaveBeenCalledTimes(1);
+  });
 });
