@@ -34,8 +34,7 @@ export default async function InstrumentsPage() {
     instruments = await listInstruments(session.accessToken);
   } catch (err) {
     instruments = [];
-    fetchError =
-      err instanceof Error ? err.message : "Gagal mengambil data instrumen dari server.";
+    fetchError = err instanceof Error ? err.message : "Gagal mengambil data instrumen dari server.";
   }
 
   return (
