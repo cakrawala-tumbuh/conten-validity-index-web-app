@@ -32,11 +32,11 @@ describe("KisiKisiKonstruk", () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("harus tidak merender apa pun jika tidak ada domain dengan kisi-kisi", () => {
-    const { container } = render(
-      <KisiKisiKonstruk domains={[makeDomain({ id: "dom-1", name: "Kosong" })]} />,
-    );
-    expect(container).toBeEmptyDOMElement();
+  it("harus tetap merender dimensi meskipun kisi-kisi belum diisi", () => {
+    render(<KisiKisiKonstruk domains={[makeDomain({ id: "dom-1", name: "Kosong" })]} />);
+    expect(screen.getByText("Kosong")).toBeInTheDocument();
+    // Ketiga kolom kisi-kisi kosong → ditampilkan sebagai strip
+    expect(screen.getAllByText("—").length).toBeGreaterThanOrEqual(3);
   });
 
   it("harus merender tabel kisi-kisi untuk domain yang memiliki definisi konstruk", () => {
@@ -53,14 +53,14 @@ describe("KisiKisiKonstruk", () => {
         ]}
       />,
     );
-    expect(screen.getByText("Kisi-Kisi Konstruk")).toBeInTheDocument();
+    expect(screen.getByText(/Kisi-Kisi Konstruk/i)).toBeInTheDocument();
     expect(screen.getByText("Stability of Change")).toBeInTheDocument();
     expect(screen.getByText("Sejauh mana kebijakan tetap stabil.")).toBeInTheDocument();
     expect(screen.getByText("Frekuensi perubahan kebijakan.")).toBeInTheDocument();
     expect(screen.getByText("Rafferty & Griffin (2006)")).toBeInTheDocument();
   });
 
-  it("harus menyaring domain tanpa kisi-kisi dari tabel", () => {
+  it("harus menampilkan semua dimensi instrumen, terisi maupun kosong", () => {
     render(
       <KisiKisiKonstruk
         domains={[
@@ -70,7 +70,7 @@ describe("KisiKisiKonstruk", () => {
       />,
     );
     expect(screen.getByText("Terisi")).toBeInTheDocument();
-    expect(screen.queryByText("Kosong")).not.toBeInTheDocument();
+    expect(screen.getByText("Kosong")).toBeInTheDocument();
   });
 
   it("harus menampilkan placeholder untuk kolom yang kosong pada domain yang terisi sebagian", () => {

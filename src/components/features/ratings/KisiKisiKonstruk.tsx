@@ -1,10 +1,10 @@
 /**
- * Komponen tampilan kisi-kisi konstruk instrumen untuk expert.
+ * Komponen tampilan tabel dimensi (kisi-kisi konstruk) instrumen untuk expert.
  *
- * Menampilkan tabel referensi berisi dimensi/domain instrumen beserta definisi
- * konstruk (kolom D), contoh indikator perilaku (kolom E), dan referensi teori
- * (kolom F). Komponen ini ditempatkan di atas tabel penilaian agar expert dapat
- * memahami konstruk yang diukur sebelum memberikan skor relevansi.
+ * Menampilkan tabel referensi read-only berisi seluruh dimensi/domain instrumen
+ * beserta definisi konstruk (kolom D), contoh indikator perilaku (kolom E), dan
+ * referensi teori (kolom F). Komponen ini ditempatkan di atas tabel penilaian
+ * agar expert dapat memahami konstruk yang diukur sebelum memberikan skor.
  */
 import type { DomainResponse } from "@/types/domain";
 
@@ -16,38 +16,27 @@ interface KisiKisiKonstrukProps {
 }
 
 /**
- * Menentukan apakah sebuah domain memiliki isi kisi-kisi konstruk.
+ * Tabel dimensi (kisi-kisi konstruk) sebagai referensi read-only bagi expert.
  *
- * @param domain - Domain yang akan diperiksa.
- * @returns `true` bila salah satu kolom D/E/F terisi.
- */
-const hasKisiKisi = (domain: DomainResponse): boolean =>
-  Boolean(
-    domain.construct_definition || domain.behavioral_indicator_example || domain.theory_reference,
-  );
-
-/**
- * Tabel kisi-kisi konstruk sebagai referensi bagi expert saat menilai.
- *
- * Hanya menampilkan domain yang memiliki minimal satu kolom kisi-kisi terisi.
- * Bila tidak ada domain yang memiliki kisi-kisi, komponen tidak dirender.
+ * Menampilkan seluruh dimensi instrumen. Kolom kisi-kisi yang belum diisi
+ * ditampilkan sebagai tanda strip ("—"). Bila instrumen belum memiliki dimensi,
+ * komponen tidak dirender.
  *
  * @param props.domains - Daftar domain/dimensi instrumen.
- * @returns Tabel kisi-kisi konstruk, atau `null` bila tidak ada data.
+ * @returns Tabel dimensi kisi-kisi konstruk, atau `null` bila tidak ada dimensi.
  */
 export const KisiKisiKonstruk = ({ domains }: KisiKisiKonstrukProps) => {
-  const relevantDomains = domains.filter(hasKisiKisi);
-
-  if (relevantDomains.length === 0) {
+  if (domains.length === 0) {
     return null;
   }
 
   return (
     <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
       <div className="border-b border-gray-200 bg-gray-50 px-5 py-3">
-        <p className="text-sm font-semibold text-gray-800">Kisi-Kisi Konstruk</p>
+        <p className="text-sm font-semibold text-gray-800">Kisi-Kisi Konstruk (Dimensi)</p>
         <p className="mt-0.5 text-xs text-gray-500">
-          Gunakan tabel berikut sebagai acuan konstruk yang diukur sebelum memberi penilaian.
+          Tabel acuan dimensi yang diukur instrumen ini. Bersifat read-only; gunakan sebagai panduan
+          sebelum memberi penilaian.
         </p>
       </div>
       <div className="overflow-x-auto">
@@ -72,7 +61,7 @@ export const KisiKisiKonstruk = ({ domains }: KisiKisiKonstrukProps) => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {relevantDomains.map((domain, idx) => (
+            {domains.map((domain, idx) => (
               <tr key={domain.id} className="align-top">
                 <td className="px-4 py-3 text-sm text-gray-500 text-center">{idx + 1}</td>
                 <td className="px-4 py-3 text-sm font-medium text-gray-900">{domain.name}</td>
