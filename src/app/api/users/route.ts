@@ -26,6 +26,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const backendUrl = process.env.BACKEND_API_INTERNAL_URL ?? "http://localhost:8000";
 
   const backendResp = await fetch(`${backendUrl}/api/v1/users/${qs}`, {
+    cache: "no-store",
     headers: { Authorization: `Bearer ${session.accessToken}` },
   });
 

@@ -91,6 +91,12 @@ export async function apiRequest<T>(path: string, options: ApiRequestOptions = {
   let response: Response;
   try {
     response = await fetch(url, {
+      // Default no-store: data API bersifat per-user dan dinamis. Tanpa ini,
+      // Next.js menyimpan response (termasuk error seperti 404) di Data Cache dan
+      // menyajikannya kembali sampai revalidasi — menyebabkan data tampak
+      // "muncul lalu hilang" serta risiko cache bocor antar-user. Dapat ditimpa
+      // oleh caller via options bila memang perlu caching.
+      cache: "no-store",
       ...restOptions,
       headers: requestHeaders,
       signal: controller.signal,
@@ -142,6 +148,7 @@ export async function apiDownload(path: string, token: string, filename: string)
   const url = `${getBaseUrl()}${path}`;
 
   const response = await fetch(url, {
+    cache: "no-store",
     headers: { Authorization: `Bearer ${token}` },
   });
 
