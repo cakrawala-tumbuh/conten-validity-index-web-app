@@ -8,7 +8,9 @@ import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { listUsers } from "@/services/user-service";
+import { listExpertiseAreas } from "@/services/expertise-area-service";
 import type { UserResponse } from "@/types/user";
+import type { ExpertiseAreaResponse } from "@/types/expertise-area";
 import { UserTable } from "@/components/features/users/UserTable";
 import type { Metadata } from "next";
 
@@ -31,10 +33,14 @@ export default async function UsersPage() {
   if (session.user.role !== "admin") redirect("/my-assignments");
 
   let users: UserResponse[] = [];
+  let expertiseAreas: ExpertiseAreaResponse[] = [];
   let fetchError: string | null = null;
 
   try {
-    users = await listUsers(session.accessToken, { limit: 200 });
+    [users, expertiseAreas] = await Promise.all([
+      listUsers(session.accessToken, { limit: 200 }),
+      listExpertiseAreas(session.accessToken, { limit: 200 }),
+    ]);
   } catch (err) {
     fetchError = err instanceof Error ? err.message : "Gagal mengambil data pengguna dari server.";
   }
@@ -60,7 +66,7 @@ export default async function UsersPage() {
           <strong>Gagal memuat pengguna:</strong> {fetchError}
         </div>
       ) : (
-        <UserTable initialUsers={users} />
+        <UserTable initialUsers={users} expertiseAreaOptions={expertiseAreas} />
       )}
     </div>
   );

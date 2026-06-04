@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import type { ItemResponse } from "@/types/item";
 import type { RatingResponse } from "@/types/rating";
 import type { AssignmentResponse } from "@/types/expert-assignment";
+import type { DomainResponse } from "@/types/domain";
 
 /**
  * Label untuk setiap nilai skala Likert yang digunakan dalam CVI.
@@ -21,6 +22,20 @@ const SCORE_LABELS: Record<number, string> = {
   3: "Cukup Relevan",
   4: "Sangat Relevan",
 };
+
+/**
+ * Skor relevansi yang mewajibkan expert mengisi catatan/alasan.
+ */
+const SCORES_REQUIRING_NOTES: ReadonlyArray<1 | 2 | 3 | 4> = [1, 2];
+
+/**
+ * Mengecek apakah sebuah skor mewajibkan catatan untuk diisi.
+ *
+ * @param score - Skor relevansi item, atau null jika belum dinilai.
+ * @returns True jika skor termasuk yang mewajibkan catatan.
+ */
+const isNotesRequired = (score: 1 | 2 | 3 | 4 | null): boolean =>
+  score !== null && SCORES_REQUIRING_NOTES.includes(score);
 
 /**
  * State penilaian per item, diidentifikasi oleh item ID.
@@ -37,6 +52,11 @@ interface RatingFormProps {
   assignment: AssignmentResponse;
   items: ItemResponse[];
   existingRatings: RatingResponse[];
+  /**
+   * Daftar dimensi (domain) instrumen, dipakai untuk menampilkan nama dimensi
+   * pada setiap item. Opsional; jika tidak diberikan, label dimensi tidak tampil.
+   */
+  domains?: DomainResponse[];
 }
 
 /**
@@ -49,10 +69,19 @@ interface RatingFormProps {
  * @param props.assignment - Data assignment milik expert.
  * @param props.items - Daftar item instrumen yang akan dinilai.
  * @param props.existingRatings - Penilaian yang sudah ada (untuk edit mode).
+ * @param props.domains - Daftar dimensi instrumen untuk pelabelan item.
  * @returns Form penilaian interaktif.
  */
-export const RatingForm = ({ assignment, items, existingRatings }: RatingFormProps) => {
+export const RatingForm = ({
+  assignment,
+  items,
+  existingRatings,
+  domains = [],
+}: RatingFormProps) => {
   const router = useRouter();
+
+  // Peta id dimensi → nama dimensi untuk pelabelan cepat per item.
+  const domainNameById = new Map(domains.map((domain) => [domain.id, domain.name]));
 
   const initialState = (): Record<string, RatingState> => {
     const state: Record<string, RatingState> = {};
@@ -74,6 +103,13 @@ export const RatingForm = ({ assignment, items, existingRatings }: RatingFormPro
   const filledCount = Object.values(ratings).filter((r) => r.score !== null).length;
   const isComplete = filledCount === items.length;
 
+  // Item dengan skor 1/2 wajib disertai catatan; kumpulkan yang masih kosong.
+  const itemsMissingNotes = items.filter((item) => {
+    const r = ratings[item.id];
+    return isNotesRequired(r.score) && !r.notes.trim();
+  });
+  const hasMissingNotes = itemsMissingNotes.length > 0;
+
   /**
    * Memperbarui skor atau catatan untuk satu item tertentu.
    *
@@ -91,7 +127,8 @@ export const RatingForm = ({ assignment, items, existingRatings }: RatingFormPro
   /**
    * Menangani pengiriman semua penilaian (bulk submit).
    *
-   * Memvalidasi semua item sudah dinilai sebelum mengirim.
+   * Memvalidasi semua item sudah dinilai dan catatan terisi untuk item
+   * berskor 1/2 sebelum mengirim.
    *
    * @param e - Event form submission.
    */
@@ -99,6 +136,13 @@ export const RatingForm = ({ assignment, items, existingRatings }: RatingFormPro
     e.preventDefault();
     if (!isComplete) {
       setError("Semua item harus dinilai sebelum submit.");
+      return;
+    }
+
+    if (hasMissingNotes) {
+      setError(
+        "Catatan wajib diisi untuk item dengan skor 1 (Tidak Relevan) atau 2 (Kurang Relevan).",
+      );
       return;
     }
 
@@ -163,11 +207,16 @@ export const RatingForm = ({ assignment, items, existingRatings }: RatingFormPro
           </span>{" "}
           item sudah dinilai
         </span>
-        {isComplete && (
-          <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">
-            Siap submit
-          </span>
-        )}
+        {isComplete &&
+          (hasMissingNotes ? (
+            <span className="text-xs font-medium text-red-600 bg-red-100 px-2 py-0.5 rounded-full">
+              {itemsMissingNotes.length} catatan wajib diisi
+            </span>
+          ) : (
+            <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">
+              Siap submit
+            </span>
+          ))}
       </div>
 
       {error && (
@@ -206,7 +255,9 @@ export const RatingForm = ({ assignment, items, existingRatings }: RatingFormPro
                   <td className="px-4 py-4 align-top">
                     <p className="text-sm text-gray-900">{item.content}</p>
                     {item.domain_id && (
-                      <p className="mt-1 text-xs text-gray-400">Domain: {item.domain_id}</p>
+                      <p className="mt-1 text-xs text-gray-400">
+                        Dimensi: {domainNameById.get(item.domain_id) ?? item.domain_id}
+                      </p>
                     )}
                   </td>
                   <td className="px-4 py-4 align-top">
@@ -236,13 +287,32 @@ export const RatingForm = ({ assignment, items, existingRatings }: RatingFormPro
                     </div>
                   </td>
                   <td className="px-4 py-4 align-top">
-                    <textarea
-                      value={current.notes}
-                      onChange={(e) => updateRating(item.id, "notes", e.target.value)}
-                      placeholder="Catatan opsional..."
-                      rows={3}
-                      className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-xs text-gray-900 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 resize-none"
-                    />
+                    {(() => {
+                      const notesRequired = isNotesRequired(current.score);
+                      const notesMissing = notesRequired && !current.notes.trim();
+                      return (
+                        <>
+                          <textarea
+                            value={current.notes}
+                            onChange={(e) => updateRating(item.id, "notes", e.target.value)}
+                            placeholder={
+                              notesRequired ? "Catatan wajib diisi..." : "Catatan opsional..."
+                            }
+                            rows={3}
+                            aria-required={notesRequired}
+                            aria-invalid={notesMissing}
+                            className={`w-full rounded-md border px-2 py-1.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-1 resize-none ${
+                              notesMissing
+                                ? "border-red-300 focus:border-red-400 focus:ring-red-400"
+                                : "border-gray-200 focus:border-blue-400 focus:ring-blue-400"
+                            }`}
+                          />
+                          {notesMissing && (
+                            <p className="mt-1 text-xs text-red-600">Wajib diisi untuk skor 1/2.</p>
+                          )}
+                        </>
+                      );
+                    })()}
                   </td>
                 </tr>
               );
@@ -255,7 +325,7 @@ export const RatingForm = ({ assignment, items, existingRatings }: RatingFormPro
       <div className="flex justify-end">
         <button
           type="submit"
-          disabled={isSubmitting || !isComplete}
+          disabled={isSubmitting || !isComplete || hasMissingNotes}
           className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition disabled:cursor-not-allowed disabled:opacity-50"
         >
           {isSubmitting ? "Menyimpan..." : "Simpan Semua Penilaian"}

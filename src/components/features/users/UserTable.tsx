@@ -11,30 +11,34 @@ import { useRouter } from "next/navigation";
 import { Pencil, X, Check, UserX } from "lucide-react";
 import { USER_ROLE_LABELS } from "@/constants";
 import type { UserResponse, UserUpdate } from "@/types/user";
+import type { ExpertiseAreaResponse } from "@/types/expertise-area";
+import { ExpertiseAreaSelect } from "@/components/features/expertise-areas/ExpertiseAreaSelect";
 
 /**
  * Props untuk UserTable.
  */
 interface UserTableProps {
   initialUsers: UserResponse[];
+  /** Daftar master bidang keahlian yang dapat ditetapkan ke pengguna. */
+  expertiseAreaOptions: ExpertiseAreaResponse[];
 }
 
 /**
  * Tabel daftar pengguna dengan aksi edit dan nonaktifkan.
  *
- * Mendukung edit inline untuk `full_name`, `institution`, dan `expertise_area`.
+ * Mendukung edit inline untuk `institution` dan bidang keahlian (multi-select).
  * Tombol nonaktifkan akan melakukan soft delete (is_active = false) dengan konfirmasi.
  *
  * @param props.initialUsers - Daftar pengguna awal dari server.
+ * @param props.expertiseAreaOptions - Daftar master bidang keahlian.
  * @returns Komponen tabel pengguna interaktif.
  */
-export const UserTable = ({ initialUsers }: UserTableProps) => {
+export const UserTable = ({ initialUsers, expertiseAreaOptions }: UserTableProps) => {
   const router = useRouter();
   const [users, setUsers] = useState<UserResponse[]>(initialUsers);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editFullName, setEditFullName] = useState("");
   const [editInstitution, setEditInstitution] = useState("");
-  const [editExpertise, setEditExpertise] = useState("");
+  const [editExpertiseIds, setEditExpertiseIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,9 +54,8 @@ export const UserTable = ({ initialUsers }: UserTableProps) => {
    */
   const startEdit = (user: UserResponse) => {
     setEditingId(user.id);
-    setEditFullName(user.full_name);
     setEditInstitution(user.institution ?? "");
-    setEditExpertise(user.expertise_area ?? "");
+    setEditExpertiseIds(user.expertise_areas.map((area) => area.id));
     setError(null);
   };
 
@@ -70,16 +73,12 @@ export const UserTable = ({ initialUsers }: UserTableProps) => {
    * @param userId - ID pengguna yang diperbarui.
    */
   const saveEdit = async (userId: string) => {
-    if (!editFullName.trim()) {
-      setError("Nama tidak boleh kosong.");
-      return;
-    }
     setLoading(true);
     setError(null);
     try {
       const body: UserUpdate = {
         institution: editInstitution.trim() || undefined,
-        expertise_area: editExpertise.trim() || undefined,
+        expertise_area_ids: editExpertiseIds,
       };
       const resp = await fetch(`/api/users/${userId}`, {
         method: "PATCH",
@@ -172,13 +171,8 @@ export const UserTable = ({ initialUsers }: UserTableProps) => {
               editingId === user.id ? (
                 <tr key={user.id} className="bg-yellow-50">
                   <td className="px-4 py-3" colSpan={2}>
-                    <input
-                      type="text"
-                      value={editFullName}
-                      onChange={(e) => setEditFullName(e.target.value)}
-                      placeholder="Nama lengkap"
-                      className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-gray-900 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
-                    />
+                    <p className="text-sm font-medium text-gray-900">{user.full_name}</p>
+                    <p className="text-xs text-gray-400">{user.email}</p>
                   </td>
                   <td className="px-4 py-3 text-center">
                     <span
@@ -188,7 +182,7 @@ export const UserTable = ({ initialUsers }: UserTableProps) => {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="space-y-1.5">
+                    <div className="space-y-2">
                       <input
                         type="text"
                         value={editInstitution}
@@ -196,12 +190,11 @@ export const UserTable = ({ initialUsers }: UserTableProps) => {
                         placeholder="Institusi..."
                         className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-gray-900 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
                       />
-                      <input
-                        type="text"
-                        value={editExpertise}
-                        onChange={(e) => setEditExpertise(e.target.value)}
-                        placeholder="Area keahlian..."
-                        className="w-full rounded-md border border-gray-200 px-2 py-1.5 text-sm text-gray-900 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400"
+                      <ExpertiseAreaSelect
+                        options={expertiseAreaOptions}
+                        selectedIds={editExpertiseIds}
+                        onChange={setEditExpertiseIds}
+                        disabled={loading}
                       />
                     </div>
                   </td>
@@ -246,8 +239,19 @@ export const UserTable = ({ initialUsers }: UserTableProps) => {
                   </td>
                   <td className="px-4 py-3">
                     <p className="text-sm text-gray-700">{user.institution ?? "—"}</p>
-                    {user.expertise_area && (
-                      <p className="text-xs text-gray-400">{user.expertise_area}</p>
+                    {user.expertise_areas.length > 0 ? (
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {user.expertise_areas.map((area) => (
+                          <span
+                            key={area.id}
+                            className="inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700"
+                          >
+                            {area.name}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs text-gray-300 italic">Belum ada keahlian</p>
                     )}
                   </td>
                   <td className="px-4 py-3 text-center">

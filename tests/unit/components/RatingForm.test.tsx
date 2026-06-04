@@ -9,6 +9,7 @@ import { RatingForm } from "@/components/features/ratings/RatingForm";
 import type { AssignmentResponse } from "@/types/expert-assignment";
 import type { ItemResponse } from "@/types/item";
 import type { RatingResponse } from "@/types/rating";
+import type { DomainResponse } from "@/types/domain";
 
 jest.mock("next/navigation", () => ({
   useRouter: () => ({ push: jest.fn(), refresh: jest.fn() }),
@@ -245,5 +246,96 @@ describe("RatingForm", () => {
     const notesTextarea = screen.getByDisplayValue("Catatan item 1");
     fireEvent.change(notesTextarea, { target: { value: "Catatan diperbarui" } });
     expect(screen.getByDisplayValue("Catatan diperbarui")).toBeInTheDocument();
+  });
+
+  describe("label dimensi", () => {
+    const mockDomains: DomainResponse[] = [
+      {
+        id: "dom-1",
+        instrument_id: "inst-1",
+        name: "Kontrol Kerja",
+        construct_definition: null,
+        behavioral_indicator_example: null,
+        theory_reference: null,
+        created_at: "2024-01-01T00:00:00Z",
+        updated_at: "2024-01-01T00:00:00Z",
+      },
+    ];
+
+    const itemsWithDomain: ItemResponse[] = [{ ...mockItems[0], domain_id: "dom-1" }, mockItems[1]];
+
+    it("harus menampilkan nama dimensi, bukan UUID, jika domain ditemukan", () => {
+      render(
+        <RatingForm
+          assignment={mockAssignment}
+          items={itemsWithDomain}
+          existingRatings={[]}
+          domains={mockDomains}
+        />,
+      );
+      expect(screen.getByText(/Dimensi: Kontrol Kerja/)).toBeInTheDocument();
+    });
+
+    it("harus fallback ke domain_id jika dimensi tidak ditemukan di daftar", () => {
+      render(
+        <RatingForm
+          assignment={mockAssignment}
+          items={[{ ...mockItems[0], domain_id: "dom-tak-dikenal" }]}
+          existingRatings={[]}
+          domains={mockDomains}
+        />,
+      );
+      expect(screen.getByText(/Dimensi: dom-tak-dikenal/)).toBeInTheDocument();
+    });
+  });
+
+  describe("catatan wajib untuk skor 1/2", () => {
+    it("harus menonaktifkan submit jika item skor 1 belum diberi catatan", () => {
+      render(
+        <RatingForm assignment={mockAssignment} items={[mockItems[0]]} existingRatings={[]} />,
+      );
+      const radio1 = screen.getByRole("radio", { name: /tidak relevan/i });
+      fireEvent.click(radio1);
+      // Semua item dinilai (1/1) tetapi catatan kosong → submit tetap disabled.
+      const submitButton = screen.getByRole("button", { name: /simpan semua penilaian/i });
+      expect(submitButton).toBeDisabled();
+      expect(screen.getByText(/catatan wajib diisi/i)).toBeInTheDocument();
+    });
+
+    it("harus menampilkan error dan tidak submit jika catatan skor 2 kosong", () => {
+      render(
+        <RatingForm assignment={mockAssignment} items={[mockItems[0]]} existingRatings={[]} />,
+      );
+      const radio2 = screen.getByRole("radio", { name: /kurang relevan/i });
+      fireEvent.click(radio2);
+      const form = screen.getByRole("button", { name: /simpan semua penilaian/i }).closest("form");
+      if (form) fireEvent.submit(form);
+      expect(
+        screen.getByText(
+          "Catatan wajib diisi untuk item dengan skor 1 (Tidak Relevan) atau 2 (Kurang Relevan).",
+        ),
+      ).toBeInTheDocument();
+      expect(mockFetch).not.toHaveBeenCalled();
+    });
+
+    it("harus mengaktifkan submit setelah catatan skor 1 diisi", async () => {
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+      render(
+        <RatingForm assignment={mockAssignment} items={[mockItems[0]]} existingRatings={[]} />,
+      );
+      fireEvent.click(screen.getByRole("radio", { name: /tidak relevan/i }));
+      const notesTextarea = screen.getByPlaceholderText(/catatan wajib diisi/i);
+      fireEvent.change(notesTextarea, { target: { value: "Tidak sesuai konstruk." } });
+      const submitButton = screen.getByRole("button", { name: /simpan semua penilaian/i });
+      expect(submitButton).not.toBeDisabled();
+      const form = submitButton.closest("form");
+      if (form) fireEvent.submit(form);
+      await waitFor(() => {
+        expect(mockFetch).toHaveBeenCalledWith(
+          `/api/assignments/${mockAssignment.id}/ratings/bulk`,
+          expect.objectContaining({ method: "POST" }),
+        );
+      });
+    });
   });
 });

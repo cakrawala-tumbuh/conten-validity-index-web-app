@@ -8,7 +8,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FileText, Users, ClipboardList, Activity, LayoutDashboard, X } from "lucide-react";
+import {
+  FileText,
+  Users,
+  ClipboardList,
+  Activity,
+  GraduationCap,
+  LayoutDashboard,
+  UserCog,
+  X,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { UserRole } from "@/types/user";
 import { APP_NAME } from "@/constants";
@@ -40,16 +49,22 @@ interface NavItem {
   icon: React.ComponentType<{ className?: string }>;
 }
 
+/** Menu profil, tersedia untuk semua role. */
+const PROFILE_NAV: NavItem = { href: "/profile", label: "Profil Saya", icon: UserCog };
+
 /** Menu navigasi untuk admin. */
 const ADMIN_NAV: NavItem[] = [
   { href: "/instruments", label: "Instrumen", icon: FileText },
   { href: "/users", label: "Pengguna", icon: Users },
+  { href: "/expertise-areas", label: "Bidang Keahlian", icon: GraduationCap },
   { href: "/activity-logs", label: "Log Aktivitas", icon: Activity },
+  PROFILE_NAV,
 ];
 
 /** Menu navigasi untuk expert. */
 const EXPERT_NAV: NavItem[] = [
   { href: "/my-assignments", label: "Penilaian Saya", icon: ClipboardList },
+  PROFILE_NAV,
 ];
 
 /**

@@ -64,6 +64,18 @@ describe("Sidebar", () => {
       const link = screen.getByRole("link", { name: /log aktivitas/i });
       expect(link).toHaveAttribute("href", "/activity-logs");
     });
+
+    it("harus memiliki link ke /expertise-areas (Bidang Keahlian)", () => {
+      render(<Sidebar role="admin" />);
+      const link = screen.getByRole("link", { name: /bidang keahlian/i });
+      expect(link).toHaveAttribute("href", "/expertise-areas");
+    });
+
+    it("harus memiliki link ke /profile (Profil Saya)", () => {
+      render(<Sidebar role="admin" />);
+      const link = screen.getByRole("link", { name: /profil saya/i });
+      expect(link).toHaveAttribute("href", "/profile");
+    });
   });
 
   describe("role: expert", () => {
@@ -75,12 +87,19 @@ describe("Sidebar", () => {
     it("tidak harus menampilkan menu admin untuk expert", () => {
       render(<Sidebar role="expert" />);
       expect(screen.queryByText("Log Aktivitas")).not.toBeInTheDocument();
+      expect(screen.queryByText("Bidang Keahlian")).not.toBeInTheDocument();
     });
 
     it("harus memiliki link ke /my-assignments", () => {
       render(<Sidebar role="expert" />);
       const link = screen.getByRole("link", { name: /penilaian saya/i });
       expect(link).toHaveAttribute("href", "/my-assignments");
+    });
+
+    it("harus memiliki link ke /profile (Profil Saya)", () => {
+      render(<Sidebar role="expert" />);
+      const link = screen.getByRole("link", { name: /profil saya/i });
+      expect(link).toHaveAttribute("href", "/profile");
     });
   });
 

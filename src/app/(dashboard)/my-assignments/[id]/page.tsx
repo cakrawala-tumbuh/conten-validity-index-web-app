@@ -144,7 +144,11 @@ export default async function RatingPage({ params }: RatingPageProps) {
             <strong>3</strong> = Cukup Relevan, <strong>4</strong> = Sangat Relevan.
           </li>
           <li>Semua item wajib dinilai sebelum dapat submit.</li>
-          <li>Kolom catatan bersifat opsional.</li>
+          <li>
+            Kolom catatan <strong>wajib diisi</strong> bila skor yang diberikan{" "}
+            <strong>1 (Tidak Relevan)</strong> atau <strong>2 (Kurang Relevan)</strong>; opsional
+            untuk skor lainnya.
+          </li>
         </ul>
       </div>
 
@@ -156,7 +160,12 @@ export default async function RatingPage({ params }: RatingPageProps) {
           <p className="text-sm text-gray-500">Instrumen ini belum memiliki item untuk dinilai.</p>
         </div>
       ) : (
-        <RatingForm assignment={assignment} items={items} existingRatings={existingRatings} />
+        <RatingForm
+          assignment={assignment}
+          items={items}
+          existingRatings={existingRatings}
+          domains={domains}
+        />
       )}
     </div>
   );

@@ -1,11 +1,13 @@
 /**
  * Unit test untuk komponen UserTable.
  *
- * Menguji rendering tabel pengguna, mode edit, dan tombol nonaktifkan.
+ * Menguji rendering tabel pengguna, mode edit (institusi + bidang keahlian),
+ * dan tombol nonaktifkan.
  */
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { UserTable } from "@/components/features/users/UserTable";
 import type { UserResponse } from "@/types/user";
+import type { ExpertiseAreaResponse } from "@/types/expertise-area";
 
 // Mock next/navigation
 jest.mock("next/navigation", () => ({
@@ -20,13 +22,30 @@ global.fetch = mockFetch;
 const mockConfirm = jest.fn();
 global.confirm = mockConfirm;
 
+const mockOptions: ExpertiseAreaResponse[] = [
+  {
+    id: "area-1",
+    name: "Keperawatan",
+    description: null,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+  {
+    id: "area-2",
+    name: "Kedokteran",
+    description: null,
+    created_at: "2024-01-01T00:00:00Z",
+    updated_at: "2024-01-01T00:00:00Z",
+  },
+];
+
 const mockUsers: UserResponse[] = [
   {
     id: "user-1",
     email: "admin@example.com",
     full_name: "Admin Pertama",
     institution: "Universitas A",
-    expertise_area: "Keperawatan",
+    expertise_areas: [mockOptions[0]],
     role: "admin",
     is_active: true,
     created_at: "2024-01-01T00:00:00Z",
@@ -37,7 +56,7 @@ const mockUsers: UserResponse[] = [
     email: "expert@example.com",
     full_name: "Expert Satu",
     institution: null,
-    expertise_area: null,
+    expertise_areas: [],
     role: "expert",
     is_active: true,
     created_at: "2024-02-01T00:00:00Z",
@@ -48,7 +67,7 @@ const mockUsers: UserResponse[] = [
     email: "inactive@example.com",
     full_name: "Expert Nonaktif",
     institution: null,
-    expertise_area: null,
+    expertise_areas: [],
     role: "expert",
     is_active: false,
     created_at: "2024-03-01T00:00:00Z",
@@ -56,100 +75,125 @@ const mockUsers: UserResponse[] = [
   },
 ];
 
+/**
+ * Merender UserTable dengan opsi keahlian default.
+ */
+const renderTable = (users: UserResponse[]) =>
+  render(<UserTable initialUsers={users} expertiseAreaOptions={mockOptions} />);
+
 describe("UserTable", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("harus menampilkan pesan kosong jika tidak ada pengguna", () => {
-    render(<UserTable initialUsers={[]} />);
+    renderTable([]);
     expect(screen.getByText(/belum ada pengguna terdaftar/i)).toBeInTheDocument();
   });
 
   it("harus merender tabel dengan semua nama pengguna", () => {
-    render(<UserTable initialUsers={mockUsers} />);
+    renderTable(mockUsers);
     expect(screen.getByText("Admin Pertama")).toBeInTheDocument();
     expect(screen.getByText("Expert Satu")).toBeInTheDocument();
     expect(screen.getByText("Expert Nonaktif")).toBeInTheDocument();
   });
 
   it("harus menampilkan email semua pengguna", () => {
-    render(<UserTable initialUsers={mockUsers} />);
+    renderTable(mockUsers);
     expect(screen.getByText("admin@example.com")).toBeInTheDocument();
     expect(screen.getByText("expert@example.com")).toBeInTheDocument();
   });
 
   it("harus menampilkan badge role Admin dan Expert", () => {
-    render(<UserTable initialUsers={mockUsers} />);
+    renderTable(mockUsers);
     expect(screen.getByText("Admin")).toBeInTheDocument();
     const expertBadges = screen.getAllByText("Expert");
     expect(expertBadges.length).toBeGreaterThan(0);
   });
 
   it("harus menampilkan institusi jika ada", () => {
-    render(<UserTable initialUsers={mockUsers} />);
+    renderTable(mockUsers);
     expect(screen.getByText("Universitas A")).toBeInTheDocument();
   });
 
+  it("harus menampilkan bidang keahlian sebagai chip", () => {
+    renderTable([mockUsers[0]]);
+    expect(screen.getByText("Keperawatan")).toBeInTheDocument();
+  });
+
+  it("harus menampilkan placeholder bila pengguna belum punya keahlian", () => {
+    renderTable([mockUsers[1]]);
+    expect(screen.getByText(/belum ada keahlian/i)).toBeInTheDocument();
+  });
+
   it("harus menampilkan badge status Aktif dan Nonaktif", () => {
-    render(<UserTable initialUsers={mockUsers} />);
+    renderTable(mockUsers);
     const aktif = screen.getAllByText("Aktif");
     expect(aktif.length).toBeGreaterThan(0);
     expect(screen.getByText("Nonaktif")).toBeInTheDocument();
   });
 
   it("harus tidak menampilkan tombol nonaktifkan untuk user yang sudah nonaktif", () => {
-    render(<UserTable initialUsers={[mockUsers[2]]} />);
-    // User nonaktif tidak punya tombol UserX (deactivate)
+    renderTable([mockUsers[2]]);
     const editButtons = screen.getAllByTitle("Edit");
     expect(editButtons).toHaveLength(1);
     expect(screen.queryByTitle("Nonaktifkan")).not.toBeInTheDocument();
   });
 
   it("harus masuk mode edit ketika tombol edit diklik", () => {
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
-    const editButton = screen.getByTitle("Edit");
-    fireEvent.click(editButton);
-    // Setelah edit, muncul tombol Simpan dan Batal
+    renderTable([mockUsers[0]]);
+    fireEvent.click(screen.getByTitle("Edit"));
     expect(screen.getByTitle("Simpan")).toBeInTheDocument();
     expect(screen.getByTitle("Batal")).toBeInTheDocument();
   });
 
   it("harus keluar dari mode edit saat tombol Batal diklik", () => {
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
-    const editButton = screen.getByTitle("Edit");
-    fireEvent.click(editButton);
+    renderTable([mockUsers[0]]);
+    fireEvent.click(screen.getByTitle("Edit"));
     expect(screen.getByTitle("Batal")).toBeInTheDocument();
     fireEvent.click(screen.getByTitle("Batal"));
     expect(screen.queryByTitle("Batal")).not.toBeInTheDocument();
   });
 
+  it("harus menampilkan input institusi dan keahlian terpilih dalam mode edit", () => {
+    renderTable([mockUsers[0]]);
+    fireEvent.click(screen.getByTitle("Edit"));
+    expect(screen.getByDisplayValue("Universitas A")).toBeInTheDocument();
+    // Keahlian yang sudah dimiliki tampil tercentang.
+    expect(screen.getByRole("checkbox", { name: /keperawatan/i })).toBeChecked();
+    expect(screen.getByRole("checkbox", { name: /kedokteran/i })).not.toBeChecked();
+  });
+
+  it("harus memperbarui pilihan keahlian saat checkbox di-toggle", () => {
+    renderTable([mockUsers[0]]);
+    fireEvent.click(screen.getByTitle("Edit"));
+    const kedokteran = screen.getByRole("checkbox", { name: /kedokteran/i });
+    fireEvent.click(kedokteran);
+    expect(kedokteran).toBeChecked();
+  });
+
   it("harus menampilkan konfirmasi sebelum menonaktifkan pengguna", () => {
     mockConfirm.mockReturnValue(false);
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
-    const deactivateButton = screen.getByTitle("Nonaktifkan");
-    fireEvent.click(deactivateButton);
+    renderTable([mockUsers[0]]);
+    fireEvent.click(screen.getByTitle("Nonaktifkan"));
     expect(mockConfirm).toHaveBeenCalledWith(expect.stringContaining("Admin Pertama"));
   });
 
   it("harus membatalkan nonaktifkan jika konfirmasi ditolak", () => {
     mockConfirm.mockReturnValue(false);
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
+    renderTable([mockUsers[0]]);
     fireEvent.click(screen.getByTitle("Nonaktifkan"));
     expect(mockFetch).not.toHaveBeenCalled();
   });
 
-  it("harus menyimpan edit pengguna berhasil saat fetch sukses", async () => {
+  it("harus menyimpan edit dengan institusi & expertise_area_ids saat fetch sukses", async () => {
     const updatedUser = { ...mockUsers[0], institution: "Universitas Baru" };
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => updatedUser,
-    });
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => updatedUser });
+    renderTable([mockUsers[0]]);
     fireEvent.click(screen.getByTitle("Edit"));
-    // Ubah institusi
     const institutionInput = screen.getByPlaceholderText("Institusi...");
     fireEvent.change(institutionInput, { target: { value: "Universitas Baru" } });
+    fireEvent.click(screen.getByRole("checkbox", { name: /kedokteran/i }));
     fireEvent.click(screen.getByTitle("Simpan"));
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
@@ -157,6 +201,9 @@ describe("UserTable", () => {
         expect.objectContaining({ method: "PATCH" }),
       );
     });
+    const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+    expect(body.institution).toBe("Universitas Baru");
+    expect(body.expertise_area_ids).toEqual(["area-1", "area-2"]);
   });
 
   it("harus menampilkan error saat simpan edit gagal", async () => {
@@ -164,7 +211,7 @@ describe("UserTable", () => {
       ok: false,
       json: async () => ({ detail: "Gagal update user" }),
     });
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
+    renderTable([mockUsers[0]]);
     fireEvent.click(screen.getByTitle("Edit"));
     fireEvent.click(screen.getByTitle("Simpan"));
     await waitFor(() => {
@@ -175,7 +222,7 @@ describe("UserTable", () => {
   it("harus menonaktifkan pengguna saat konfirmasi diterima", async () => {
     mockConfirm.mockReturnValue(true);
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
+    renderTable([mockUsers[0]]);
     fireEvent.click(screen.getByTitle("Nonaktifkan"));
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
@@ -191,66 +238,20 @@ describe("UserTable", () => {
       ok: false,
       json: async () => ({ detail: "Gagal nonaktifkan" }),
     });
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
+    renderTable([mockUsers[0]]);
     fireEvent.click(screen.getByTitle("Nonaktifkan"));
     await waitFor(() => {
       expect(screen.getByText("Gagal nonaktifkan")).toBeInTheDocument();
     });
   });
 
-  it("harus menampilkan input institusi dalam mode edit", () => {
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
-    fireEvent.click(screen.getByTitle("Edit"));
-    expect(screen.getByDisplayValue("Universitas A")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("Keperawatan")).toBeInTheDocument();
-  });
-
-  it("harus memperbarui expertise saat input area keahlian diubah", () => {
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
-    fireEvent.click(screen.getByTitle("Edit"));
-    const expertiseInput = screen.getByDisplayValue("Keperawatan");
-    fireEvent.change(expertiseInput, { target: { value: "Kedokteran" } });
-    expect(screen.getByDisplayValue("Kedokteran")).toBeInTheDocument();
-  });
-
-  it("harus menampilkan error jika nama kosong saat simpan edit", async () => {
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
-    fireEvent.click(screen.getByTitle("Edit"));
-    // Kosongkan input nama lengkap
-    const nameInput = screen.getByPlaceholderText("Nama lengkap");
-    fireEvent.change(nameInput, { target: { value: "" } });
-    fireEvent.click(screen.getByTitle("Simpan"));
-    await waitFor(() => {
-      expect(screen.getByText("Nama tidak boleh kosong.")).toBeInTheDocument();
-    });
-  });
-
-  it("harus memperbarui nilai nama lengkap saat input diubah", () => {
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
-    fireEvent.click(screen.getByTitle("Edit"));
-    const nameInput = screen.getByPlaceholderText("Nama lengkap");
-    fireEvent.change(nameInput, { target: { value: "Nama Baru" } });
-    expect(screen.getByDisplayValue("Nama Baru")).toBeInTheDocument();
-  });
-
-  it("harus mengisi institusi dan keahlian kosong saat edit user dengan data null", () => {
-    // mockUsers[1] punya institution: null dan expertise_area: null
-    render(<UserTable initialUsers={[mockUsers[1]]} />);
-    fireEvent.click(screen.getByTitle("Edit"));
-    // Input institusi dan keahlian harus kosong (??  "" applied)
-    const inputs = screen.getAllByRole("textbox");
-    // Semua input teks terbuka (nama, institusi, keahlian)
-    expect(inputs.length).toBeGreaterThan(0);
-  });
-
-  it("harus mengirim body dengan undefined saat institusi dan keahlian kosong", async () => {
+  it("harus mengirim body dengan undefined institusi saat data kosong", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ ...mockUsers[1], full_name: "Expert Satu" }),
+      json: async () => ({ ...mockUsers[1] }),
     });
-    render(<UserTable initialUsers={[mockUsers[1]]} />);
+    renderTable([mockUsers[1]]);
     fireEvent.click(screen.getByTitle("Edit"));
-    // institution dan expertise_area null → input kosong → trim() || undefined = undefined
     fireEvent.click(screen.getByTitle("Simpan"));
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith(
@@ -258,14 +259,14 @@ describe("UserTable", () => {
         expect.objectContaining({ method: "PATCH" }),
       );
     });
+    const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+    expect(body.institution).toBeUndefined();
+    expect(body.expertise_area_ids).toEqual([]);
   });
 
   it("harus menampilkan error fallback saat simpan edit gagal tanpa detail", async () => {
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({}),
-    });
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
+    mockFetch.mockResolvedValueOnce({ ok: false, json: async () => ({}) });
+    renderTable([mockUsers[0]]);
     fireEvent.click(screen.getByTitle("Edit"));
     fireEvent.click(screen.getByTitle("Simpan"));
     await waitFor(() => {
@@ -275,11 +276,8 @@ describe("UserTable", () => {
 
   it("harus menampilkan error fallback saat nonaktifkan gagal tanpa detail", async () => {
     mockConfirm.mockReturnValue(true);
-    mockFetch.mockResolvedValueOnce({
-      ok: false,
-      json: async () => ({}),
-    });
-    render(<UserTable initialUsers={[mockUsers[0]]} />);
+    mockFetch.mockResolvedValueOnce({ ok: false, json: async () => ({}) });
+    renderTable([mockUsers[0]]);
     fireEvent.click(screen.getByTitle("Nonaktifkan"));
     await waitFor(() => {
       expect(screen.getByText(/gagal menonaktifkan pengguna/i)).toBeInTheDocument();
@@ -287,33 +285,30 @@ describe("UserTable", () => {
   });
 
   it("harus menutup mode edit dan memperbarui data setelah simpan berhasil", async () => {
-    // Render dengan beberapa user agar ternary map mencakup kedua branch (match & no-match)
-    const updatedUser = { ...mockUsers[0], full_name: "Admin Diperbarui" };
+    const updatedUser = { ...mockUsers[0], institution: "Universitas Diperbarui" };
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => updatedUser });
-    render(<UserTable initialUsers={mockUsers} />);
+    renderTable(mockUsers);
     const editButtons = screen.getAllByTitle("Edit");
     fireEvent.click(editButtons[0]);
     expect(screen.getByTitle("Simpan")).toBeInTheDocument();
-    const nameInput = screen.getByPlaceholderText("Nama lengkap");
-    fireEvent.change(nameInput, { target: { value: "Admin Diperbarui" } });
+    const institutionInput = screen.getByPlaceholderText("Institusi...");
+    fireEvent.change(institutionInput, { target: { value: "Universitas Diperbarui" } });
     fireEvent.click(screen.getByTitle("Simpan"));
     await waitFor(() => {
       expect(screen.queryByTitle("Simpan")).not.toBeInTheDocument();
     });
-    expect(screen.getByText("Admin Diperbarui")).toBeInTheDocument();
+    expect(screen.getByText("Universitas Diperbarui")).toBeInTheDocument();
   });
 
   it("harus menampilkan badge Nonaktif setelah deaktivasi berhasil", async () => {
     mockConfirm.mockReturnValue(true);
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
-    // Render dengan beberapa user agar ternary map mencakup kedua branch
-    render(<UserTable initialUsers={mockUsers} />);
+    renderTable(mockUsers);
     const aktifBadges = screen.getAllByText("Aktif");
     expect(aktifBadges.length).toBeGreaterThan(0);
     const deactivateButtons = screen.getAllByTitle("Nonaktifkan");
     fireEvent.click(deactivateButtons[0]);
     await waitFor(() => {
-      // Setelah deaktivasi, badge Nonaktif bertambah satu
       const nonaktifBadges = screen.getAllByText("Nonaktif");
       expect(nonaktifBadges.length).toBeGreaterThan(1);
     });

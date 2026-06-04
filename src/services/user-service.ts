@@ -5,7 +5,7 @@
  * melalui backend REST API.
  */
 import { apiRequest } from "@/lib/api";
-import type { UserResponse, UserUpdate } from "@/types/user";
+import type { UserResponse, UserSelfUpdate, UserUpdate } from "@/types/user";
 import type { PaginationParams } from "@/types/common";
 
 /**
@@ -17,6 +17,22 @@ import type { PaginationParams } from "@/types/common";
  */
 export async function getMe(token: string): Promise<UserResponse> {
   return apiRequest<UserResponse>("/api/v1/users/me/", { token });
+}
+
+/**
+ * Memperbarui identitas pribadi pengguna yang sedang login.
+ *
+ * @param token - Access token dari session.
+ * @param data - Data identitas yang akan diperbarui (partial update).
+ * @returns Data profil pengguna setelah diperbarui.
+ * @throws {ApiError} Jika token tidak valid, atau nama lengkap kosong (400).
+ */
+export async function updateMe(token: string, data: UserSelfUpdate): Promise<UserResponse> {
+  return apiRequest<UserResponse>("/api/v1/users/me", {
+    method: "PATCH",
+    body: JSON.stringify(data),
+    token,
+  });
 }
 
 /**

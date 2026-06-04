@@ -88,7 +88,7 @@ const mockExperts: UserResponse[] = [
     email: "e@example.com",
     full_name: "Expert Satu",
     institution: "Univ A",
-    expertise_area: null,
+    expertise_areas: [],
     role: "expert",
     is_active: true,
     created_at: "2024-01-01T00:00:00Z",
