@@ -36,7 +36,8 @@ export const KisiKisiKonstruk = ({ domains }: KisiKisiKonstrukProps) => {
         <p className="text-sm font-semibold text-gray-800">Kisi-Kisi Konstruk (Dimensi)</p>
         <p className="mt-0.5 text-xs text-gray-500">
           Tabel acuan dimensi yang diukur instrumen ini. Bersifat read-only; gunakan sebagai panduan
-          sebelum memberi penilaian.
+          sebelum memberi penilaian. Warna pada setiap dimensi sama dengan warna latar item terkait
+          di tabel penilaian.
         </p>
       </div>
       <div className="overflow-x-auto">
@@ -64,7 +65,18 @@ export const KisiKisiKonstruk = ({ domains }: KisiKisiKonstrukProps) => {
             {domains.map((domain, idx) => (
               <tr key={domain.id} className="align-top">
                 <td className="px-4 py-3 text-sm text-gray-500 text-center">{idx + 1}</td>
-                <td className="px-4 py-3 text-sm font-medium text-gray-900">{domain.name}</td>
+                <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <span className="flex items-center gap-2">
+                    {domain.background_color && (
+                      <span
+                        className="inline-block h-3.5 w-3.5 shrink-0 rounded border border-black/10"
+                        style={{ backgroundColor: domain.background_color }}
+                        title={`Warna latar: ${domain.background_color}`}
+                      />
+                    )}
+                    {domain.name}
+                  </span>
+                </td>
                 <td className="px-4 py-3 text-xs text-gray-600 whitespace-pre-line">
                   {domain.construct_definition ?? "—"}
                 </td>

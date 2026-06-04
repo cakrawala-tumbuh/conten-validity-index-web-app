@@ -17,6 +17,8 @@ export interface DomainCreate {
   behavioral_indicator_example?: string | null;
   /** Referensi teori dari kisi-kisi (kolom F). */
   theory_reference?: string | null;
+  /** Warna latar dimensi dalam format hex `#RRGGBB`. */
+  background_color?: string | null;
 }
 
 /**
@@ -31,6 +33,8 @@ export interface DomainUpdate {
   behavioral_indicator_example?: string | null;
   /** Referensi teori dari kisi-kisi (kolom F). */
   theory_reference?: string | null;
+  /** Warna latar dimensi dalam format hex `#RRGGBB`. */
+  background_color?: string | null;
 }
 
 /**
@@ -46,6 +50,8 @@ export interface DomainResponse {
   behavioral_indicator_example: string | null;
   /** Referensi teori dari kisi-kisi (kolom F). */
   theory_reference: string | null;
+  /** Warna latar dimensi dalam format hex `#RRGGBB`, atau null bila tidak diatur. */
+  background_color: string | null;
   created_at: string;
   updated_at: string;
 }

@@ -26,6 +26,7 @@ const mockDomains: DomainResponse[] = [
     construct_definition: "Definisi konstruk kognitif.",
     behavioral_indicator_example: "Contoh indikator kognitif.",
     theory_reference: "Bloom (1956)",
+    background_color: null,
     created_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
   },
@@ -36,6 +37,7 @@ const mockDomains: DomainResponse[] = [
     construct_definition: null,
     behavioral_indicator_example: null,
     theory_reference: null,
+    background_color: null,
     created_at: "2024-02-01T00:00:00Z",
     updated_at: "2024-02-01T00:00:00Z",
   },
@@ -46,6 +48,7 @@ const mockDomains: DomainResponse[] = [
     construct_definition: null,
     behavioral_indicator_example: null,
     theory_reference: null,
+    background_color: null,
     created_at: "2024-03-01T00:00:00Z",
     updated_at: "2024-03-01T00:00:00Z",
   },
@@ -115,6 +118,7 @@ describe("DomainsManager", () => {
       construct_definition: "Definisi sosial.",
       behavioral_indicator_example: "Indikator sosial.",
       theory_reference: "Bandura (1977)",
+      background_color: null,
       created_at: "2024-04-01T00:00:00Z",
       updated_at: "2024-04-01T00:00:00Z",
     };
@@ -148,6 +152,7 @@ describe("DomainsManager", () => {
       construct_definition: "Definisi sosial.",
       behavioral_indicator_example: "Indikator sosial.",
       theory_reference: "Bandura (1977)",
+      background_color: null,
     });
     await waitFor(() => {
       expect(screen.getByText("Sosial")).toBeInTheDocument();
@@ -162,6 +167,7 @@ describe("DomainsManager", () => {
       construct_definition: null,
       behavioral_indicator_example: null,
       theory_reference: null,
+      background_color: null,
       created_at: "2024-06-01T00:00:00Z",
       updated_at: "2024-06-01T00:00:00Z",
     };
@@ -304,6 +310,7 @@ describe("DomainsManager", () => {
       construct_definition: null,
       behavioral_indicator_example: null,
       theory_reference: null,
+      background_color: null,
       created_at: "2024-05-01T00:00:00Z",
       updated_at: "2024-05-01T00:00:00Z",
     };

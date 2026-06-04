@@ -21,6 +21,7 @@ const makeDomain = (overrides: Partial<DomainResponse>): DomainResponse => ({
   construct_definition: null,
   behavioral_indicator_example: null,
   theory_reference: null,
+  background_color: null,
   created_at: "2024-01-01T00:00:00Z",
   updated_at: "2024-01-01T00:00:00Z",
   ...overrides,
@@ -49,6 +50,7 @@ describe("KisiKisiKonstruk", () => {
             construct_definition: "Sejauh mana kebijakan tetap stabil.",
             behavioral_indicator_example: "Frekuensi perubahan kebijakan.",
             theory_reference: "Rafferty & Griffin (2006)",
+            background_color: null,
           }),
         ]}
       />,
@@ -81,6 +83,7 @@ describe("KisiKisiKonstruk", () => {
             id: "dom-1",
             name: "Sebagian",
             theory_reference: "Hanya referensi teori.",
+            background_color: null,
           }),
         ]}
       />,

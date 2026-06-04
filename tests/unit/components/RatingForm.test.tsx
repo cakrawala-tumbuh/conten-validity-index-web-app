@@ -257,6 +257,7 @@ describe("RatingForm", () => {
         construct_definition: null,
         behavioral_indicator_example: null,
         theory_reference: null,
+        background_color: null,
         created_at: "2024-01-01T00:00:00Z",
         updated_at: "2024-01-01T00:00:00Z",
       },

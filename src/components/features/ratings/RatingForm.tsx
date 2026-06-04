@@ -83,6 +83,9 @@ export const RatingForm = ({
   // Peta id dimensi → nama dimensi untuk pelabelan cepat per item.
   const domainNameById = new Map(domains.map((domain) => [domain.id, domain.name]));
 
+  // Peta id dimensi → warna latar untuk membedakan item antar dimensi secara visual.
+  const domainColorById = new Map(domains.map((domain) => [domain.id, domain.background_color]));
+
   const initialState = (): Record<string, RatingState> => {
     const state: Record<string, RatingState> = {};
     for (const item of items) {
@@ -247,8 +250,27 @@ export const RatingForm = ({
           <tbody className="divide-y divide-gray-100">
             {items.map((item) => {
               const current = ratings[item.id];
+              const isUnrated = current.score === null;
+              // Warna latar dimensi (jika diatur) menjadi latar baris item.
+              const domainColor = item.domain_id
+                ? (domainColorById.get(item.domain_id) ?? null)
+                : null;
+              // Tanpa warna dimensi: pertahankan perilaku lama (kuning = belum dinilai).
+              // Dengan warna dimensi: warna jadi latar, status belum-dinilai ditandai
+              // aksen garis kiri kuning agar warna dimensi tetap terlihat.
+              const rowClassName = domainColor
+                ? isUnrated
+                  ? "border-l-4 border-yellow-400"
+                  : ""
+                : isUnrated
+                  ? "bg-yellow-50"
+                  : "bg-white";
               return (
-                <tr key={item.id} className={current.score !== null ? "bg-white" : "bg-yellow-50"}>
+                <tr
+                  key={item.id}
+                  className={rowClassName}
+                  style={domainColor ? { backgroundColor: domainColor } : undefined}
+                >
                   <td className="px-4 py-4 text-sm text-gray-500 text-center align-top">
                     {item.sequence_number}
                   </td>

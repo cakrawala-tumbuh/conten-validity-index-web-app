@@ -13,6 +13,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2, Plus, X, Layers } from "lucide-react";
 import type { DomainResponse } from "@/types/domain";
+import { ColorPicker } from "@/components/ui/ColorPicker";
 
 /**
  * Props untuk DomainsManager.
@@ -30,6 +31,8 @@ interface DomainFormState {
   construct_definition: string;
   behavioral_indicator_example: string;
   theory_reference: string;
+  /** Warna latar dimensi (hex `#RRGGBB`), atau string kosong bila tidak ada. */
+  background_color: string;
 }
 
 /**
@@ -40,6 +43,7 @@ const EMPTY_FORM: DomainFormState = {
   construct_definition: "",
   behavioral_indicator_example: "",
   theory_reference: "",
+  background_color: "",
 };
 
 /**
@@ -105,6 +109,7 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
       construct_definition: domain.construct_definition ?? "",
       behavioral_indicator_example: domain.behavioral_indicator_example ?? "",
       theory_reference: domain.theory_reference ?? "",
+      background_color: domain.background_color ?? "",
     });
     setError(null);
   };
@@ -138,6 +143,7 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
       construct_definition: toNullable(form.construct_definition),
       behavioral_indicator_example: toNullable(form.behavioral_indicator_example),
       theory_reference: toNullable(form.theory_reference),
+      background_color: toNullable(form.background_color),
     };
 
     try {
@@ -285,6 +291,17 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
               className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-400 focus:outline-none focus:ring-1 focus:ring-blue-400 resize-y"
             />
           </div>
+          <div className="space-y-1">
+            <label className="block text-xs font-medium text-gray-700">Warna Latar Dimensi</label>
+            <p className="text-xs text-gray-500">
+              Warna ini dipakai sebagai latar item milik dimensi ini pada tabel penilaian expert,
+              agar mudah dibedakan.
+            </p>
+            <ColorPicker
+              value={form.background_color || null}
+              onChange={(value) => setForm((prev) => ({ ...prev, background_color: value ?? "" }))}
+            />
+          </div>
           <div className="flex justify-end">
             <button
               type="button"
@@ -294,6 +311,28 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
             >
               {loading ? "Menyimpan..." : "Simpan Domain"}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Legenda warna dimensi */}
+      {domains.some((d) => d.background_color) && (
+        <div className="rounded-lg border border-gray-200 bg-white px-4 py-3">
+          <p className="mb-2 text-xs font-medium uppercase tracking-wider text-gray-500">
+            Keterangan Warna Dimensi
+          </p>
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {domains
+              .filter((d) => d.background_color)
+              .map((d) => (
+                <div key={d.id} className="flex items-center gap-2">
+                  <span
+                    className="inline-block h-4 w-4 rounded border border-black/10"
+                    style={{ backgroundColor: d.background_color ?? undefined }}
+                  />
+                  <span className="text-xs text-gray-700">{d.name}</span>
+                </div>
+              ))}
           </div>
         </div>
       )}
@@ -320,6 +359,9 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                   Nama Domain
                 </th>
+                <th className="w-20 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                  Warna
+                </th>
                 <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                   Definisi Konstruk
                 </th>
@@ -337,6 +379,21 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
                   </td>
                   <td className="px-4 py-3 text-sm font-medium text-gray-900 align-top">
                     {domain.name}
+                  </td>
+                  <td className="px-4 py-3 align-top">
+                    {domain.background_color ? (
+                      <span className="flex items-center gap-1.5">
+                        <span
+                          className="inline-block h-4 w-4 rounded border border-black/10"
+                          style={{ backgroundColor: domain.background_color }}
+                        />
+                        <span className="font-mono text-xs text-gray-500">
+                          {domain.background_color}
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="text-xs italic text-gray-300">—</span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-xs text-gray-500 align-top">
                     {domain.construct_definition ? (
