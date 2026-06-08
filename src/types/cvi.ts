@@ -25,6 +25,46 @@ export interface ItemCVIResult {
 }
 
 /**
+ * Penilaian seorang expert untuk satu item instrumen.
+ */
+export interface ItemRatingByExpert {
+  item_id: string;
+  sequence_number: number;
+  content: string;
+  domain_id: string | null;
+  /** Skor relevansi 1–4, atau null jika belum dinilai. */
+  relevance_score: number | null;
+  notes: string | null;
+  /** True jika skor >= 3, null jika belum dinilai. */
+  is_relevant: boolean | null;
+}
+
+/**
+ * Ringkasan penilaian seorang expert untuk seluruh item instrumen.
+ */
+export interface ExpertRatingSummary {
+  assignment_id: string;
+  user_id: string;
+  expert_name: string;
+  institution: string | null;
+  /** Status assignment: pending | in_progress | completed */
+  status: string;
+  deadline: string | null;
+  ratings: ItemRatingByExpert[];
+}
+
+/**
+ * Tampilan penilaian per expert untuk sebuah instrumen (admin only).
+ */
+export interface InstrumentExpertRatingsResponse {
+  instrument_id: string;
+  instrument_name: string;
+  n_items: number;
+  n_experts: number;
+  experts: ExpertRatingSummary[];
+}
+
+/**
  * Hasil kalkulasi CVI lengkap untuk satu instrumen.
  */
 export interface CVIResult {

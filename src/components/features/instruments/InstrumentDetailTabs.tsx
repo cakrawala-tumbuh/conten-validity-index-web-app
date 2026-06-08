@@ -8,11 +8,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Info, List, Users, BarChart3, Layers } from "lucide-react";
+import { Info, List, Users, BarChart3, Layers, ClipboardList } from "lucide-react";
 import { ItemsManager } from "@/components/features/instruments/ItemsManager";
 import { DomainsManager } from "@/components/features/instruments/DomainsManager";
 import { AssignmentManager } from "@/components/features/instruments/AssignmentManager";
 import { CVISection } from "@/components/features/instruments/CVISection";
+import { ExpertRatingsSection } from "@/components/features/instruments/ExpertRatingsSection";
 import { INSTRUMENT_STATUS_LABELS } from "@/constants";
 import type { InstrumentResponse, InstrumentUpdate } from "@/types/instrument";
 import type { ItemResponse } from "@/types/item";
@@ -23,7 +24,7 @@ import type { UserResponse } from "@/types/user";
 /**
  * Tab yang tersedia pada halaman detail instrumen.
  */
-type Tab = "info" | "items" | "domains" | "experts" | "cvi";
+type Tab = "info" | "items" | "domains" | "experts" | "expert-ratings" | "cvi";
 
 /**
  * Props untuk InstrumentDetailTabs.
@@ -62,6 +63,11 @@ export const InstrumentDetailTabs = ({
     { id: "items", label: `Item (${items.length})`, icon: <List className="h-4 w-4" /> },
     { id: "domains", label: `Dimensi (${domains.length})`, icon: <Layers className="h-4 w-4" /> },
     { id: "experts", label: `Expert (${assignments.length})`, icon: <Users className="h-4 w-4" /> },
+    {
+      id: "expert-ratings",
+      label: "Penilaian Expert",
+      icon: <ClipboardList className="h-4 w-4" />,
+    },
     { id: "cvi", label: "Hasil CVI", icon: <BarChart3 className="h-4 w-4" /> },
   ];
 
@@ -103,6 +109,9 @@ export const InstrumentDetailTabs = ({
             initialAssignments={assignments}
             availableExperts={experts}
           />
+        )}
+        {activeTab === "expert-ratings" && (
+          <ExpertRatingsSection instrumentId={instrument.id} />
         )}
         {activeTab === "cvi" && (
           <CVISection instrumentId={instrument.id} instrumentName={instrument.name} />
