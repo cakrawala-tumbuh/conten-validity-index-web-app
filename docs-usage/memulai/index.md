@@ -12,9 +12,9 @@ CVI Manager adalah aplikasi web yang dijalankan melalui browser:
 - **Browser yang didukung**: Chrome, Firefox, Edge, atau Safari versi terbaru.
 
 !!! info "Bisa dipasang sebagai aplikasi"
-    CVI Manager adalah Progressive Web App (PWA). Di browser yang mendukung,
-    Anda dapat memilih **"Pasang aplikasi"** agar CVI Manager muncul seperti
-    aplikasi biasa di perangkat Anda.
+CVI Manager adalah Progressive Web App (PWA). Di browser yang mendukung,
+Anda dapat memilih **"Pasang aplikasi"** agar CVI Manager muncul seperti
+aplikasi biasa di perangkat Anda.
 
 ---
 
@@ -29,8 +29,8 @@ oleh **Authentik (Single Sign-On)**.
 4. Anda akan kembali ke CVI Manager dalam keadaan sudah masuk.
 
 !!! tip "Tidak punya akses?"
-    Akun dan peran (role) diatur oleh administrator melalui Authentik.
-    Jika tombol login gagal atau Anda tidak punya akses, hubungi administrator.
+Akun dan peran (role) diatur oleh administrator melalui Authentik.
+Jika tombol login gagal atau Anda tidak punya akses, hubungi administrator.
 
 <!-- Screenshot: halaman login dengan tombol "Masuk dengan Authentik" -->
 
@@ -40,10 +40,10 @@ oleh **Authentik (Single Sign-On)**.
 
 Tampilan aplikasi menyesuaikan peran Anda secara otomatis:
 
-| Peran | Diarahkan ke | Menu yang tersedia |
-|---|---|---|
-| **Admin** | Daftar **Instrumen** | Instrumen, Pengguna, Bidang Keahlian, Log Aktivitas, Profil Saya |
-| **Expert** | **Penilaian Saya** | Penilaian Saya, Profil Saya |
+| Peran      | Diarahkan ke         | Menu yang tersedia                                               |
+| ---------- | -------------------- | ---------------------------------------------------------------- |
+| **Admin**  | Daftar **Instrumen** | Instrumen, Pengguna, Bidang Keahlian, Log Aktivitas, Profil Saya |
+| **Expert** | **Penilaian Saya**   | Penilaian Saya, Profil Saya                                      |
 
 Peran ditentukan oleh keanggotaan grup di Authentik:
 

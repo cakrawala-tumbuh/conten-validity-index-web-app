@@ -15,13 +15,13 @@ Klik menu **Profil Saya** di sidebar.
 
 ## Field Profil
 
-| Field | Dapat diubah? | Keterangan |
-|---|---|---|
-| **Email** | Tidak | Dikelola oleh penyedia login (Authentik) |
-| **Role** | Tidak | Ditentukan oleh grup Authentik |
-| **Nama Lengkap** | Ya (wajib) | Nama tampilan Anda |
-| **Institusi** | Ya | Mis. *Universitas Gadjah Mada* |
-| **Bidang Keahlian** | Ya | Dipilih dari daftar master bidang keahlian |
+| Field               | Dapat diubah? | Keterangan                                 |
+| ------------------- | ------------- | ------------------------------------------ |
+| **Email**           | Tidak         | Dikelola oleh penyedia login (Authentik)   |
+| **Role**            | Tidak         | Ditentukan oleh grup Authentik             |
+| **Nama Lengkap**    | Ya (wajib)    | Nama tampilan Anda                         |
+| **Institusi**       | Ya            | Mis. _Universitas Gadjah Mada_             |
+| **Bidang Keahlian** | Ya            | Dipilih dari daftar master bidang keahlian |
 
 ---
 
@@ -31,10 +31,10 @@ Klik menu **Profil Saya** di sidebar.
 2. Klik **Simpan Perubahan**.
 
 !!! note "Email dan Role bersifat read-only"
-    Kedua field ini berasal dari Authentik dan tidak dapat diubah dari CVI Manager.
-    Hubungi administrator bila perlu mengubahnya.
+Kedua field ini berasal dari Authentik dan tidak dapat diubah dari CVI Manager.
+Hubungi administrator bila perlu mengubahnya.
 
 !!! tip "Lengkapi bidang keahlian Anda"
-    Bagi expert, mengisi bidang keahlian membantu admin menugaskan instrumen yang
-    sesuai dengan kepakaran Anda. Pilihan bidang keahlian berasal dari daftar master
-    yang dikelola admin di [Bidang Keahlian](bidang-keahlian.md).
+Bagi expert, mengisi bidang keahlian membantu admin menugaskan instrumen yang
+sesuai dengan kepakaran Anda. Pilihan bidang keahlian berasal dari daftar master
+yang dikelola admin di [Bidang Keahlian](bidang-keahlian.md).

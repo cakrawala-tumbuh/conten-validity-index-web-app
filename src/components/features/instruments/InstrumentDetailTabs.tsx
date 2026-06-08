@@ -110,9 +110,7 @@ export const InstrumentDetailTabs = ({
             availableExperts={experts}
           />
         )}
-        {activeTab === "expert-ratings" && (
-          <ExpertRatingsSection instrumentId={instrument.id} />
-        )}
+        {activeTab === "expert-ratings" && <ExpertRatingsSection instrumentId={instrument.id} />}
         {activeTab === "cvi" && (
           <CVISection instrumentId={instrument.id} instrumentName={instrument.name} />
         )}

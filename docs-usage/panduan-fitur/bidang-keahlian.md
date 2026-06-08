@@ -1,7 +1,7 @@
 # Bidang Keahlian
 
-**Bidang Keahlian** adalah daftar master kategori keahlian (mis. *Psikologi
-Pendidikan*, *Statistika*) yang dapat ditetapkan ke expert. Daftar ini dikelola
+**Bidang Keahlian** adalah daftar master kategori keahlian (mis. _Psikologi
+Pendidikan_, _Statistika_) yang dapat ditetapkan ke expert. Daftar ini dikelola
 oleh **Admin** dan menjadi pilihan saat mengisi profil pengguna atau expert.
 
 ---
@@ -18,7 +18,7 @@ keahlian dengan kolom **Nama** dan **Deskripsi**, beserta aksi Edit dan Hapus.
 ## Menambah Bidang Keahlian
 
 1. Klik **Tambah Bidang Keahlian**.
-2. Isi **Nama** (wajib) — mis. *Psikologi Pendidikan*.
+2. Isi **Nama** (wajib) — mis. _Psikologi Pendidikan_.
 3. Isi **Deskripsi** (opsional).
 4. Klik **Simpan**.
 
@@ -38,9 +38,9 @@ keahlian dengan kolom **Nama** dan **Deskripsi**, beserta aksi Edit dan Hapus.
 2. Konfirmasi pada dialog yang muncul.
 
 !!! warning "Keterkaitan dengan expert akan dilepaskan"
-    Menghapus sebuah bidang keahlian akan melepaskan kaitannya dari semua expert
-    yang sebelumnya memilikinya. Data expert tidak terhapus, hanya kaitan bidang
-    keahlian tersebut yang hilang.
+Menghapus sebuah bidang keahlian akan melepaskan kaitannya dari semua expert
+yang sebelumnya memilikinya. Data expert tidak terhapus, hanya kaitan bidang
+keahlian tersebut yang hilang.
 
 ---
 

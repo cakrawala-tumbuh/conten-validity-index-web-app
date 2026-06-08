@@ -70,20 +70,20 @@ extra:
 nav:
   - Beranda: index.md
   - Memulai:
-    - Cara Memulai: memulai/index.md
+      - Cara Memulai: memulai/index.md
   - Panduan Fitur:
-    - Semua Fitur: panduan-fitur/index.md
-    - Mengelola Instrumen: panduan-fitur/instrumen.md
-    - Hasil CVI: panduan-fitur/hasil-cvi.md
-    - Penilaian Saya (Expert): panduan-fitur/penilaian-saya.md
-    - Mengelola Pengguna: panduan-fitur/pengguna.md
-    - Bidang Keahlian: panduan-fitur/bidang-keahlian.md
-    - Log Aktivitas: panduan-fitur/log-aktivitas.md
-    - Profil Saya: panduan-fitur/profil-saya.md
+      - Semua Fitur: panduan-fitur/index.md
+      - Mengelola Instrumen: panduan-fitur/instrumen.md
+      - Hasil CVI: panduan-fitur/hasil-cvi.md
+      - Penilaian Saya (Expert): panduan-fitur/penilaian-saya.md
+      - Mengelola Pengguna: panduan-fitur/pengguna.md
+      - Bidang Keahlian: panduan-fitur/bidang-keahlian.md
+      - Log Aktivitas: panduan-fitur/log-aktivitas.md
+      - Profil Saya: panduan-fitur/profil-saya.md
   - Tutorial:
-    - Daftar Tutorial: tutorial/index.md
-    - Membuat & Menghitung CVI: tutorial/membuat-dan-menghitung-cvi.md
-    - Menilai Instrumen (Expert): tutorial/menilai-instrumen.md
+      - Daftar Tutorial: tutorial/index.md
+      - Membuat & Menghitung CVI: tutorial/membuat-dan-menghitung-cvi.md
+      - Menilai Instrumen (Expert): tutorial/menilai-instrumen.md
   - Referensi:
-    - Memahami CVI: referensi/memahami-cvi.md
-    - FAQ: referensi/faq.md
+      - Memahami CVI: referensi/memahami-cvi.md
+      - FAQ: referensi/faq.md

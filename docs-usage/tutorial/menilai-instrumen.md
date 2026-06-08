@@ -31,16 +31,16 @@ agar penilaian Anda konsisten.
 
 Untuk setiap item, pilih skor relevansi:
 
-| Skor | Arti |
-|---|---|
-| 1 | Tidak Relevan |
-| 2 | Kurang Relevan |
-| 3 | Cukup Relevan |
-| 4 | Sangat Relevan |
+| Skor | Arti           |
+| ---- | -------------- |
+| 1    | Tidak Relevan  |
+| 2    | Kurang Relevan |
+| 3    | Cukup Relevan  |
+| 4    | Sangat Relevan |
 
 !!! warning "Skor 1 atau 2 wajib disertai catatan"
-    Bila Anda memilih skor **1** atau **2**, isi kolom **Catatan** pada item
-    tersebut untuk menjelaskan alasannya. Tanpa catatan, penilaian tidak dapat disimpan.
+Bila Anda memilih skor **1** atau **2**, isi kolom **Catatan** pada item
+tersebut untuk menjelaskan alasannya. Tanpa catatan, penilaian tidak dapat disimpan.
 
 Pantau indikator **Progres** di bagian atas untuk memastikan semua item terisi.
 
@@ -53,8 +53,8 @@ Pantau indikator **Progres** di bagian atas untuk memastikan semua item terisi.
 3. Tunggu konfirmasi **"Penilaian berhasil disimpan!"**.
 
 !!! tip "Bisa dilanjutkan nanti"
-    Anda dapat menyimpan lalu kembali kapan saja melalui **Penilaian Saya**.
-    Form akan terisi otomatis dengan penilaian yang sudah ada.
+Anda dapat menyimpan lalu kembali kapan saja melalui **Penilaian Saya**.
+Form akan terisi otomatis dengan penilaian yang sudah ada.
 
 ---
 
@@ -64,5 +64,5 @@ Penilaian Anda tersimpan dan status penugasan berubah menjadi **Selesai**. Admin
 kemudian dapat menggabungkan penilaian semua expert untuk menghitung CVI.
 
 !!! success "Selamat!"
-    Tutorial selesai. Lihat [Memahami CVI](../referensi/memahami-cvi.md) bila ingin
-    tahu bagaimana skor Anda dipakai dalam perhitungan.
+Tutorial selesai. Lihat [Memahami CVI](../referensi/memahami-cvi.md) bila ingin
+tahu bagaimana skor Anda dipakai dalam perhitungan.

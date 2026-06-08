@@ -1,32 +1,37 @@
-.DEFAULT_GOAL := ci
-.PHONY: lint test ci clean
+.DEFAULT_GOAL := test
+.PHONY: build lint unit test clean help
 
-# Sama dengan .github/workflows/lint.yml — berjalan di dalam Docker
-# (tidak memerlukan Node.js atau npm terinstal di lokal)
-lint:
-	docker build -t cvi-web:test --target test .
+IMAGE_NAME := cvi-web-test
+
+build:
+	docker build -f Dockerfile -t $(IMAGE_NAME) --target test .
+
+lint: build
+	docker run --rm -e NODE_ENV=test $(IMAGE_NAME) npm run lint
+	docker run --rm -e NODE_ENV=test $(IMAGE_NAME) npm run format:check
+	docker run --rm -e NODE_ENV=test $(IMAGE_NAME) npm run type-check
+
+unit: build
 	docker run --rm \
 		-e NODE_ENV=test \
-		cvi-web:test npm run lint
-	docker run --rm \
-		-e NODE_ENV=test \
-		cvi-web:test npm run format:check
-	docker run --rm \
-		-e NODE_ENV=test \
-		cvi-web:test npm run type-check
+		-e NEXTAUTH_SECRET=test-secret \
+		-e NEXTAUTH_URL=http://localhost:3000 \
+		-e AUTHENTIK_CLIENT_ID=test-client-id \
+		-e AUTHENTIK_CLIENT_SECRET=test-client-secret \
+		-e AUTHENTIK_ISSUER_URL=http://authentik-server:9000/application/o/cvi/ \
+		-e BACKEND_API_INTERNAL_URL=http://backend:8000 \
+		-e NEXT_PUBLIC_API_URL=http://localhost:8000 \
+		$(IMAGE_NAME) npm run test:coverage
 
-# Sama dengan .github/workflows/test.yml — berjalan di dalam Docker
-# (tidak menghasilkan artefak di lokal, tidak memerlukan npm ci)
-test:
-	docker build -t cvi-web:test --target test .
-	docker compose -f docker-compose.test.yml up \
-		--build \
-		--abort-on-container-exit \
-		--exit-code-from test
-	docker compose -f docker-compose.test.yml down --volumes
-
-ci: lint test
+test: lint unit
 
 clean:
-	docker compose -f docker-compose.test.yml down --volumes --rmi local 2>/dev/null || true
-	docker rmi cvi-web:test 2>/dev/null || true
+	docker rmi $(IMAGE_NAME) 2>/dev/null || true
+
+help:
+	@echo "Targets:"
+	@echo "  make build   Bangun image test"
+	@echo "  make lint    Linter (ESLint + Prettier + TypeScript) di dalam container"
+	@echo "  make unit    Unit test (Jest) di dalam container"
+	@echo "  make test    Gate lengkap: lint + unit (default)"
+	@echo "  make clean   Hapus image test"

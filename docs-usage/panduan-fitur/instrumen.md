@@ -23,24 +23,24 @@ dengan kolom:
 
 1. Di halaman **Instrumen**, klik tombol **+ Buat Instrumen**.
 2. Isi field berikut:
-   - **Nama Instrumen** (wajib) — mis. *WCP Survey — Workplace Characteristics Profile*.
+   - **Nama Instrumen** (wajib) — mis. _WCP Survey — Workplace Characteristics Profile_.
    - **Deskripsi** (opsional) — penjelasan singkat instrumen.
    - **Versi** — default `1.0`.
 3. **(Opsional) Tambahkan Dimensi/Domain.** Klik **+ Tambah Dimensi** lalu beri
-   nama tiap dimensi (mis. *Kognitif*, *Afektif*). Dimensi dipakai untuk
+   nama tiap dimensi (mis. _Kognitif_, _Afektif_). Dimensi dipakai untuk
    mengelompokkan item.
 4. **Tambahkan Item.** Klik **+ Tambah Item** untuk setiap pernyataan. Isi konten
    item, dan bila sudah ada dimensi, pilih dimensi item dari dropdown.
 5. Klik **Buat Instrumen**.
 
 !!! note "Urutan pembuatan"
-    Sistem menyimpan instrumen lebih dulu, lalu dimensinya, lalu item-nya. Karena
-    itu dropdown dimensi pada item baru aktif hanya setelah Anda mengetik nama
-    dimensi di bagian atas form.
+Sistem menyimpan instrumen lebih dulu, lalu dimensinya, lalu item-nya. Karena
+itu dropdown dimensi pada item baru aktif hanya setelah Anda mengetik nama
+dimensi di bagian atas form.
 
 !!! tip "Tidak harus lengkap di awal"
-    Anda bisa membuat instrumen hanya dengan nama, lalu menambah item dan dimensi
-    kemudian melalui halaman detail.
+Anda bisa membuat instrumen hanya dengan nama, lalu menambah item dan dimensi
+kemudian melalui halaman detail.
 
 ---
 
@@ -48,13 +48,13 @@ dengan kolom:
 
 Dari daftar instrumen, klik **Detail**. Halaman detail tersusun dalam lima tab:
 
-| Tab | Fungsi |
-|---|---|
+| Tab           | Fungsi                                                           |
+| ------------- | ---------------------------------------------------------------- |
 | **Informasi** | Ubah nama/deskripsi/versi/status instrumen, atau hapus instrumen |
-| **Item** | Kelola daftar item (tambah, edit, hapus, tambah massal) |
-| **Dimensi** | Kelola dimensi beserta kisi-kisi konstruk |
-| **Expert** | Menugaskan dan melepas expert penilai |
-| **Hasil CVI** | Menghitung dan mengekspor hasil CVI |
+| **Item**      | Kelola daftar item (tambah, edit, hapus, tambah massal)          |
+| **Dimensi**   | Kelola dimensi beserta kisi-kisi konstruk                        |
+| **Expert**    | Menugaskan dan melepas expert penilai                            |
+| **Hasil CVI** | Menghitung dan mengekspor hasil CVI                              |
 
 <!-- Screenshot: tab navigasi halaman detail instrumen -->
 
@@ -64,8 +64,8 @@ Ubah **nama**, **deskripsi**, **versi**, dan **status** instrumen, lalu simpan.
 Tab ini juga menyediakan aksi **hapus instrumen**.
 
 !!! danger "Menghapus instrumen"
-    Menghapus instrumen akan menghapus seluruh item, dimensi, penugasan, dan
-    penilaian yang terkait. Tindakan ini tidak dapat dibatalkan.
+Menghapus instrumen akan menghapus seluruh item, dimensi, penugasan, dan
+penilaian yang terkait. Tindakan ini tidak dapat dibatalkan.
 
 ### Tab Item
 
@@ -122,18 +122,18 @@ Tabel penugasan menampilkan status tiap expert:
 Untuk melepas penugasan, klik ikon **hapus** pada baris expert tersebut.
 
 !!! tip "Berapa expert yang ideal?"
-    Jumlah expert memengaruhi ambang validitas CVI. Lihat
-    [Memahami CVI](../referensi/memahami-cvi.md) untuk penjelasan ambang
-    berdasarkan jumlah penilai.
+Jumlah expert memengaruhi ambang validitas CVI. Lihat
+[Memahami CVI](../referensi/memahami-cvi.md) untuk penjelasan ambang
+berdasarkan jumlah penilai.
 
 ---
 
 ## Tips & Catatan
 
 !!! tip "Susun dimensi sebelum item"
-    Mendefinisikan dimensi lebih dulu memudahkan Anda mengelompokkan item saat
-    menambahkannya, sekaligus melengkapi kisi-kisi konstruk untuk expert.
+Mendefinisikan dimensi lebih dulu memudahkan Anda mengelompokkan item saat
+menambahkannya, sekaligus melengkapi kisi-kisi konstruk untuk expert.
 
 !!! warning "Perubahan item setelah penilaian"
-    Mengubah atau menghapus item setelah expert mulai menilai dapat memengaruhi
-    konsistensi hasil. Lakukan perubahan item sebelum penugasan bila memungkinkan.
+Mengubah atau menghapus item setelah expert mulai menilai dapat memengaruhi
+konsistensi hasil. Lakukan perubahan item sebelum penugasan bila memungkinkan.

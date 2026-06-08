@@ -13,12 +13,12 @@ beberapa ahli (expert).
 
 Setiap expert menilai tiap item dengan skala 1–4:
 
-| Skor | Arti | Dihitung sebagai |
-|---|---|---|
-| 1 | Tidak Relevan | tidak relevan |
-| 2 | Kurang Relevan | tidak relevan |
-| 3 | Cukup Relevan | **relevan** |
-| 4 | Sangat Relevan | **relevan** |
+| Skor | Arti           | Dihitung sebagai |
+| ---- | -------------- | ---------------- |
+| 1    | Tidak Relevan  | tidak relevan    |
+| 2    | Kurang Relevan | tidak relevan    |
+| 3    | Cukup Relevan  | **relevan**      |
+| 4    | Sangat Relevan | **relevan**      |
 
 Dalam perhitungan, skor **3 dan 4 dianggap "relevan"**, sedangkan 1 dan 2 tidak.
 
@@ -41,10 +41,10 @@ Nilai I-CVI berkisar antara 0,0 dan 1,0. Makin tinggi, makin disepakati relevan.
 
 Sebuah item dianggap **Valid** bila I-CVI-nya mencapai ambang berikut (Lynn, 1986):
 
-| Jumlah Expert | Ambang I-CVI |
-|---|---|
-| 3 – 5 expert | **0,83** |
-| 6 expert atau lebih | **0,78** |
+| Jumlah Expert       | Ambang I-CVI |
+| ------------------- | ------------ |
+| 3 – 5 expert        | **0,83**     |
+| 6 expert atau lebih | **0,78**     |
 
 Karena itu, badge **Valid / Tidak Valid** pada tabel hasil bergantung pada berapa
 banyak expert yang menilai.
@@ -56,15 +56,15 @@ banyak expert yang menilai.
 S-CVI mengukur validitas **keseluruhan instrumen**. Ada dua cara hitung yang
 keduanya ditampilkan CVI Manager:
 
-- **S-CVI/Ave** (*Average*) — rata-rata dari seluruh I-CVI item. Menggambarkan
+- **S-CVI/Ave** (_Average_) — rata-rata dari seluruh I-CVI item. Menggambarkan
   rata-rata relevansi instrumen.
-- **S-CVI/UA** (*Universal Agreement*) — proporsi item yang dinilai relevan oleh
+- **S-CVI/UA** (_Universal Agreement_) — proporsi item yang dinilai relevan oleh
   **semua** expert (I-CVI = 1,0). Ukuran yang lebih ketat.
 
 !!! info "Acuan umum"
-    Sebagai pedoman yang banyak dipakai, instrumen dianggap memiliki validitas isi
-    yang baik bila **S-CVI/Ave ≥ 0,90**. Selalu sesuaikan dengan standar bidang
-    penelitian Anda.
+Sebagai pedoman yang banyak dipakai, instrumen dianggap memiliki validitas isi
+yang baik bila **S-CVI/Ave ≥ 0,90**. Selalu sesuaikan dengan standar bidang
+penelitian Anda.
 
 ---
 
@@ -81,5 +81,5 @@ keduanya ditampilkan CVI Manager:
 
 ## Referensi
 
-Lynn, M. R. (1986). *Determination and quantification of content validity.*
+Lynn, M. R. (1986). _Determination and quantification of content validity._
 Nursing Research, 35(6), 382–385.

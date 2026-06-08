@@ -19,9 +19,9 @@ beserta jumlah total pengguna, dengan kolom:
 - **Aksi** (Edit, Nonaktifkan)
 
 !!! info "Pengguna dibuat otomatis saat login pertama"
-    Anda tidak menambah pengguna secara manual. Setiap orang yang berhasil login
-    melalui Authentik akan otomatis terdaftar di sistem, dengan role mengikuti
-    grup Authentik-nya.
+Anda tidak menambah pengguna secara manual. Setiap orang yang berhasil login
+melalui Authentik akan otomatis terdaftar di sistem, dengan role mengikuti
+grup Authentik-nya.
 
 <!-- Screenshot: tabel daftar pengguna -->
 
@@ -34,8 +34,8 @@ beserta jumlah total pengguna, dengan kolom:
 3. Klik **Simpan**.
 
 !!! note "Email dan role tidak dapat diubah di sini"
-    Email dan role berasal dari Authentik. Untuk mengubahnya, lakukan di Authentik,
-    bukan di CVI Manager.
+Email dan role berasal dari Authentik. Untuk mengubahnya, lakukan di Authentik,
+bukan di CVI Manager.
 
 ---
 
@@ -48,8 +48,8 @@ Pengguna yang dinonaktifkan **tidak dapat login lagi**. Ini adalah penonaktifan
 (soft delete), bukan penghapusan permanen, sehingga riwayat dan data terkait tetap utuh.
 
 !!! warning "Periksa penugasan aktif"
-    Sebelum menonaktifkan seorang expert, pastikan penugasan penilaiannya sudah
-    selesai atau dialihkan, agar tidak ada penilaian yang tertinggal.
+Sebelum menonaktifkan seorang expert, pastikan penugasan penilaiannya sudah
+selesai atau dialihkan, agar tidak ada penilaian yang tertinggal.
 
 ---
 
