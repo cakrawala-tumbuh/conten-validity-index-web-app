@@ -16,6 +16,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   UserCog,
+  Database,
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -58,6 +59,7 @@ const ADMIN_NAV: NavItem[] = [
   { href: "/users", label: "Pengguna", icon: Users },
   { href: "/expertise-areas", label: "Bidang Keahlian", icon: GraduationCap },
   { href: "/activity-logs", label: "Log Aktivitas", icon: Activity },
+  { href: "/backup", label: "Backup & Restore", icon: Database },
   PROFILE_NAV,
 ];
 

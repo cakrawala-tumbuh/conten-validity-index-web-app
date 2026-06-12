@@ -76,6 +76,12 @@ describe("Sidebar", () => {
       const link = screen.getByRole("link", { name: /profil saya/i });
       expect(link).toHaveAttribute("href", "/profile");
     });
+
+    it("harus memiliki link ke /backup (Backup & Restore)", () => {
+      render(<Sidebar role="admin" />);
+      const link = screen.getByRole("link", { name: /backup & restore/i });
+      expect(link).toHaveAttribute("href", "/backup");
+    });
   });
 
   describe("role: expert", () => {
