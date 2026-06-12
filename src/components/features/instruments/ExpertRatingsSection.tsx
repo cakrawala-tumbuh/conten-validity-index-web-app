@@ -10,6 +10,7 @@
 import { useState } from "react";
 import { ClipboardList, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
 import type { ExpertRatingSummary, InstrumentExpertRatingsResponse } from "@/types/cvi";
+import { TableInfoTooltip } from "@/components/ui/Tooltip";
 
 /**
  * Props untuk ExpertRatingsSection.
@@ -107,53 +108,61 @@ const ExpertCard = ({
 
       {/* Tabel penilaian per item */}
       {open && (
-        <div className="border-t border-gray-200 overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-100">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="w-12 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  No.
-                </th>
-                <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Konten Item
-                </th>
-                <th className="w-40 px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Skor
-                </th>
-                <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Catatan
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {expert.ratings.map((rating) => (
-                <tr
-                  key={rating.item_id}
-                  className={rating.relevance_score === null ? "bg-gray-50/60" : "hover:bg-gray-50"}
-                >
-                  <td className="px-4 py-2.5 text-sm text-gray-400 text-center">
-                    {rating.sequence_number}
-                  </td>
-                  <td className="px-4 py-2.5 text-sm text-gray-800">{rating.content}</td>
-                  <td className="px-4 py-2.5 text-center">
-                    {rating.relevance_score !== null ? (
-                      <span
-                        className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${SCORE_COLORS[rating.relevance_score] ?? ""}`}
-                        title={SCORE_LABELS[rating.relevance_score]}
-                      >
-                        {rating.relevance_score} — {SCORE_LABELS[rating.relevance_score]}
-                      </span>
-                    ) : (
-                      <span className="text-xs text-gray-400 italic">Belum dinilai</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-2.5 text-sm text-gray-600">
-                    {rating.notes ?? <span className="text-gray-300">—</span>}
-                  </td>
+        <div className="border-t border-gray-200">
+          <div className="flex items-center gap-1.5 px-4 py-2.5">
+            <p className="text-xs font-medium text-gray-600">Rincian Penilaian per Item</p>
+            <TableInfoTooltip description="Rincian skor relevansi (1–4) yang diberikan expert ini untuk tiap item beserta catatannya. Item yang belum dinilai ditampilkan abu-abu." />
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-100">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="w-12 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    No.
+                  </th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Konten Item
+                  </th>
+                  <th className="w-40 px-4 py-2.5 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Skor
+                  </th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Catatan
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {expert.ratings.map((rating) => (
+                  <tr
+                    key={rating.item_id}
+                    className={
+                      rating.relevance_score === null ? "bg-gray-50/60" : "hover:bg-gray-50"
+                    }
+                  >
+                    <td className="px-4 py-2.5 text-sm text-gray-400 text-center">
+                      {rating.sequence_number}
+                    </td>
+                    <td className="px-4 py-2.5 text-sm text-gray-800">{rating.content}</td>
+                    <td className="px-4 py-2.5 text-center">
+                      {rating.relevance_score !== null ? (
+                        <span
+                          className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${SCORE_COLORS[rating.relevance_score] ?? ""}`}
+                          title={SCORE_LABELS[rating.relevance_score]}
+                        >
+                          {rating.relevance_score} — {SCORE_LABELS[rating.relevance_score]}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400 italic">Belum dinilai</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2.5 text-sm text-gray-600">
+                      {rating.notes ?? <span className="text-gray-300">—</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

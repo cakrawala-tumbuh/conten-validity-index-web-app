@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2, Plus, X, GraduationCap } from "lucide-react";
 import type { ExpertiseAreaResponse } from "@/types/expertise-area";
+import { TableInfoTooltip } from "@/components/ui/Tooltip";
 
 /**
  * Props untuk ExpertiseAreaManager.
@@ -236,61 +237,67 @@ export const ExpertiseAreaManager = ({ initialAreas }: ExpertiseAreaManagerProps
           </p>
         </div>
       ) : (
-        <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Nama
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Deskripsi
-                </th>
-                <th className="w-24 px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {areas.map((area) => (
-                <tr
-                  key={area.id}
-                  className={editingId === area.id ? "bg-yellow-50" : "hover:bg-gray-50"}
-                >
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900 align-top">
-                    {area.name}
-                  </td>
-                  <td className="px-4 py-3 text-xs text-gray-500 align-top">
-                    {area.description ? (
-                      <span className="line-clamp-2">{area.description}</span>
-                    ) : (
-                      <span className="italic text-gray-300">—</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 align-top">
-                    <div className="flex gap-1 justify-end">
-                      <button
-                        type="button"
-                        onClick={() => startEdit(area)}
-                        className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-blue-600 transition"
-                        title="Edit"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => deleteArea(area)}
-                        disabled={loading}
-                        className="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition disabled:opacity-50"
-                        title="Hapus"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </td>
+        <>
+          <div className="flex items-center gap-1.5">
+            <h3 className="text-sm font-medium text-gray-700">Daftar Bidang Keahlian</h3>
+            <TableInfoTooltip description="Daftar master bidang keahlian yang dapat dipilih untuk mengategorikan keahlian setiap expert." />
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Nama
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Deskripsi
+                  </th>
+                  <th className="w-24 px-4 py-3" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {areas.map((area) => (
+                  <tr
+                    key={area.id}
+                    className={editingId === area.id ? "bg-yellow-50" : "hover:bg-gray-50"}
+                  >
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900 align-top">
+                      {area.name}
+                    </td>
+                    <td className="px-4 py-3 text-xs text-gray-500 align-top">
+                      {area.description ? (
+                        <span className="line-clamp-2">{area.description}</span>
+                      ) : (
+                        <span className="italic text-gray-300">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 align-top">
+                      <div className="flex gap-1 justify-end">
+                        <button
+                          type="button"
+                          onClick={() => startEdit(area)}
+                          className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-blue-600 transition"
+                          title="Edit"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => deleteArea(area)}
+                          disabled={loading}
+                          className="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition disabled:opacity-50"
+                          title="Hapus"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

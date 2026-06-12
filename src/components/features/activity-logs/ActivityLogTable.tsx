@@ -9,6 +9,7 @@
 import { useState } from "react";
 import { Search, RefreshCw } from "lucide-react";
 import type { ActivityLogResponse, ActivityAction } from "@/types/activity-log";
+import { TableInfoTooltip } from "@/components/ui/Tooltip";
 
 /**
  * Label ramah untuk setiap jenis aksi.
@@ -155,7 +156,10 @@ export const ActivityLogTable = ({ initialLogs }: ActivityLogTableProps) => {
         </div>
       )}
 
-      <div className="text-xs text-gray-500">Menampilkan {logs.length} log</div>
+      <div className="flex items-center gap-1.5">
+        <span className="text-xs text-gray-500">Menampilkan {logs.length} log</span>
+        <TableInfoTooltip description="Catatan audit seluruh aksi pengguna di sistem: waktu kejadian, pelaku, jenis aksi, tipe sumber daya yang diubah, dan alamat IP." />
+      </div>
 
       {logs.length === 0 ? (
         <div className="rounded-lg border border-dashed border-gray-300 bg-white p-12 text-center">

@@ -13,6 +13,7 @@ import { USER_ROLE_LABELS } from "@/constants";
 import type { UserResponse, UserUpdate } from "@/types/user";
 import type { ExpertiseAreaResponse } from "@/types/expertise-area";
 import { ExpertiseAreaSelect } from "@/components/features/expertise-areas/ExpertiseAreaSelect";
+import { TableInfoTooltip } from "@/components/ui/Tooltip";
 
 /**
  * Props untuk UserTable.
@@ -143,6 +144,11 @@ export const UserTable = ({ initialUsers, expertiseAreaOptions }: UserTableProps
           {error}
         </div>
       )}
+
+      <div className="flex items-center gap-1.5">
+        <h3 className="text-sm font-medium text-gray-700">Daftar Pengguna</h3>
+        <TableInfoTooltip description="Daftar seluruh pengguna sistem beserta peran (admin/expert), institusi, bidang keahlian, dan status aktifnya." />
+      </div>
 
       <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">

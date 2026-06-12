@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { Pencil, Trash2, Plus, Upload, X, Check } from "lucide-react";
 import type { ItemResponse } from "@/types/item";
 import type { DomainResponse } from "@/types/domain";
+import { TableInfoTooltip } from "@/components/ui/Tooltip";
 
 /**
  * Props untuk ItemsManager.
@@ -232,7 +233,10 @@ export const ItemsManager = ({ instrumentId, initialItems, domains }: ItemsManag
     <div className="space-y-4">
       {/* Action bar */}
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-500">{items.length} item</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm text-gray-500">{items.length} item</span>
+          <TableInfoTooltip description="Daftar item/pernyataan instrumen yang akan dinilai expert, beserta domain pengelompokannya. Item inilah yang dihitung nilai I-CVI dan S-CVI-nya." />
+        </div>
         {mode === "idle" && (
           <div className="flex gap-2">
             <button

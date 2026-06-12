@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { Pencil, Trash2, Plus, X, Layers } from "lucide-react";
 import type { DomainResponse } from "@/types/domain";
 import { ColorPicker } from "@/components/ui/ColorPicker";
+import { TableInfoTooltip } from "@/components/ui/Tooltip";
 
 /**
  * Props untuk DomainsManager.
@@ -212,7 +213,10 @@ export const DomainsManager = ({ instrumentId, initialDomains }: DomainsManagerP
     <div className="space-y-4">
       {/* Action bar */}
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-500">{domains.length} domain</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-sm text-gray-500">{domains.length} domain</span>
+          <TableInfoTooltip description="Daftar domain/dimensi yang mengelompokkan item instrumen. Tiap domain memiliki nama, warna penanda, dan definisi konstruk yang menjadi acuan penilaian expert." />
+        </div>
         {mode === "idle" ? (
           <button
             type="button"

@@ -7,6 +7,7 @@
  * agar expert dapat memahami konstruk yang diukur sebelum memberikan skor.
  */
 import type { DomainResponse } from "@/types/domain";
+import { TableInfoTooltip } from "@/components/ui/Tooltip";
 
 /**
  * Props untuk KisiKisiKonstruk.
@@ -33,7 +34,10 @@ export const KisiKisiKonstruk = ({ domains }: KisiKisiKonstrukProps) => {
   return (
     <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
       <div className="border-b border-gray-200 bg-gray-50 px-5 py-3">
-        <p className="text-sm font-semibold text-gray-800">Kisi-Kisi Konstruk (Dimensi)</p>
+        <div className="flex items-center gap-1.5">
+          <p className="text-sm font-semibold text-gray-800">Kisi-Kisi Konstruk (Dimensi)</p>
+          <TableInfoTooltip description="Tabel acuan dimensi/konstruk yang diukur instrumen ini, lengkap dengan definisi konstruk, contoh indikator perilaku, dan referensi teori. Bersifat read-only sebagai panduan sebelum expert memberi penilaian." />
+        </div>
         <p className="mt-0.5 text-xs text-gray-500">
           Tabel acuan dimensi yang diukur instrumen ini. Bersifat read-only; gunakan sebagai panduan
           sebelum memberi penilaian. Warna pada setiap dimensi sama dengan warna latar item terkait

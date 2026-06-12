@@ -12,6 +12,7 @@ import type { ItemResponse } from "@/types/item";
 import type { RatingResponse } from "@/types/rating";
 import type { AssignmentResponse } from "@/types/expert-assignment";
 import type { DomainResponse } from "@/types/domain";
+import { TableInfoTooltip } from "@/components/ui/Tooltip";
 
 /**
  * Label untuk setiap nilai skala Likert yang digunakan dalam CVI.
@@ -229,6 +230,10 @@ export const RatingForm = ({
       )}
 
       {/* Rating table */}
+      <div className="flex items-center gap-1.5">
+        <h3 className="text-sm font-medium text-gray-700">Tabel Penilaian Item</h3>
+        <TableInfoTooltip description="Tempat expert menilai relevansi tiap item terhadap konstruk pada skala 1–4 (1 = tidak relevan, 4 = sangat relevan) dan menuliskan catatan. Skor 3–4 dihitung sebagai relevan dalam perhitungan CVI. Baris diwarnai sesuai dimensinya." />
+      </div>
       <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
         <table className="min-w-full">
           <thead className="bg-gray-50 border-b border-gray-200">

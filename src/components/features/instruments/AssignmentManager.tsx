@@ -12,6 +12,7 @@ import { Trash2, UserPlus } from "lucide-react";
 import { ASSIGNMENT_STATUS_LABELS } from "@/constants";
 import type { AssignmentResponse } from "@/types/expert-assignment";
 import type { UserResponse } from "@/types/user";
+import { TableInfoTooltip } from "@/components/ui/Tooltip";
 
 /**
  * Props untuk AssignmentManager.
@@ -212,68 +213,74 @@ export const AssignmentManager = ({
           </p>
         </div>
       ) : (
-        <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Expert
-                </th>
-                <th className="w-40 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Status
-                </th>
-                <th className="w-40 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                  Tenggat
-                </th>
-                <th className="w-16 px-4 py-3" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {assignments.map((a) => {
-                const expert = availableExperts.find((u) => u.id === a.user_id);
-                return (
-                  <tr key={a.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <p className="text-sm font-medium text-gray-900">
-                        {expert?.full_name ?? a.user_id.slice(0, 8)}
-                      </p>
-                      {expert?.institution && (
-                        <p className="text-xs text-gray-500">{expert.institution}</p>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[a.status] ?? "bg-gray-100 text-gray-600"}`}
-                      >
-                        {ASSIGNMENT_STATUS_LABELS[a.status] ?? a.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
-                      {a.deadline
-                        ? new Date(a.deadline).toLocaleDateString("id-ID", {
-                            day: "numeric",
-                            month: "short",
-                            year: "numeric",
-                          })
-                        : "—"}
-                    </td>
-                    <td className="px-4 py-3">
-                      <button
-                        type="button"
-                        onClick={() => removeAssignment(a)}
-                        disabled={loading}
-                        className="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition disabled:opacity-50"
-                        title="Hapus assignment"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <div className="flex items-center gap-1.5">
+            <h3 className="text-sm font-medium text-gray-700">Daftar Penugasan Expert</h3>
+            <TableInfoTooltip description="Daftar expert yang ditugaskan menilai instrumen ini beserta status pengerjaan (menunggu/sedang dikerjakan/selesai) dan tenggat waktu penilaian." />
+          </div>
+          <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Expert
+                  </th>
+                  <th className="w-40 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Status
+                  </th>
+                  <th className="w-40 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Tenggat
+                  </th>
+                  <th className="w-16 px-4 py-3" />
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {assignments.map((a) => {
+                  const expert = availableExperts.find((u) => u.id === a.user_id);
+                  return (
+                    <tr key={a.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3">
+                        <p className="text-sm font-medium text-gray-900">
+                          {expert?.full_name ?? a.user_id.slice(0, 8)}
+                        </p>
+                        {expert?.institution && (
+                          <p className="text-xs text-gray-500">{expert.institution}</p>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[a.status] ?? "bg-gray-100 text-gray-600"}`}
+                        >
+                          {ASSIGNMENT_STATUS_LABELS[a.status] ?? a.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-500">
+                        {a.deadline
+                          ? new Date(a.deadline).toLocaleDateString("id-ID", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                            })
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          type="button"
+                          onClick={() => removeAssignment(a)}
+                          disabled={loading}
+                          className="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition disabled:opacity-50"
+                          title="Hapus assignment"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   );

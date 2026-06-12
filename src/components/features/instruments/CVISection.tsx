@@ -14,6 +14,7 @@ import {
   CVI_FEW_EXPERTS_MAX,
 } from "@/constants";
 import type { CVIResult } from "@/types/cvi";
+import { TableInfoTooltip } from "@/components/ui/Tooltip";
 
 /**
  * Props untuk CVISection.
@@ -192,8 +193,9 @@ export const CVISection = ({ instrumentId, instrumentName }: CVISectionProps) =>
 
           {/* Tabel I-CVI per item */}
           <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-200">
+            <div className="flex items-center gap-1.5 px-4 py-3 border-b border-gray-200">
               <p className="text-sm font-medium text-gray-700">Hasil I-CVI per Item</p>
+              <TableInfoTooltip description="Menampilkan nilai I-CVI (Item-level Content Validity Index) tiap item: jumlah expert yang menilai relevan (skor 3–4), nilai I-CVI = jumlah relevan dibagi total expert, dan status valid bila memenuhi ambang batas (≥0,78 untuk ≥6 expert; ≥0,83 untuk 3–5 expert)." />
             </div>
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
