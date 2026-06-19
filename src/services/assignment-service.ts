@@ -75,3 +75,24 @@ export async function deleteAssignment(
 export async function getMyAssignments(token: string): Promise<AssignmentResponse[]> {
   return apiRequest<AssignmentResponse[]>("/api/v1/my-assignments/", { token });
 }
+
+/**
+ * Membuka kembali assignment yang sudah selesai untuk diedit ulang (expert).
+ *
+ * Mengubah status assignment dari 'completed' menjadi 'in_progress'.
+ *
+ * @param token - Access token expert.
+ * @param assignmentId - ID assignment yang akan dibuka kembali.
+ * @returns Data assignment dengan status yang sudah diperbarui.
+ * @throws {ApiError} Jika assignment tidak ditemukan (404), bukan pemilik (403),
+ *                    atau status bukan 'completed' (400).
+ */
+export async function reopenAssignment(
+  token: string,
+  assignmentId: string,
+): Promise<AssignmentResponse> {
+  return apiRequest<AssignmentResponse>(`/api/v1/assignments/${assignmentId}/reopen`, {
+    method: "POST",
+    token,
+  });
+}

@@ -101,8 +101,10 @@ export const RatingForm = ({
 
   const [ratings, setRatings] = useState<Record<string, RatingState>>(initialState);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isReopening, setIsReopening] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [reopenError, setReopenError] = useState<string | null>(null);
 
   const filledCount = Object.values(ratings).filter((r) => r.score !== null).length;
   const isComplete = filledCount === items.length;
@@ -182,6 +184,31 @@ export const RatingForm = ({
     }
   };
 
+  /**
+   * Menangani permintaan membuka kembali assignment yang sudah selesai.
+   *
+   * Mengirimkan POST ke endpoint reopen, lalu merefresh halaman agar
+   * form kembali aktif dengan status terbaru dari server.
+   */
+  const handleReopen = async () => {
+    setReopenError(null);
+    setIsReopening(true);
+    try {
+      const resp = await fetch(`/api/assignments/${assignment.id}/reopen`, {
+        method: "POST",
+      });
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        throw new Error(data.detail ?? `Gagal membuka kembali penilaian (${resp.status})`);
+      }
+      router.refresh();
+    } catch (err) {
+      setReopenError(err instanceof Error ? err.message : "Terjadi kesalahan tidak diketahui.");
+    } finally {
+      setIsReopening(false);
+    }
+  };
+
   if (success) {
     return (
       <div className="rounded-lg border border-green-200 bg-green-50 p-8 text-center">
@@ -196,6 +223,32 @@ export const RatingForm = ({
         >
           Kembali ke Daftar Penilaian
         </button>
+      </div>
+    );
+  }
+
+  if (assignment.status === "completed") {
+    return (
+      <div className="space-y-4">
+        <div className="rounded-lg border border-green-200 bg-green-50 p-6">
+          <p className="text-base font-semibold text-green-800">
+            Penilaian sudah selesai dikumpulkan.
+          </p>
+          <p className="mt-1 text-sm text-green-700">
+            Semua {items.length} item telah dinilai. Jika ingin merevisi, klik tombol di bawah.
+          </p>
+          {reopenError && (
+            <p className="mt-2 text-sm text-red-600">{reopenError}</p>
+          )}
+          <button
+            type="button"
+            onClick={handleReopen}
+            disabled={isReopening}
+            className="mt-4 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 transition disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {isReopening ? "Membuka..." : "Ubah Penilaian"}
+          </button>
+        </div>
       </div>
     );
   }

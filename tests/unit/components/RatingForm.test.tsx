@@ -290,6 +290,102 @@ describe("RatingForm", () => {
     });
   });
 
+  describe("reopen assignment yang sudah completed", () => {
+    const completedAssignment: AssignmentResponse = {
+      ...mockAssignment,
+      status: "completed",
+    };
+
+    it("harus menampilkan banner selesai jika status assignment completed", () => {
+      render(
+        <RatingForm
+          assignment={completedAssignment}
+          items={mockItems}
+          existingRatings={mockAllRatings}
+        />,
+      );
+      expect(screen.getByText(/penilaian sudah selesai dikumpulkan/i)).toBeInTheDocument();
+    });
+
+    it("harus menampilkan tombol Ubah Penilaian saat status completed", () => {
+      render(
+        <RatingForm
+          assignment={completedAssignment}
+          items={mockItems}
+          existingRatings={mockAllRatings}
+        />,
+      );
+      expect(screen.getByRole("button", { name: /ubah penilaian/i })).toBeInTheDocument();
+    });
+
+    it("harus tidak menampilkan form penilaian saat status completed", () => {
+      render(
+        <RatingForm
+          assignment={completedAssignment}
+          items={mockItems}
+          existingRatings={mockAllRatings}
+        />,
+      );
+      expect(
+        screen.queryByRole("button", { name: /simpan semua penilaian/i }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("harus memanggil endpoint reopen saat tombol Ubah Penilaian diklik", async () => {
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+      render(
+        <RatingForm
+          assignment={completedAssignment}
+          items={mockItems}
+          existingRatings={mockAllRatings}
+        />,
+      );
+      const reopenBtn = screen.getByRole("button", { name: /ubah penilaian/i });
+      fireEvent.click(reopenBtn);
+      await waitFor(() => {
+        expect(mockFetch).toHaveBeenCalledWith(
+          `/api/assignments/${completedAssignment.id}/reopen`,
+          expect.objectContaining({ method: "POST" }),
+        );
+      });
+    });
+
+    it("harus menampilkan error saat reopen gagal", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ detail: "Gagal membuka kembali" }),
+      });
+      render(
+        <RatingForm
+          assignment={completedAssignment}
+          items={mockItems}
+          existingRatings={mockAllRatings}
+        />,
+      );
+      const reopenBtn = screen.getByRole("button", { name: /ubah penilaian/i });
+      fireEvent.click(reopenBtn);
+      await waitFor(() => {
+        expect(screen.getByText("Gagal membuka kembali")).toBeInTheDocument();
+      });
+    });
+
+    it("harus menonaktifkan tombol Ubah Penilaian saat sedang memproses", async () => {
+      mockFetch.mockImplementationOnce(() => new Promise(() => {}));
+      render(
+        <RatingForm
+          assignment={completedAssignment}
+          items={mockItems}
+          existingRatings={mockAllRatings}
+        />,
+      );
+      const reopenBtn = screen.getByRole("button", { name: /ubah penilaian/i });
+      fireEvent.click(reopenBtn);
+      await waitFor(() => {
+        expect(screen.getByRole("button", { name: /membuka\.\.\./i })).toBeDisabled();
+      });
+    });
+  });
+
   describe("catatan wajib untuk skor 1/2", () => {
     it("harus menonaktifkan submit jika item skor 1 belum diberi catatan", () => {
       render(
