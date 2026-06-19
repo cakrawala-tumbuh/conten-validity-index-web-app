@@ -28,6 +28,8 @@ const mockAssignments: AssignmentResponse[] = [
     status: "pending",
     assigned_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
+    previous_assignment_id: null,
+    revision_number: 1,
   },
   {
     id: "asgn-2",
@@ -39,6 +41,8 @@ const mockAssignments: AssignmentResponse[] = [
     status: "in_progress",
     assigned_at: "2024-02-01T00:00:00Z",
     updated_at: "2024-02-01T00:00:00Z",
+    previous_assignment_id: null,
+    revision_number: 1,
   },
 ];
 

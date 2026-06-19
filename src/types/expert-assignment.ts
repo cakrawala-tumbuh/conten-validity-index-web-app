@@ -7,7 +7,7 @@
 /**
  * Status assignment expert terhadap satu instrumen.
  */
-export type AssignmentStatus = "pending" | "in_progress" | "completed";
+export type AssignmentStatus = "pending" | "in_progress" | "completed" | "archived";
 
 /**
  * Payload untuk membuat assignment expert baru.
@@ -30,4 +30,16 @@ export interface AssignmentResponse {
   status: AssignmentStatus;
   assigned_at: string;
   updated_at: string;
+  previous_assignment_id: string | null;
+  revision_number: number;
+}
+
+/**
+ * Hasil operasi arsip dan revisi assignment.
+ *
+ * Berisi assignment lama yang diarsipkan dan assignment baru yang dibuat.
+ */
+export interface RevisionResult {
+  archived_assignment: AssignmentResponse;
+  new_assignment: AssignmentResponse;
 }

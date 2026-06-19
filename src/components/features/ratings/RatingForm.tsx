@@ -237,9 +237,7 @@ export const RatingForm = ({
           <p className="mt-1 text-sm text-green-700">
             Semua {items.length} item telah dinilai. Jika ingin merevisi, klik tombol di bawah.
           </p>
-          {reopenError && (
-            <p className="mt-2 text-sm text-red-600">{reopenError}</p>
-          )}
+          {reopenError && <p className="mt-2 text-sm text-red-600">{reopenError}</p>}
           <button
             type="button"
             onClick={handleReopen}

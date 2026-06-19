@@ -32,6 +32,7 @@ export const ASSIGNMENT_STATUS_LABELS: Record<string, string> = {
   pending: "Menunggu",
   in_progress: "Sedang Berjalan",
   completed: "Selesai",
+  archived: "Diarsipkan",
 };
 
 /** Label role pengguna untuk tampilan UI. */

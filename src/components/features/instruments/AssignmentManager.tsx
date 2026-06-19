@@ -8,9 +8,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, UserPlus } from "lucide-react";
+import { Archive, Trash2, UserPlus } from "lucide-react";
 import { ASSIGNMENT_STATUS_LABELS } from "@/constants";
-import type { AssignmentResponse } from "@/types/expert-assignment";
+import type { AssignmentResponse, RevisionResult } from "@/types/expert-assignment";
 import type { UserResponse } from "@/types/user";
 import { TableInfoTooltip } from "@/components/ui/Tooltip";
 
@@ -47,13 +47,16 @@ export const AssignmentManager = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const assignedUserIds = new Set(assignments.map((a) => a.user_id));
-  const unassignedExperts = availableExperts.filter((u) => !assignedUserIds.has(u.id));
+  const activeAssignedUserIds = new Set(
+    assignments.filter((a) => a.status !== "archived").map((a) => a.user_id),
+  );
+  const unassignedExperts = availableExperts.filter((u) => !activeAssignedUserIds.has(u.id));
 
   const statusColor: Record<string, string> = {
     pending: "bg-yellow-100 text-yellow-700",
     in_progress: "bg-blue-100 text-blue-700",
     completed: "bg-green-100 text-green-700",
+    archived: "bg-gray-100 text-gray-500",
   };
 
   /**
@@ -119,6 +122,53 @@ export const AssignmentManager = ({
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal menghapus assignment.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /**
+   * Mengarsipkan assignment dan membuat assignment revisi baru setelah konfirmasi.
+   *
+   * Assignment lama diubah ke status 'archived' (data tetap tersimpan sebagai
+   * riwayat audit), dan assignment baru dibuat dengan salinan semua penilaian
+   * yang sudah ada sehingga expert hanya perlu merevisi nilai yang keliru.
+   *
+   * @param assignment - Assignment yang akan diarsipkan dan direvisi.
+   */
+  const archiveAndRevise = async (assignment: AssignmentResponse) => {
+    const expert = availableExperts.find((u) => u.id === assignment.user_id);
+    const label = expert?.full_name ?? assignment.user_id.slice(0, 8);
+    if (
+      !confirm(
+        `Arsipkan penilaian ${label} dan buat revisi baru?\n\n` +
+          `Penilaian lama akan diarsipkan (tidak dihapus) dan assignment baru ` +
+          `akan dibuat dengan salinan semua penilaian yang sudah ada. ` +
+          `Expert hanya perlu merevisi nilai yang keliru.`,
+      )
+    ) {
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const resp = await fetch(
+        `/api/instruments/${instrumentId}/assignments/${assignment.id}/revise`,
+        { method: "POST" },
+      );
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        throw new Error(data.detail ?? `Gagal mengarsipkan assignment (${resp.status})`);
+      }
+      const result: RevisionResult = await resp.json();
+      setAssignments((prev) =>
+        prev
+          .map((a) => (a.id === result.archived_assignment.id ? result.archived_assignment : a))
+          .concat(result.new_assignment),
+      );
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gagal mengarsipkan assignment.");
     } finally {
       setLoading(false);
     }
@@ -231,7 +281,7 @@ export const AssignmentManager = ({
                   <th className="w-40 px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                     Tenggat
                   </th>
-                  <th className="w-16 px-4 py-3" />
+                  <th className="w-24 px-4 py-3" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -264,15 +314,28 @@ export const AssignmentManager = ({
                           : "—"}
                       </td>
                       <td className="px-4 py-3">
-                        <button
-                          type="button"
-                          onClick={() => removeAssignment(a)}
-                          disabled={loading}
-                          className="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition disabled:opacity-50"
-                          title="Hapus assignment"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
+                        <div className="flex items-center gap-1">
+                          {a.status !== "archived" && (
+                            <button
+                              type="button"
+                              onClick={() => archiveAndRevise(a)}
+                              disabled={loading}
+                              className="rounded-md p-1.5 text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition disabled:opacity-50"
+                              title="Arsipkan & buat revisi baru"
+                            >
+                              <Archive className="h-4 w-4" />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => removeAssignment(a)}
+                            disabled={loading}
+                            className="rounded-md p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600 transition disabled:opacity-50"
+                            title="Hapus assignment"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

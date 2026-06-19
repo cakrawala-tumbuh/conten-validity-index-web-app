@@ -5,7 +5,11 @@
  * mengambil assignment milik pengguna yang sedang login.
  */
 import { apiRequest } from "@/lib/api";
-import type { AssignmentCreate, AssignmentResponse } from "@/types/expert-assignment";
+import type {
+  AssignmentCreate,
+  AssignmentResponse,
+  RevisionResult,
+} from "@/types/expert-assignment";
 
 /**
  * Mengambil daftar assignment dalam satu instrumen (hanya admin).
@@ -95,4 +99,29 @@ export async function reopenAssignment(
     method: "POST",
     token,
   });
+}
+
+/**
+ * Mengarsipkan assignment lama dan membuat assignment revisi baru (hanya admin).
+ *
+ * Assignment lama diubah statusnya ke 'archived' dan assignment baru dibuat
+ * dengan salinan semua penilaian yang sudah ada. Expert hanya perlu merevisi
+ * nilai yang keliru.
+ *
+ * @param token - Access token admin.
+ * @param instrumentId - ID instrumen yang terkait.
+ * @param assignmentId - ID assignment yang akan diarsipkan dan direvisi.
+ * @returns Objek berisi assignment lama (archived) dan assignment baru.
+ * @throws {ApiError} Jika assignment tidak ditemukan (404), bukan admin (403),
+ *                    atau assignment sudah diarsipkan (400).
+ */
+export async function reviseAssignment(
+  token: string,
+  instrumentId: string,
+  assignmentId: string,
+): Promise<RevisionResult> {
+  return apiRequest<RevisionResult>(
+    `/api/v1/instruments/${instrumentId}/assignments/${assignmentId}/revise`,
+    { method: "POST", token },
+  );
 }

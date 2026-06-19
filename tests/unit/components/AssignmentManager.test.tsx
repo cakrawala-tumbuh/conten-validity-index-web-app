@@ -30,6 +30,8 @@ const mockAssignments: AssignmentResponse[] = [
     status: "pending",
     assigned_at: "2024-01-01T00:00:00Z",
     updated_at: "2024-01-01T00:00:00Z",
+    previous_assignment_id: null,
+    revision_number: 1,
   },
 ];
 
@@ -303,5 +305,142 @@ describe("AssignmentManager", () => {
     );
     // deadline: "2025-12-31" harus ditampilkan dalam format lokal
     expect(screen.getByText(/des.*2025|31.*2025|2025/i)).toBeInTheDocument();
+  });
+
+  it("harus menampilkan tombol Arsipkan untuk assignment yang tidak archived", () => {
+    render(
+      <AssignmentManager
+        instrumentId="inst-1"
+        initialAssignments={mockAssignments}
+        availableExperts={mockExperts}
+      />,
+    );
+    expect(screen.getByTitle("Arsipkan & buat revisi baru")).toBeInTheDocument();
+  });
+
+  it("harus tidak menampilkan tombol Arsipkan untuk assignment berstatus archived", () => {
+    const archivedAssignments: AssignmentResponse[] = [
+      {
+        ...mockAssignments[0],
+        id: "asgn-archived",
+        status: "archived",
+      },
+    ];
+    render(
+      <AssignmentManager
+        instrumentId="inst-1"
+        initialAssignments={archivedAssignments}
+        availableExperts={mockExperts}
+      />,
+    );
+    expect(screen.queryByTitle("Arsipkan & buat revisi baru")).not.toBeInTheDocument();
+  });
+
+  it("harus menampilkan label Diarsipkan untuk status archived", () => {
+    const archivedAssignments: AssignmentResponse[] = [
+      {
+        ...mockAssignments[0],
+        id: "asgn-archived",
+        status: "archived",
+      },
+    ];
+    render(
+      <AssignmentManager
+        instrumentId="inst-1"
+        initialAssignments={archivedAssignments}
+        availableExperts={mockExperts}
+      />,
+    );
+    expect(screen.getByText("Diarsipkan")).toBeInTheDocument();
+  });
+
+  it("harus menampilkan konfirmasi sebelum mengarsipkan assignment", () => {
+    mockConfirm.mockReturnValue(false);
+    render(
+      <AssignmentManager
+        instrumentId="inst-1"
+        initialAssignments={mockAssignments}
+        availableExperts={mockExperts}
+      />,
+    );
+    fireEvent.click(screen.getByTitle("Arsipkan & buat revisi baru"));
+    expect(mockConfirm).toHaveBeenCalled();
+  });
+
+  it("harus berhasil mengarsipkan dan membuat revisi baru", async () => {
+    mockConfirm.mockReturnValue(true);
+    const revisionResult = {
+      archived_assignment: {
+        ...mockAssignments[0],
+        status: "archived",
+      },
+      new_assignment: {
+        ...mockAssignments[0],
+        id: "asgn-2",
+        status: "in_progress",
+        previous_assignment_id: "asgn-1",
+        revision_number: 2,
+      },
+    };
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => revisionResult,
+    });
+    render(
+      <AssignmentManager
+        instrumentId="inst-1"
+        initialAssignments={mockAssignments}
+        availableExperts={mockExperts}
+      />,
+    );
+    fireEvent.click(screen.getByTitle("Arsipkan & buat revisi baru"));
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith(
+        "/api/instruments/inst-1/assignments/asgn-1/revise",
+        expect.objectContaining({ method: "POST" }),
+      );
+    });
+    await waitFor(() => {
+      expect(screen.getByText("Diarsipkan")).toBeInTheDocument();
+      expect(screen.getByText("Sedang Berjalan")).toBeInTheDocument();
+    });
+  });
+
+  it("harus menampilkan error jika arsip assignment gagal", async () => {
+    mockConfirm.mockReturnValue(true);
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ detail: "Assignment sudah diarsipkan" }),
+    });
+    render(
+      <AssignmentManager
+        instrumentId="inst-1"
+        initialAssignments={mockAssignments}
+        availableExperts={mockExperts}
+      />,
+    );
+    fireEvent.click(screen.getByTitle("Arsipkan & buat revisi baru"));
+    await waitFor(() => {
+      expect(screen.getByText("Assignment sudah diarsipkan")).toBeInTheDocument();
+    });
+  });
+
+  it("harus menampilkan expert archived di dropdown karena sudah tidak aktif", () => {
+    const archivedAssignment: AssignmentResponse = {
+      ...mockAssignments[0],
+      status: "archived",
+    };
+    render(
+      <AssignmentManager
+        instrumentId="inst-1"
+        initialAssignments={[archivedAssignment]}
+        availableExperts={mockExperts}
+      />,
+    );
+    // Karena assignment archived, expert-1 seharusnya muncul kembali di dropdown
+    fireEvent.click(screen.getByRole("button", { name: /tugaskan expert/i }));
+    const options = screen.queryAllByRole("option");
+    const expertOneOption = options.find((o) => o.textContent?.includes("Dr. Expert Satu"));
+    expect(expertOneOption).toBeDefined();
   });
 });
