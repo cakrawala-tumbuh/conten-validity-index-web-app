@@ -111,6 +111,12 @@ services:
     environment:
       - DATABASE_URL=postgresql+asyncpg://cvi:cvi_test@db:5432/cvi_test
       - AUTHENTIK_ISSUER_URL=http://authentik-server:9000/application/o/cvi/
+      # Credential client untuk introspeksi token (RFC 7662). Tanpa ini backend
+      # mengintrospeksi tanpa autentikasi client, Authentik membalas
+      # {"active": false}, dan SEMUA request backend ditolak ("Token tidak aktif").
+      # Harus cocok dengan provider OAuth2 di blueprints/cvi-e2e-setup.yaml.
+      - AUTHENTIK_CLIENT_ID=${AUTHENTIK_CLIENT_ID:-cvi-e2e-client}
+      - AUTHENTIK_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET:-cvi-e2e-secret}
     depends_on:
       db:
         condition: service_healthy
