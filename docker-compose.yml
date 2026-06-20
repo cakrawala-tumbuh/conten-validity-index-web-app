@@ -45,6 +45,13 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql+asyncpg://cvi:cvi@db:5432/cvi
+      # Konfigurasi Authentik untuk verifikasi JWT (JWKS) dan introspeksi token.
+      # Tanpa credential client, introspeksi dikirim tanpa autentikasi sehingga
+      # Authentik membalas {"active": false} dan backend menolak SETIAP request
+      # dengan 401 "Token tidak aktif". Harus sama dengan client yang dipakai web.
+      - AUTHENTIK_ISSUER_URL=${AUTHENTIK_ISSUER_URL:-http://authentik-server:9000/application/o/cvi/}
+      - AUTHENTIK_CLIENT_ID=${AUTHENTIK_CLIENT_ID}
+      - AUTHENTIK_CLIENT_SECRET=${AUTHENTIK_CLIENT_SECRET}
     depends_on:
       db:
         condition: service_healthy
