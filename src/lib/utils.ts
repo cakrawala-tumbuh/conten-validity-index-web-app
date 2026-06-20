@@ -75,6 +75,41 @@ export function formatDate(isoString: string): string {
 }
 
 /**
+ * Memicu unduhan berkas dari sebuah `Blob` di sisi browser secara andal.
+ *
+ * Membuat object URL, menambahkan anchor tersembunyi ke `document.body`,
+ * lalu mengkliknya. Anchor sengaja DILAMPIRKAN ke DOM (bukan elemen lepas)
+ * dan object URL DIBATALKAN secara tertunda — keduanya diperlukan agar
+ * unduhan benar-benar terpicu di sebagian browser/lingkungan produksi.
+ * Mengklik anchor lepas atau memanggil `revokeObjectURL` secara sinkron
+ * tepat setelah `click()` dapat membatalkan unduhan sebelum dimulai, sehingga
+ * tombol seolah "tidak melakukan apa-apa" tanpa melempar error.
+ *
+ * @param blob - Konten berkas yang akan diunduh.
+ * @param filename - Nama berkas yang disarankan kepada browser.
+ *
+ * @example
+ * ```ts
+ * triggerBlobDownload(new Blob(["{}"], { type: "application/json" }), "data.json");
+ * ```
+ */
+export function triggerBlobDownload(blob: Blob, filename: string): void {
+  const objectUrl = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = objectUrl;
+  anchor.download = filename;
+  anchor.rel = "noopener";
+  anchor.style.display = "none";
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  // Tunda pembatalan object URL agar browser sempat memulai unduhan terlebih
+  // dahulu; membatalkannya pada frame yang sama dengan click() dapat
+  // menggagalkan unduhan secara diam-diam.
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 1_000);
+}
+
+/**
  * Memformat nilai CVI sebagai persentase dengan dua desimal.
  *
  * @param value - Nilai antara 0.0 dan 1.0.

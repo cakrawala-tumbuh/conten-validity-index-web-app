@@ -47,18 +47,23 @@ describe("BackupRestorePanel", () => {
     expect(screen.getByRole("button", { name: /pulihkan database/i })).toBeDisabled();
   });
 
-  it("harus memanggil endpoint backup saat tombol unduh diklik", async () => {
+  it("harus memanggil endpoint backup dan memicu unduhan saat tombol unduh diklik", async () => {
     mockFetch.mockResolvedValueOnce({
       ok: true,
       blob: async () => new Blob(["{}"], { type: "application/json" }),
       json: async () => ({}),
     });
+    // Spy klik anchor membuktikan mekanisme unduhan benar-benar terpicu —
+    // bukan sekadar memanggil fetch tanpa hasil (regresi "tidak terjadi apa-apa").
+    const clickSpy = jest.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
     render(<BackupRestorePanel />);
     fireEvent.click(screen.getByRole("button", { name: /unduh backup/i }));
     await waitFor(() => {
       expect(mockFetch).toHaveBeenCalledWith("/api/backup");
     });
     expect(global.URL.createObjectURL).toHaveBeenCalled();
+    expect(clickSpy).toHaveBeenCalled();
+    clickSpy.mockRestore();
   });
 
   it("harus menampilkan error saat unduh backup gagal", async () => {

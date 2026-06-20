@@ -22,13 +22,23 @@ export async function GET(): Promise<NextResponse> {
 
   const backendUrl = process.env.BACKEND_API_INTERNAL_URL ?? "http://localhost:8000";
 
-  const backendResp = await fetch(`${backendUrl}/api/v1/backup/`, {
-    cache: "no-store",
-    headers: { Authorization: `Bearer ${session.accessToken}` },
-  });
+  let backendResp: Response;
+  try {
+    backendResp = await fetch(`${backendUrl}/api/v1/backup/`, {
+      cache: "no-store",
+      headers: { Authorization: `Bearer ${session.accessToken}` },
+    });
+  } catch {
+    return NextResponse.json(
+      { detail: "Tidak dapat terhubung ke server backend untuk membuat backup." },
+      { status: 502 },
+    );
+  }
 
   if (!backendResp.ok) {
-    const data = await backendResp.json().catch(() => ({}));
+    const data = await backendResp.json().catch(() => ({
+      detail: `Gagal membuat backup (${backendResp.status}).`,
+    }));
     return NextResponse.json(data, { status: backendResp.status });
   }
 

@@ -28,17 +28,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
   const backendUrl = process.env.BACKEND_API_INTERNAL_URL ?? "http://localhost:8000";
 
-  const backendResp = await fetch(`${backendUrl}/api/v1/backup/restore`, {
-    method: "POST",
-    cache: "no-store",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${session.accessToken}`,
-    },
-    body: JSON.stringify(payload),
-  });
+  let backendResp: Response;
+  try {
+    backendResp = await fetch(`${backendUrl}/api/v1/backup/restore`, {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.accessToken}`,
+      },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    return NextResponse.json(
+      { detail: "Tidak dapat terhubung ke server backend untuk memulihkan database." },
+      { status: 502 },
+    );
+  }
 
-  const data = await backendResp.json().catch(() => ({}));
+  const data = await backendResp.json().catch(() => ({
+    detail: `Gagal memulihkan database (${backendResp.status}).`,
+  }));
 
   return NextResponse.json(data, { status: backendResp.status });
 }

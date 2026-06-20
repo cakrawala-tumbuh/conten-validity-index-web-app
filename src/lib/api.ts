@@ -8,6 +8,7 @@
  * - Normalisasi error menjadi `ApiError` dengan status dan pesan yang konsisten.
  */
 import { API_TIMEOUT_MS } from "@/constants";
+import { triggerBlobDownload } from "@/lib/utils";
 
 /**
  * Error yang dilempar saat API mengembalikan response error.
@@ -157,10 +158,5 @@ export async function apiDownload(path: string, token: string, filename: string)
   }
 
   const blob = await response.blob();
-  const objectUrl = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = objectUrl;
-  anchor.download = filename;
-  anchor.click();
-  URL.revokeObjectURL(objectUrl);
+  triggerBlobDownload(blob, filename);
 }

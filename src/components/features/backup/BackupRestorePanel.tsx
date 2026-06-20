@@ -10,6 +10,7 @@
 import { useState } from "react";
 import { Download, Upload, AlertTriangle, CheckCircle2, RefreshCw } from "lucide-react";
 import { z } from "zod";
+import { triggerBlobDownload } from "@/lib/utils";
 import type { BackupData, RestoreResponse } from "@/types/backup";
 
 /**
@@ -54,12 +55,7 @@ export const BackupRestorePanel = () => {
         throw new Error(data.detail ?? `Gagal mengunduh backup (${resp.status}).`);
       }
       const blob = await resp.blob();
-      const url = URL.createObjectURL(blob);
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = `cvi-backup-${new Date().toISOString().slice(0, 10)}.json`;
-      anchor.click();
-      URL.revokeObjectURL(url);
+      triggerBlobDownload(blob, `cvi-backup-${new Date().toISOString().slice(0, 10)}.json`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal mengunduh backup.");
     } finally {
