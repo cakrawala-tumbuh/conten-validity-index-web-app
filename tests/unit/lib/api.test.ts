@@ -140,24 +140,24 @@ describe("apiRequest()", () => {
 describe("apiDownload()", () => {
   const mockCreateObjectURL = jest.fn(() => "blob:http://localhost/test");
   const mockRevokeObjectURL = jest.fn();
-  const mockClick = jest.fn();
+  let mockClick: jest.SpyInstance;
 
   beforeEach(() => {
+    jest.useFakeTimers();
     mockCreateObjectURL.mockClear();
     mockRevokeObjectURL.mockClear();
-    mockClick.mockClear();
 
     global.URL.createObjectURL = mockCreateObjectURL;
     global.URL.revokeObjectURL = mockRevokeObjectURL;
 
-    jest.spyOn(document, "createElement").mockReturnValue({
-      href: "",
-      download: "",
-      click: mockClick,
-    } as unknown as HTMLAnchorElement);
+    // Pakai anchor jsdom asli (punya `style` & dapat di-append ke DOM); hanya
+    // klik yang di-stub agar tidak memicu navigasi sungguhan.
+    mockClick = jest.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
   });
 
   afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
     jest.restoreAllMocks();
   });
 
@@ -180,6 +180,9 @@ describe("apiDownload()", () => {
     );
     expect(mockCreateObjectURL).toHaveBeenCalledWith(mockBlob);
     expect(mockClick).toHaveBeenCalled();
+    // revokeObjectURL ditunda agar unduhan sempat dimulai; flush timer dulu.
+    expect(mockRevokeObjectURL).not.toHaveBeenCalled();
+    jest.runAllTimers();
     expect(mockRevokeObjectURL).toHaveBeenCalledWith("blob:http://localhost/test");
   });
 
