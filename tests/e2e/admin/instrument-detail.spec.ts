@@ -106,7 +106,7 @@ test.describe("Halaman Detail Instrumen (Admin)", () => {
     await page.goto(`/instruments/${instrumentId}`);
     await expect(page.getByRole("button", { name: /informasi/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /item/i })).toBeVisible();
-    await expect(page.getByRole("button", { name: /expert/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^expert \(/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /hasil cvi/i })).toBeVisible();
   });
 
@@ -118,7 +118,7 @@ test.describe("Halaman Detail Instrumen (Admin)", () => {
 
   test("harus membuka tab Expert saat diklik", async ({ page }) => {
     await page.goto(`/instruments/${instrumentId}`);
-    await page.getByRole("button", { name: /expert/i }).click();
+    await page.getByRole("button", { name: /^expert \(/i }).click();
     await expect(page.getByText(/expert ditugaskan/i)).toBeVisible();
   });
 
@@ -232,7 +232,7 @@ test.describe("Halaman Detail Instrumen (Admin)", () => {
 
   test("Tab Expert: harus menampilkan jumlah expert yang ditugaskan", async ({ page }) => {
     await page.goto(`/instruments/${instrumentId}`);
-    await page.getByRole("button", { name: /expert/i }).click();
+    await page.getByRole("button", { name: /^expert \(/i }).click();
     await expect(page.getByText(/expert ditugaskan/i)).toBeVisible();
   });
 
@@ -240,7 +240,7 @@ test.describe("Halaman Detail Instrumen (Admin)", () => {
     page,
   }) => {
     await page.goto(`/instruments/${instrumentId}`);
-    await page.getByRole("button", { name: /expert/i }).click();
+    await page.getByRole("button", { name: /^expert \(/i }).click();
     // Tombol muncul hanya jika ada expert yang belum ditugaskan
     const assignBtn = page.getByRole("button", { name: /tugaskan expert/i });
     const noExpert = page.getByText(/tidak ada expert/i);
