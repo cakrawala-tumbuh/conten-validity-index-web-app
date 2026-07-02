@@ -8,7 +8,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Archive, Trash2, UserPlus } from "lucide-react";
+import { Archive, Eye, EyeOff, Trash2, UserPlus } from "lucide-react";
 import { ASSIGNMENT_STATUS_LABELS } from "@/constants";
 import type { AssignmentResponse, RevisionResult } from "@/types/expert-assignment";
 import type { UserResponse } from "@/types/user";
@@ -174,6 +174,34 @@ export const AssignmentManager = ({
     }
   };
 
+  /**
+   * Mengaktifkan/menonaktifkan penilaian seorang expert lalu menyegarkan tampilan.
+   *
+   * @param assignment - Assignment yang akan diubah statusnya.
+   */
+  const toggleActive = async (assignment: AssignmentResponse) => {
+    const action = assignment.is_active ? "deactivate" : "activate";
+    setLoading(true);
+    setError(null);
+    try {
+      const resp = await fetch(
+        `/api/instruments/${instrumentId}/assignments/${assignment.id}/${action}`,
+        { method: "POST" },
+      );
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        throw new Error(data.detail ?? "Gagal mengubah status penilaian.");
+      }
+      const updated: AssignmentResponse = await resp.json();
+      setAssignments((prev) => prev.map((a) => (a.id === updated.id ? updated : a)));
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Terjadi kesalahan.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       {/* Action bar */}
@@ -298,11 +326,21 @@ export const AssignmentManager = ({
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        <span
-                          className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[a.status] ?? "bg-gray-100 text-gray-600"}`}
-                        >
-                          {ASSIGNMENT_STATUS_LABELS[a.status] ?? a.status}
-                        </span>
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span
+                            className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${statusColor[a.status] ?? "bg-gray-100 text-gray-600"}`}
+                          >
+                            {ASSIGNMENT_STATUS_LABELS[a.status] ?? a.status}
+                          </span>
+                          {!a.is_active && (
+                            <span
+                              className="inline-flex rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-600"
+                              title="Penilaian ini dikecualikan dari kalkulasi CVI"
+                            >
+                              Nonaktif
+                            </span>
+                          )}
+                        </div>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-500">
                         {a.deadline
@@ -324,6 +362,23 @@ export const AssignmentManager = ({
                               title="Arsipkan & buat revisi baru"
                             >
                               <Archive className="h-4 w-4" />
+                            </button>
+                          )}
+                          {a.status !== "archived" && (
+                            <button
+                              type="button"
+                              onClick={() => toggleActive(a)}
+                              disabled={loading}
+                              className="rounded-md p-1.5 text-gray-400 hover:bg-slate-100 hover:text-slate-700 transition disabled:opacity-50"
+                              title={
+                                a.is_active ? "Nonaktifkan dari kalkulasi CVI" : "Aktifkan kembali"
+                              }
+                            >
+                              {a.is_active ? (
+                                <EyeOff className="h-4 w-4" />
+                              ) : (
+                                <Eye className="h-4 w-4" />
+                              )}
                             </button>
                           )}
                           <button
