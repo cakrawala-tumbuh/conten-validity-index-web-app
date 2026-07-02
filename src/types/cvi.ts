@@ -51,6 +51,8 @@ export interface ExpertRatingSummary {
   status: string;
   deadline: string | null;
   ratings: ItemRatingByExpert[];
+  /** True jika penilaian expert diperhitungkan dalam CVI. */
+  is_active: boolean;
 }
 
 /**

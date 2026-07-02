@@ -30,6 +30,7 @@ const mockAssignment: AssignmentResponse = {
   updated_at: "2024-01-01T00:00:00Z",
   previous_assignment_id: null,
   revision_number: 1,
+  is_active: true,
 };
 
 const mockItems: ItemResponse[] = [

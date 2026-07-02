@@ -30,6 +30,7 @@ const mockAssignments: AssignmentResponse[] = [
     updated_at: "2024-01-01T00:00:00Z",
     previous_assignment_id: null,
     revision_number: 1,
+    is_active: true,
   },
   {
     id: "asgn-2",
@@ -43,6 +44,7 @@ const mockAssignments: AssignmentResponse[] = [
     updated_at: "2024-02-01T00:00:00Z",
     previous_assignment_id: null,
     revision_number: 1,
+    is_active: true,
   },
 ];
 

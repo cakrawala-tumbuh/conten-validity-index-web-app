@@ -32,6 +32,8 @@ export interface AssignmentResponse {
   updated_at: string;
   previous_assignment_id: string | null;
   revision_number: number;
+  /** True jika penilaian diperhitungkan dalam CVI; false jika dinonaktifkan admin. */
+  is_active: boolean;
 }
 
 /**

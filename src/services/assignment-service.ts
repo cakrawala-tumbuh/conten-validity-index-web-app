@@ -125,3 +125,29 @@ export async function reviseAssignment(
     { method: "POST", token },
   );
 }
+
+/**
+ * Mengaktifkan atau menonaktifkan penilaian sebuah assignment (admin).
+ *
+ * Assignment yang dinonaktifkan dieksklusi dari kalkulasi CVI tanpa
+ * menghapus data penilaian yang sudah ada.
+ *
+ * @param token - Access token admin.
+ * @param instrumentId - ID instrumen.
+ * @param assignmentId - ID assignment.
+ * @param isActive - True untuk aktifkan, false untuk nonaktifkan.
+ * @returns Assignment yang sudah diperbarui.
+ * @throws {ApiError} Jika assignment tidak ditemukan (404) atau bukan admin (403).
+ */
+export async function setAssignmentActive(
+  token: string,
+  instrumentId: string,
+  assignmentId: string,
+  isActive: boolean,
+): Promise<AssignmentResponse> {
+  const action = isActive ? "activate" : "deactivate";
+  return apiRequest<AssignmentResponse>(
+    `/api/v1/instruments/${instrumentId}/assignments/${assignmentId}/${action}`,
+    { method: "POST", token },
+  );
+}

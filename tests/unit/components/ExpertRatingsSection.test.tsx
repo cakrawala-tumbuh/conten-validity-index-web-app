@@ -27,6 +27,7 @@ const makeResponse = (
       institution: "Universitas X",
       status: "completed",
       deadline: null,
+      is_active: true,
       ratings: [
         {
           item_id: "item-1",
@@ -290,6 +291,7 @@ describe("ExpertRatingsSection", () => {
       institution: null,
       status: "pending",
       deadline: null,
+      is_active: true,
       ratings: [
         {
           item_id: "item-1",

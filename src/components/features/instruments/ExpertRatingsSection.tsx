@@ -82,7 +82,17 @@ const ExpertCard = ({
             {expert.expert_name.charAt(0).toUpperCase()}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">{expert.expert_name}</p>
+            <div className="flex items-center gap-1.5">
+              <p className="text-sm font-medium text-gray-900 truncate">{expert.expert_name}</p>
+              {!expert.is_active && (
+                <span
+                  className="inline-flex flex-shrink-0 rounded-full bg-slate-200 px-2 py-0.5 text-xs font-medium text-slate-600"
+                  title="Penilaian expert ini dikecualikan dari kalkulasi CVI"
+                >
+                  Nonaktif (tidak dihitung)
+                </span>
+              )}
+            </div>
             {expert.institution && (
               <p className="text-xs text-gray-500 truncate">{expert.institution}</p>
             )}
