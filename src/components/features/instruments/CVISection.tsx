@@ -7,7 +7,7 @@
 "use client";
 
 import { useState } from "react";
-import { BarChart3, Download, RefreshCw } from "lucide-react";
+import { BarChart3, Download, FileText, RefreshCw } from "lucide-react";
 import {
   CVI_THRESHOLD_MANY_EXPERTS,
   CVI_THRESHOLD_FEW_EXPERTS,
@@ -51,6 +51,7 @@ export const CVISection = ({ instrumentId, instrumentName }: CVISectionProps) =>
   const [result, setResult] = useState<CVIResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   /**
@@ -100,6 +101,32 @@ export const CVISection = ({ instrumentId, instrumentName }: CVISectionProps) =>
     }
   };
 
+  /**
+   * Mengunduh hasil CVI sebagai file PDF.
+   */
+  const exportPdf = async () => {
+    setExportingPdf(true);
+    setError(null);
+    try {
+      const resp = await fetch(`/api/instruments/${instrumentId}/cvi/export/pdf`);
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        throw new Error(data.detail ?? `Gagal mengekspor PDF (${resp.status})`);
+      }
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `CVI-${instrumentName.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Gagal mengekspor PDF.");
+    } finally {
+      setExportingPdf(false);
+    }
+  };
+
   const validItemsCount = result ? result.items.filter((item) => item.is_valid).length : 0;
 
   return (
@@ -133,6 +160,17 @@ export const CVISection = ({ instrumentId, instrumentName }: CVISectionProps) =>
           >
             <Download className="h-4 w-4" />
             {exporting ? "Mengekspor..." : "Export Excel"}
+          </button>
+        )}
+        {result && (
+          <button
+            type="button"
+            onClick={exportPdf}
+            disabled={exportingPdf}
+            className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition disabled:opacity-50"
+          >
+            <FileText className="h-4 w-4" />
+            {exportingPdf ? "Mengekspor..." : "Export PDF"}
           </button>
         )}
       </div>

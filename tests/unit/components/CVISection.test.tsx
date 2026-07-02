@@ -199,6 +199,81 @@ describe("CVISection", () => {
     });
   });
 
+  it("harus menampilkan tombol Export PDF setelah hasil muncul", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        instrument_id: "inst-1",
+        n_experts: 5,
+        s_cvi_ave: 0.9,
+        s_cvi_ua: 0.85,
+        items: [],
+      }),
+    });
+    render(<CVISection instrumentId="inst-1" instrumentName="Instrumen A" />);
+    fireEvent.click(screen.getByRole("button", { name: /hitung cvi/i }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /export pdf/i })).toBeInTheDocument();
+    });
+  });
+
+  it("harus memanggil endpoint export pdf saat tombol Export PDF diklik", async () => {
+    // Pertama, hitung CVI
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        instrument_id: "inst-1",
+        n_experts: 3,
+        s_cvi_ave: 0.75,
+        s_cvi_ua: 0.7,
+        items: [],
+      }),
+    });
+    // Lalu, export PDF
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      blob: async () => new Blob(["data"], { type: "application/pdf" }),
+      json: async () => ({}),
+    });
+    render(<CVISection instrumentId="inst-1" instrumentName="Instrumen A" />);
+    fireEvent.click(screen.getByRole("button", { name: /hitung cvi/i }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /export pdf/i })).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByRole("button", { name: /export pdf/i }));
+    await waitFor(() => {
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("/api/instruments/inst-1/cvi/export/pdf"),
+      );
+    });
+  });
+
+  it("harus menampilkan error jika export pdf gagal", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        instrument_id: "inst-1",
+        n_experts: 3,
+        s_cvi_ave: 0.75,
+        s_cvi_ua: 0.7,
+        items: [],
+      }),
+    });
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      json: async () => ({ detail: "Gagal ekspor PDF" }),
+    });
+    render(<CVISection instrumentId="inst-1" instrumentName="Instrumen A" />);
+    fireEvent.click(screen.getByRole("button", { name: /hitung cvi/i }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /export pdf/i })).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByRole("button", { name: /export pdf/i }));
+    await waitFor(() => {
+      expect(screen.getByText("Gagal ekspor PDF")).toBeInTheDocument();
+    });
+  });
+
   it("harus menampilkan badge Tidak Valid untuk item dengan I-CVI rendah (banyak expert)", async () => {
     // n_experts=6 → threshold 0.78; i_cvi=0.5 → Tidak Valid
     mockFetch.mockResolvedValueOnce({
