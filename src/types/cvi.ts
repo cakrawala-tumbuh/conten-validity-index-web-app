@@ -14,6 +14,8 @@ export interface ItemCVIResult {
   content: string;
   /** ID domain/dimensi tempat item ini dikelompokkan. */
   domain_id: string | null;
+  /** Nama domain/dimensi item (untuk ditampilkan), null jika tanpa domain. */
+  domain_name: string | null;
   /** Jumlah expert yang menilai item ini. */
   n_experts: number;
   /** Jumlah expert yang menilai item relevan (skor 3 atau 4). */
