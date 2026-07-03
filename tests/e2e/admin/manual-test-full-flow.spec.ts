@@ -483,4 +483,25 @@ test.describe("Tes Manual: Alur Lengkap CVI (API Setup + UI Verification)", () =
     expect(download.suggestedFilename()).toMatch(/\.xlsx$/i);
     console.log(`[test] Download berhasil: ${download.suggestedFilename()}`);
   });
+
+  // ─── Test 6: verifikasi export PDF berhasil diunduh ──────────────────────
+
+  test("export PDF Instrumen A harus memulai unduhan file PDF", async ({ page }) => {
+    const id = createdIds["A"];
+    await page.goto(`/instruments/${id}`);
+    await page.getByRole("button", { name: /hasil cvi/i }).click();
+    await page.getByRole("button", { name: /hitung cvi/i }).click();
+
+    await expect(page.getByRole("button", { name: /export pdf/i })).toBeVisible({
+      timeout: 20_000,
+    });
+
+    const [download] = await Promise.all([
+      page.waitForEvent("download"),
+      page.getByRole("button", { name: /export pdf/i }).click(),
+    ]);
+
+    expect(download.suggestedFilename()).toMatch(/\.pdf$/i);
+    console.log(`[test] Download PDF berhasil: ${download.suggestedFilename()}`);
+  });
 });

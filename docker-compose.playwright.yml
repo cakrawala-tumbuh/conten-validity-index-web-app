@@ -180,9 +180,16 @@ services:
       - TEST_EXPERT_PASSWORD=${TEST_EXPERT_PASSWORD:-ExpertTest123!}
     volumes:
       - .:/app
+      # Volume terpisah untuk node_modules agar TIDAK tertimpa bind mount di
+      # atas (image mcr.microsoft.com/playwright generik, tidak menyertakan
+      # node_modules proyek ini) dan agar hasil `npm ci` tidak mengotori
+      # folder proyek di host (tetap di volume Docker, bukan bind mount).
+      - playwright_node_modules:/app/node_modules
     # Playwright menggunakan headless mode by default saat CI=true.
     # Tidak perlu xvfb-run atau DISPLAY.
-    command: npx playwright test
+    # npm ci wajib dijalankan di sini (bukan di image base) karena node_modules
+    # host tidak pernah dibuat (proyek ini tidak install dependency di host).
+    command: sh -c "npm ci && npx playwright test"
     depends_on:
       web:
         condition: service_healthy
@@ -190,3 +197,6 @@ services:
 networks:
   e2e-network:
     driver: bridge
+
+volumes:
+  playwright_node_modules:
