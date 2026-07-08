@@ -34,6 +34,8 @@ export interface ItemRatingByExpert {
   sequence_number: number;
   content: string;
   domain_id: string | null;
+  /** Nama domain/dimensi item (untuk ditampilkan), null jika tanpa domain. */
+  domain_name: string | null;
   /** Skor relevansi 1–4, atau null jika belum dinilai. */
   relevance_score: number | null;
   notes: string | null;

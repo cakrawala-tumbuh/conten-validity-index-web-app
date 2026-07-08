@@ -8,7 +8,7 @@
 "use client";
 
 import { useState } from "react";
-import { ClipboardList, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
+import { ClipboardList, ChevronDown, ChevronUp, RefreshCw, Download, FileText } from "lucide-react";
 import type { ExpertRatingSummary, InstrumentExpertRatingsResponse } from "@/types/cvi";
 import { TableInfoTooltip } from "@/components/ui/Tooltip";
 
@@ -54,28 +54,103 @@ const SCORE_COLORS: Record<number, string> = {
  *
  * @param props.expert - Data penilaian expert.
  * @param props.defaultOpen - Apakah kartu dibuka secara default.
+ * @param props.instrumentId - ID instrumen (untuk memanggil endpoint export).
+ * @param props.instrumentName - Nama instrumen (untuk nama berkas export).
  * @returns Kartu accordion penilaian expert.
  */
 const ExpertCard = ({
   expert,
   defaultOpen,
+  instrumentId,
+  instrumentName,
 }: {
   expert: ExpertRatingSummary;
   defaultOpen: boolean;
+  instrumentId: string;
+  instrumentName: string;
 }) => {
   const [open, setOpen] = useState(defaultOpen);
+  const [exporting, setExporting] = useState(false);
+  const [exportingPdf, setExportingPdf] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const ratedCount = expert.ratings.filter((r) => r.relevance_score !== null).length;
   const relevantCount = expert.ratings.filter((r) => r.is_relevant === true).length;
   const totalCount = expert.ratings.length;
 
+  /**
+   * Mengunduh penilaian expert ini sebagai berkas Excel melalui proxy route Next.js.
+   */
+  const exportExcel = async () => {
+    setExporting(true);
+    setExportError(null);
+    try {
+      const resp = await fetch(
+        `/api/instruments/${instrumentId}/assignments/${expert.assignment_id}/export`,
+      );
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        throw new Error(data.detail ?? `Gagal mengekspor penilaian (${resp.status})`);
+      }
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Rating-${expert.expert_name.replace(/[^a-zA-Z0-9]/g, "_")}-${instrumentName.replace(/[^a-zA-Z0-9]/g, "_")}.xlsx`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setExportError(err instanceof Error ? err.message : "Gagal mengekspor penilaian.");
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  /**
+   * Mengunduh penilaian expert ini sebagai berkas PDF melalui proxy route Next.js.
+   */
+  const exportPdf = async () => {
+    setExportingPdf(true);
+    setExportError(null);
+    try {
+      const resp = await fetch(
+        `/api/instruments/${instrumentId}/assignments/${expert.assignment_id}/export/pdf`,
+      );
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        throw new Error(data.detail ?? `Gagal mengekspor penilaian (${resp.status})`);
+      }
+      const blob = await resp.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Rating-${expert.expert_name.replace(/[^a-zA-Z0-9]/g, "_")}-${instrumentName.replace(/[^a-zA-Z0-9]/g, "_")}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setExportError(err instanceof Error ? err.message : "Gagal mengekspor penilaian.");
+    } finally {
+      setExportingPdf(false);
+    }
+  };
+
   return (
-    <div className="rounded-lg border border-gray-200 bg-white overflow-hidden">
+    <div
+      className="rounded-lg border border-gray-200 bg-white overflow-hidden"
+      data-testid={`expert-card-${expert.assignment_id}`}
+    >
       {/* Header accordion */}
-      <button
-        type="button"
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setOpen((prev) => !prev)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition"
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setOpen((prev) => !prev);
+          }
+        }}
+        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition cursor-pointer"
       >
         <div className="flex items-center gap-3 min-w-0">
           <div className="flex-shrink-0 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold text-sm">
@@ -99,7 +174,7 @@ const ExpertCard = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-3 flex-shrink-0 ml-3">
+        <div className="flex items-center gap-2 flex-shrink-0 ml-3">
           <span className="text-xs text-gray-500">
             {ratedCount}/{totalCount} dinilai &middot; {relevantCount} relevan
           </span>
@@ -108,13 +183,43 @@ const ExpertCard = ({
           >
             {STATUS_LABELS[expert.status] ?? expert.status}
           </span>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              void exportExcel();
+            }}
+            disabled={exporting}
+            title="Export Excel"
+            className="rounded-md p-1.5 text-gray-400 hover:bg-slate-100 hover:text-slate-700 transition disabled:opacity-50"
+          >
+            <Download className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              void exportPdf();
+            }}
+            disabled={exportingPdf}
+            title="Export PDF"
+            className="rounded-md p-1.5 text-gray-400 hover:bg-slate-100 hover:text-slate-700 transition disabled:opacity-50"
+          >
+            <FileText className="h-4 w-4" />
+          </button>
           {open ? (
             <ChevronUp className="h-4 w-4 text-gray-400" />
           ) : (
             <ChevronDown className="h-4 w-4 text-gray-400" />
           )}
         </div>
-      </button>
+      </div>
+
+      {exportError && (
+        <div className="border-t border-red-200 bg-red-50 px-4 py-2 text-xs text-red-700">
+          {exportError}
+        </div>
+      )}
 
       {/* Tabel penilaian per item */}
       {open && (
@@ -129,6 +234,9 @@ const ExpertCard = ({
                 <tr>
                   <th className="w-12 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                     No.
+                  </th>
+                  <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Domain
                   </th>
                   <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                     Konten Item
@@ -151,6 +259,9 @@ const ExpertCard = ({
                   >
                     <td className="px-4 py-2.5 text-sm text-gray-400 text-center">
                       {rating.sequence_number}
+                    </td>
+                    <td className="px-4 py-2.5 text-sm text-gray-600">
+                      {rating.domain_name ?? "-"}
                     </td>
                     <td className="px-4 py-2.5 text-sm text-gray-800">{rating.content}</td>
                     <td className="px-4 py-2.5 text-center">
@@ -268,7 +379,13 @@ export const ExpertRatingsSection = ({ instrumentId }: ExpertRatingsSectionProps
       {data && data.experts.length > 0 && (
         <div className="space-y-3">
           {data.experts.map((expert, idx) => (
-            <ExpertCard key={expert.assignment_id} expert={expert} defaultOpen={idx === 0} />
+            <ExpertCard
+              key={expert.assignment_id}
+              expert={expert}
+              defaultOpen={idx === 0}
+              instrumentId={instrumentId}
+              instrumentName={data.instrument_name}
+            />
           ))}
         </div>
       )}
